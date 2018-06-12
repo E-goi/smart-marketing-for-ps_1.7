@@ -20,6 +20,22 @@ class SmartMarketingPs extends Module
 	protected $error_msg;
 
 	/**
+	 * Custom Override file
+	 * 
+	 * @var string
+	 */
+	protected $custom_override = '/../../override/classes/WebserviceSpecificManagementEgoi.php';
+
+	/*public $tabs = array(
+        array(
+            'name' => 'Smart Marketing',
+            'class_name' => 'SmartMarketingPs',
+            'parent_class_name' => 'AdminDashboard',
+            'visible' => true,
+        )
+    );*/
+
+	/**
 	* Module Constructor
 	*/
 	public function __construct()
@@ -42,15 +58,25 @@ class SmartMarketingPs extends Module
 	    $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
 	    // media path
-	    $this->jspath = 'views/js/';
-        $this->csspath = 'views/css/';
+	    $this->jspath = 'views/assets/js/';
+        $this->csspath = 'views/assets/css/';
+
+        spl_autoload_register(array($this, 'autoloadApi'));
 
 	    if (!Configuration::get('SMART_MARKETING')) {
 	      	$this->warning = $this->l('No name provided');
 	    }
 
-	    $this->registerHook('displayHeader');
+	    $this->validateApiKey();
 	}
+
+	public function autoloadApi() 
+	{
+        $classFile = __DIR__ . '/lib/SmartApi.php';
+        if(is_file($classFile)){
+            include_once $classFile;
+        }
+    }
 
 	/**
 	 * Install App
@@ -59,8 +85,17 @@ class SmartMarketingPs extends Module
 	 */
 	public function install()
 	{
-	  	if (!parent::install() || !$this->installDb())
+	  	if (!parent::install() || !$this->installDb() || !$this->createMenu()
+	  		|| !$this->registerHook('actionObjectCustomerAddAfter')
+	  		|| !$this->registerHook('actionValidateOrder')
+	  		|| !$this->registerHook('displayTop')
+	  		|| !$this->registerHook('displayFooter')
+	  		|| !$this->registerHook('displayHeader')
+	  		|| !$this->registerHook('header'))
 	    	return false;
+
+	    // register WebService
+		//$this->registerWebService();
 	  	return true;
 	}
 
@@ -88,7 +123,23 @@ class SmartMarketingPs extends Module
      */
     protected function uninstallDb() 
 	{
-		
+		// drop all tables from the plugin
+		include __DIR__ . '/install/sql.php';
+    	foreach ($sql as $name => $v){
+       		Db::getInstance()->execute('DROP TABLE IF EXISTS '.$name);
+   		}
+
+   		// remove menus
+   		Db::getInstance()->delete('tab', "module = '$this->name'");
+   		Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account'");
+   		Db::getInstance()->delete('authorization_role', "slug like '%SMARTMARKETINGPS%'");
+
+   		// remove API Key in cache
+   		Configuration::deleteByName('smart_api_key');
+
+   		// remove custom override file
+   		@unlink(dirname(__FILE__).$this->custom_override);
+    	return true;
     }
 
 	/**
@@ -98,8 +149,9 @@ class SmartMarketingPs extends Module
 	 */
 	public function uninstall()
 	{
-	  	if (!parent::uninstall() || !Configuration::deleteByName('SMART_MARKETING') || !$this->uninstallDb())
+	  	if (!parent::uninstall() || !$this->uninstallDb() || !$this->deleteMenu())
 	    	return false;
+
 	  	return true;
 	}
 
@@ -130,9 +182,91 @@ class SmartMarketingPs extends Module
      * 
      * @return void
      */
-    public function hookDisplayHeader() 
+    public function hookDisplayHeader($params) 
 	{
 		$this->context->controller->addCSS(($this->_path.$this->csspath). 'main.css');
+		$this->context->controller->addJS(($this->_path.$this->jspath). 'config.js');
+	}
+
+	public function hookHeader() 
+	{
+		$this->context->controller->addCSS(($this->_path.$this->csspath). 'main.css');
+		$this->context->controller->addJS(($this->_path.$this->jspath). 'config.js');
+	}
+
+	/**
+	 * Register WebService Overrides
+	 * 
+	 * @return bool
+	 */
+	public function registerWebService() 
+	{
+		$sql = array(
+			'key' => md5(time()),
+			'class_name' => "WebserviceRequest",
+			'description' => "E-goi",
+			'active' => 1
+		);
+		Db::getInstance()->insert('webservice_account', $sql);
+
+		$sql = 'SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"';
+		$row = Db::getInstance()->executeS($sql);
+
+		if(!empty($row)) {
+			$id_webservice = $row[0]['id_webservice_account'];
+
+			// add webservice relation
+			Db::getInstance()->insert('webservice_account_shop', 
+				array(
+					'id_webservice_account' => $id_webservice,
+					'id_shop' => 1,
+				)
+			);
+
+			// assign webservice permissions
+			Db::getInstance()->insert('webservice_permission', 
+				array(
+					'id_webservice_account' => $id_webservice,
+					'resource' => 'egoi',
+					'method' => "GET",
+				)
+			);
+
+			// install custom overrides
+			$this->installSmartOverrides();
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Uninstall WebService Overrides
+	 * 
+	 * @return bool
+	 */
+	public function uninstallWebService() 
+	{
+		$sql = 'SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"';
+		$row = Db::getInstance()->executeS($sql);
+
+		if(!empty($row)) {
+			$id_webservice = $row[0]['id_webservice_account'];
+			$sql = 'DELETE FROM '._DB_PREFIX_.'webservice_account WHERE id_webservice_account="'.$id_webservice.'"';
+			Db::getInstance()->executeS($sql);
+
+			// remove webservice from Shop
+			$sql = 'DELETE FROM '._DB_PREFIX_.'webservice_account_shop WHERE id_webservice_account="'.$id_webservice.'"';
+			Db::getInstance()->executeS($sql);
+
+			// remove webservice permissions
+			$sql = 'DELETE FROM '._DB_PREFIX_.'webservice_permission WHERE id_webservice_account="'.$id_webservice.'"';
+			Db::getInstance()->executeS($sql);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -141,8 +275,8 @@ class SmartMarketingPs extends Module
 	 * @return string
 	 */
 	public function getContent()
-	{	 
-	    if (Tools::isSubmit('submit_egoi')) {
+	{
+	    if (Tools::isSubmit('submit_api_key')) {
 
 	    	$api_key = Tools::getValue('smart_api_key');
 	    	
@@ -151,15 +285,8 @@ class SmartMarketingPs extends Module
 	        
 	        if (!sizeof($this->_errors)) {
                 Configuration::updateValue('smart_api_key', ($api_key));
-                $this->success_msg = $this->displayConfirmation('API Key saved and updated');
+                $this->success_msg = $this->displayConfirmation($this->l('API Key saved and updated'));
             }
-
-	        /*if (!$my_module_name || empty($my_module_name) || !Validate::isGenericName($my_module_name)) {
-	            $output .= $this->displayError($this->l('Invalid Configuration value'));
-	        } else{
-	            Configuration::updateValue('SMART_MARKETING', $my_module_name);
-	            $output .= $this->displayConfirmation($this->l('Settings updated'));
-	        }*/
 	    }
 	    return $this->displayForm();
 	}
@@ -171,78 +298,59 @@ class SmartMarketingPs extends Module
 	 */
 	public function displayForm() 
 	{
-	    $h = new HelperForm();
-
-	    // Module, token and currentIndex
-	    $h->module = $this;
-	    $h->name_controller = $this->name;
-	    $h->token = Tools::getAdminTokenLite('AdminModules');
-	    $h->currentIndex = AdminController::$currentIndex.'&configure='.$this->name;
-
-	    // Language
-	    $h->default_form_language = (int)Configuration::get('PS_LANG_DEFAULT');
-
-	    // Title and toolbar
-	    $h->title = 'E-goi Configuration';
-	    $h->show_toolbar = true;
-	    $h->toolbar_scroll = true;
-	    $h->submit_action = 'submit'.$this->name;
-	    $h->toolbar_btn = array(
-			'save' => array(
-			    'desc' => $this->l('Save'),
-			    'href' => AdminController::$currentIndex.'&configure='.$this->name.'&save'.$this->name.
-			    '&token='.Tools::getAdminTokenLite('AdminModules'),
-			),
-			'back' => array(
-			    'href' => AdminController::$currentIndex.'&token='.Tools::getAdminTokenLite('AdminModules'),
-			    'desc' => $this->l('Back to list')
-			)
-	    );
-
         $this->smarty->assign('success_msg', $this->success_msg);
         $this->smarty->assign('error_msg', $this->error_msg);
         $this->smarty->assign('smart_api_key_error', Configuration::get('smart_api_key') ? false : true);
-
-	    // Load current value
-	    $h->fields_value['smart_api_key'] = Configuration::get('smart_api_key');
 
 	    return $this->display($this->name, 'views/templates/admin/config.tpl');
 	}
 
 	/**
-	 * Create menus
+	 * Validate Api Key
+	 * 
+	 * @return void
+	 */
+	public function validateApiKey()
+	{
+		if(isset($_POST["api_key"]) && ($_POST["api_key"])) {
+
+	        $api = new SmartApi($_POST["api_key"]);
+	        $clientData = $api->getClientData();
+
+	        if(isset($clientData['CLIENTE_ID']) && ($clientData['CLIENTE_ID'])) {
+	        	echo json_encode($clientData);
+	        	exit;
+	        }else{
+	        	header('HTTP/1.1 403 Forbidden');
+				exit;
+	        }
+		}
+	}
+
+	/**
+	 * Create menu
 	 * 
 	 * @return type
 	 */
-	private function createMenu() 
+	private function createMenu()
 	{
-		$mainTab = Tab::getInstanceFromClassName('EgoiforPs');
-
 		$subtabs = array(
-			'Account' => array('1'=> $this->l('My Account')),
-			'Lists' => array('1' => $this->l('My Lists')),
-           	'Subscribers' => array('1' => $this->l('My Subscribers')),
-			'Forms' => array('1' => $this->l('My Forms'))
+			'Account' => array('1' => $this->l('Account'))
 		);
 
-		$res = true;
+		$mainTab = Tab::getInstanceFromClassName('SmartMarketingPs');
+		$mainTab->active = 1;
+		$mainTab->class_name = 'SmartMarketingPs';
+		$mainTab->id_parent = 0;
+		$mainTab->module = $this->name;
+		$mainTab->name = $this->createMultiLangField('Smart Marketing');
+		$mainTab->save();
 
-		if(!Validate::isLoadedObject($mainTab)) {
-			$mainTab->active = 1;
-			$mainTab->class_name = 'EgoiforPs';
-			$mainTab->id_parent = 0;
-			$mainTab->module = $this->name;
-			$mainTab->name = $this->createMultiLangField('Smart Marketing');
-			$res &= $mainTab->save();
-			$mainTab = Tab::getInstanceFromClassName('EgoiforPs');
+		foreach($subtabs as $className => $menuName) {
+			$this->createSubmenu($mainTab->id, $menuName[1], $className);
 		}
 
-		if($subtabs)
-    		foreach($subtabs as $className => $menuName) {
-    			$res &= $this->createSubmenu($mainTab->id, $menuName, $className);
-    		}
-
-		return $res;
+		return true;
 	}
 
 	/**
@@ -262,7 +370,7 @@ class SmartMarketingPs extends Module
 			$subTab->class_name = $className;
 			$subTab->id_parent = $parentId;
 			$subTab->module = $this->name;
-			$subTab->name = $this->createMultiLangFieldHard($menuName);
+			$subTab->name = $this->createMultiLangField($menuName);
 			return $subTab->save();
 
 		}else if($subTab->id_parent != $parentId) {
@@ -280,18 +388,13 @@ class SmartMarketingPs extends Module
 	 */
 	private function deleteMenu() 
 	{
-		Tab::getInstanceFromClassName('EgoiforPs');
 		$subtabs = array(
-			'Account',
-			'Lists',
-            'Subscribers',
-            'Forms'
+			'Account'
 		);
-		$res = true;
 
 		if($subtabs){
 			foreach($subtabs as $className) {
-				$res &= $this->deleteSubmenu($className);
+				$this->deleteSubmenu($className);
 			}
         }
 
@@ -309,6 +412,43 @@ class SmartMarketingPs extends Module
 		$subTab = Tab::getInstanceFromClassName($className);
 		return $subTab->delete();
 	}
+
+	/**
+     * Process Overrides
+     * 
+     * @return void
+     */
+    private function installSmartOverrides()
+    {
+    	exec('cp '.dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php '.dirname(__FILE__).'/../../override/classes/webservice/');
+		exec('rm -f '.dirname(__FILE__).'/../../cache/class_index.php');
+    }
+
+    /**
+     * Remove overrides
+     * 
+     * @return void
+     */
+    private function uninstallSmartOverrides()
+    {
+    	exec('rm -f '.dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
+    }
+
+    /**
+     * Create an array with language key name and respective field
+     * 
+     * @param $field
+     * @return array
+     */
+    private function createMultiLangField($field) 
+    {
+    	$res = array();
+		$languages = Language::getLanguages();
+		foreach ($languages as $lang)
+		    $res[$lang['id_lang']] = $field;
+
+		return $res;
+   	}
 
 
 }

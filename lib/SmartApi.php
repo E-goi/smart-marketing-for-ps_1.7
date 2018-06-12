@@ -29,19 +29,10 @@ class SmartApi
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct($apikey = false)
     {
         $this->client = new SoapClient($this->api_url);
-    }
-
-    /**
-     * Get API Key
-     *
-     * @return string
-     */
-    public function getApiKey()
-    {
-        return $this->apiKey ? $this->apiKey : Configuration::get('smart_api_key');
+        $this->apiKey = $this->apiKey ?: (Configuration::get('smart_api_key') ?: $apikey);
     }
 
     /**
@@ -52,8 +43,8 @@ class SmartApi
     private function getSoapParams()
     {
         return array(
-            'apikey'     => $this->getApiKey(),
-            'plugin_key' => self::PLUGIN_KEY,
+            'apikey' => $this->apiKey,
+            'plugin_key' => $this->plugin_key
         );
     }
 
@@ -91,7 +82,7 @@ class SmartApi
             'idioma_lista' => $lang,
         );
 
-        $result = $this->_client->createList(array_merge($this->getSoapParams(), $params));
+        $result = $this->client->createList(array_merge($this->getSoapParams(), $params));
         if (isset($result['ERROR'])) {
             return $result['ERROR'];
         } else {
@@ -107,8 +98,7 @@ class SmartApi
      */
     public function getLists()
     {
-
-        return $this->_client->getLists($this->getSoapParams());
+        return $this->client->getLists($this->getSoapParams());
     }
 
     /**
@@ -118,8 +108,7 @@ class SmartApi
      */
     public function getForms($listId = '', $option = false)
     {
-
-        $forms = $this->_client->getForms(array_merge($this->getSoapParams(), array('listID' => $listId)));
+        $forms = $this->client->getForms(array_merge($this->getSoapParams(), array('listID' => $listId)));
 
         if ($option) {
             $array = array();
@@ -141,7 +130,7 @@ class SmartApi
     public function getSubscribersFromListId($listId, $option = '')
     {
 
-        $subs = $this->_client->subscriberData(array_merge($this->getSoapParams(), array('listID' => $listId, 'subscriber' => 'all_subscribers')));
+        $subs = $this->client->subscriberData(array_merge($this->getSoapParams(), array('listID' => $listId, 'subscriber' => 'all_subscribers')));
         if ($option) {
             $array_subs = array();
             foreach ($subs['subscriber'] as $key => $subscriber) {
@@ -165,7 +154,7 @@ class SmartApi
      */
     public function getSubscriber($listId, $email)
     {
-        return $this->_client->subscriberData(array_merge($this->getSoapParams(), array('listID' => $listId, 'subscriber' => $email)));
+        return $this->client->subscriberData(array_merge($this->getSoapParams(), array('listID' => $listId, 'subscriber' => $email)));
     }
 
     /**
@@ -176,7 +165,7 @@ class SmartApi
      */
     public function getAllSubscribers($listId)
     {
-        $subs  = $this->_client->subscriberData(array_merge($this->getSoapParams(), array('listID' => $listId, 'subscriber' => 'all_subscribers')));
+        $subs  = $this->client->subscriberData(array_merge($this->getSoapParams(), array('listID' => $listId, 'subscriber' => 'all_subscribers')));
         $count = 0;
         foreach ($subs['subscriber'] as $key => $subscriber) {
             if ($subscriber['STATUS'] != '2') {
@@ -218,7 +207,7 @@ class SmartApi
             $params = array_merge($params, $extraFields);
         }
 
-        $result = $this->_client->addSubscriber(array_merge($this->getSoapParams(), $params));
+        $result = $this->client->addSubscriber(array_merge($this->getSoapParams(), $params));
 
         if (isset($result['ERROR'])) {
             return false;
@@ -245,7 +234,7 @@ class SmartApi
             'tags'         => array($tag),
         );
 
-        $result = $this->_client->addSubscriberBulk(array_merge($this->getSoapParams(), $params));
+        $result = $this->client->addSubscriberBulk(array_merge($this->getSoapParams(), $params));
         return true;
     }
 
@@ -296,7 +285,7 @@ class SmartApi
             }
         }
 
-        return $this->_client->addSubscriber(array_merge($this->getSoapParams(), $params));
+        return $this->client->addSubscriber(array_merge($this->getSoapParams(), $params));
     }
 
     /**
@@ -328,7 +317,7 @@ class SmartApi
             }
         }
 
-        return $this->_client->editSubscriber(array_merge($this->getSoapParams(), $params));
+        return $this->client->editSubscriber(array_merge($this->getSoapParams(), $params));
     }
 
     /**
@@ -345,7 +334,7 @@ class SmartApi
             'subscriber' => $email,
         );
 
-        return $this->_client->removeSubscriber(array_merge($this->getSoapParams(), $params));
+        return $this->client->removeSubscriber(array_merge($this->getSoapParams(), $params));
     }
 
     /**
@@ -364,7 +353,7 @@ class SmartApi
             'type'   => $type,
         );
 
-        $result = $this->_client->addExtraField(array_merge($this->getSoapParams(), $params));
+        $result = $this->client->addExtraField(array_merge($this->getSoapParams(), $params));
 
         if (isset($result['ERROR'])) {
             return false;
@@ -416,8 +405,8 @@ class SmartApi
             'listID' => $listID,
         );
 
-        $result_client = $this->_client->getExtraFields(array_merge($this->getSoapParams(), $params));
-        return $result_client['extra_fields'];
+        $resultclient = $this->client->getExtraFields(array_merge($this->getSoapParams(), $params));
+        return $resultclient['extra_fields'];
     }
 
     /**
@@ -431,7 +420,7 @@ class SmartApi
         $params = array(
             'name' => $name,
         );
-        return $this->_client->addTag(array_merge($this->getSoapParams(), $params));
+        return $this->client->addTag(array_merge($this->getSoapParams(), $params));
     }
 
     /**
@@ -441,7 +430,7 @@ class SmartApi
      */
     public function getTags()
     {
-        $result = $this->_client->getTags(array_merge($this->getSoapParams()));
+        $result = $this->client->getTags(array_merge($this->getSoapParams()));
         return $result['TAG_LIST'];
     }
 
