@@ -13,10 +13,10 @@ class AccountController extends SmartMarketingBaseController
 	 */
 	public function __construct()
 	{
+		parent::__construct();
+
 		$this->bootstrap = true;
 		$this->cfg = 0;
-		
-		parent::__construct();
 		
 		$this->meta_title = $this->l('My Account').' - '.$this->module->displayName;
 		if (!$this->module->active)
@@ -31,10 +31,8 @@ class AccountController extends SmartMarketingBaseController
 	public function initContent()
 	{
 		parent::initContent();
-		
-		$this->assign('config', $this->cfg);
 
-		if($this->has_api_key) {
+		if ($this->isValid()) {
 			
 			$api = new SmartApi();
 			if($data = $api->getClientData()) {
@@ -45,17 +43,13 @@ class AccountController extends SmartMarketingBaseController
 
 			$this->getLists();
 			$this->assign('content', $this->fetch('account.tpl'));
-
-		}else{
-			$this->assign('smart_api_key_error', true);
-			$this->assign('content', $this->fetch('errors.tpl'));
 		}
 	}
 
 	/**
 	 * Get all lists from this Account
 	 * 
-	 * @return [type] [description]
+	 * @return void
 	 */
 	protected function getLists() 
 	{
