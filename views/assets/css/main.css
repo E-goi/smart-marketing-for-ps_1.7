@@ -1,0 +1,162 @@
+#valid, #active{
+   background: url('../img/check.png') no-repeat;
+   display: inline-block;
+   width: 20px;
+   height: 20px;
+   background-size: 20px;
+   vertical-align: inherit;
+}
+#error, #inactive{
+   background: url('../img/error.png') no-repeat;
+   display: inline-block;
+   width: 20px;
+   height: 20px;
+   background-size: 20px;
+   vertical-align: inherit;
+}
+#load, #load_map, #valid_sync{
+   background: url('../img/loader.gif') no-repeat;
+   display: inline-block;
+   width: 15px;
+   height: 15px;
+   background-size: 15px;
+   vertical-align: inherit;
+}
+
+.col_map{
+   margin-top: 10%;
+}
+
+.bootstrap.panel{
+   margin-top: 13%;
+   margin-bottom: -10%;
+}
+
+.form_name_egoi{
+   float: right;
+   width: 75%;
+   padding-bottom: 30px;
+}
+.form_egoi_main{
+   float: right;
+   width: 75%;
+}
+.msg{
+   padding: 10px;
+}
+.sett, .reg{
+   padding: 22px;
+}
+
+.register{
+   float:right;
+   margin-top: -10px;
+   width: 75%;
+}
+
+.form, .list, .hide_form, .enable, .styles{
+   float:right;
+   margin-top: -10px;
+   padding-bottom: 20px;
+   width: 75%;
+}
+.list-group-item{
+   cursor:pointer;
+}
+
+.input_block{  
+   width: 10% !important;
+   display: inline-block !important;
+}
+
+
+.egoi.panel-heading{
+   height: 40px !important;
+}
+
+.img_account{
+   background: url('../img/myaccount.png') no-repeat;
+   padding-left: 30px;
+   padding-bottom: 20px;
+   font-size: 14px;
+}
+.img_lists{
+   background: url('../img/mylists.png') no-repeat;
+   padding-left: 30px;
+   padding-bottom: 20px;
+   font-size: 14px;
+}
+.img_forms{
+   background: url('../img/myforms.png') no-repeat;
+   padding-left: 30px;
+   padding-bottom: 20px;
+   font-size: 14px;
+}
+.img_subs{
+   background: url('../img/mysubscribers.png') no-repeat;
+   padding-left: 30px;
+   padding-bottom: 20px;
+   font-size: 14px;
+}
+
+.baseline{
+   vertical-align: -webkit-baseline-middle;
+   vertical-align: -moz-baseline-middle;
+   vertical-align: -ms-baseline-middle;
+   font-size: 1rem;
+}
+
+#account, #lists, #subs, #forms{
+   vertical-align: -webkit-baseline-middle;
+   vertical-align: -moz-baseline-middle;
+   padding: 10px;
+   font-size: 1.2rem !important;
+}
+
+#egoi-table tbody>tr>td{
+   line-height: 26px !important;
+}
+
+.egoi-td{
+   padding: 0px !important;
+   line-height: 3 !important;
+   border: none !important;
+}
+
+#egoi-subs-table tbody>tr>td{
+   border: none !important;
+}
+
+.egoi-save{
+   display: block; 
+   width: 30px;
+   height: 30px; 
+   margin: 0 auto; 
+   font-size: 28px; 
+   background: transparent; 
+   background-size: 26px;
+   background-position: center;
+}
+
+.egoi-b{
+   font-size: 14px;
+   vertical-align: -webkit-baseline-middle;
+   vertical-align: -moz-baseline-middle;
+}
+
+.egoi-help{
+   font-style: italic;
+}
+
+#egoi-map-icon{
+   font-size: 1em !important;
+}
+
+.egoi-map-header{
+   background-color: #25b9d7;
+
+}
+
+.egoi-title{
+   color: #fff !important;
+}
