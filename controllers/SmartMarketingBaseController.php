@@ -17,6 +17,11 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	protected $has_api_key;
 
 	/**
+	 * @var object
+	 */
+	protected $api;
+
+	/**
 	 * By default check if is a configuration page
 	 * 
 	 * @var integer
@@ -41,16 +46,26 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	}
 
 	/**
+	 * Activate E-goi API
+	 * 
+	 * @return void
+	 */
+	protected function activateApi()
+	{
+		$this->api = new SmartApi;
+	}
+
+	/**
 	 * Validate errors from base content
 	 * 
 	 * @return bool
 	 */
-	public function isValid()
+	protected function isValid()
 	{
 		$this->assign('config', $this->cfg);
 
 		// check if not have account configured
-		if(!$this->has_api_key) {
+		if (!$this->has_api_key) {
 			$this->assign('smart_api_key_error', true);
 			$this->assign('content', $this->fetch('errors.tpl'));
 			return false;
@@ -65,7 +80,7 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	 * @param  string $template
 	 * @return mixed  
 	 */
-	public function fetch($template) 
+	protected function fetch($template) 
 	{
 		return $this->context->smarty->fetch(
 			$this->module->getTemplatePath('views/templates/admin/'.$template)
@@ -79,7 +94,7 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	 * @param  string $value
 	 * @return object
 	 */
-	public function assign($key, $value) 
+	protected function assign($key, $value) 
 	{
 		return $this->context->smarty->assign($key, $value);
 	}
@@ -90,7 +105,7 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	 * @param  string $message
 	 * @return void
 	 */
-	public function displaySuccess($message)
+	protected function displaySuccess($message)
 	{
 		$this->confirmations = array($message);
 	}
@@ -101,7 +116,7 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	 * @param  string $message
 	 * @return void        
 	 */
-	public function displayWarning($message)
+	protected function displayWarning($message)
 	{
 		return parent::displayWarning($message);
 	}

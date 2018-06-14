@@ -56,9 +56,6 @@ class FormsController extends SmartMarketingBaseController
 
 		$this->formId = Tools::getIsset('form') ? (int)Tools::getValue('form') : false;
 
-		// delete form if is defined
-		$this->deleteForm();
-
 		if (!$this->module->active)
 			Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
 	}
@@ -96,7 +93,7 @@ class FormsController extends SmartMarketingBaseController
 			    'icon' => 'process-icon-new',
 			    'href' => '#',
 			    'desc' => $this->l('Add new Form'),
-			    'js' => $this->l('$( \'#add-form\' ).click();')
+			    'js' => $this->l('$( \'#add-form\' ).trigger("click");')
 			);
         }
     }
@@ -114,7 +111,10 @@ class FormsController extends SmartMarketingBaseController
 
 			if(!empty($_POST)) {
 				$this->saveForm();
-			}		
+			}
+
+			// delete form if is defined
+			$this->deleteForm();
 
 			$forms = Db::getInstance(_PS_USE_SQL_SLAVE_)
 						->executeS('SELECT * FROM '._DB_PREFIX_.'egoi_forms');
@@ -174,7 +174,7 @@ class FormsController extends SmartMarketingBaseController
 			$client = $client_data['CLIENTE_ID'];
 			
 			$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
-						->getRow('SELECT * FROM '._DB_PREFIX_.'egoi_forms WHERE form_id='.(int)$post['form_id']);
+						->getRow('SELECT * FROM '._DB_PREFIX_.'egoi_forms WHERE form_id='.(int)$this->formId);
 
 			foreach ($post as $key => $value) {
 				$this->formOptions[$key] = is_numeric($value) ? (int)$value : pSQL($value);
@@ -182,7 +182,7 @@ class FormsController extends SmartMarketingBaseController
 
 			if($res['form_id']) {
 				$this->assign('success_message', $this->displaySuccess($this->l('Form settings updated')));
-				return Db::getInstance()->update('egoi_forms', $this->formOptions, "form_id = ".(int)$form_id);
+				return Db::getInstance()->update('egoi_forms', $this->formOptions, "form_id = ".(int)$this->formId);
 			}else{
 				$this->assign('success_message', $this->displaySuccess($this->l('Form settings saved')));
 				return Db::getInstance()->insert('egoi_forms', $this->formOptions);
@@ -199,8 +199,9 @@ class FormsController extends SmartMarketingBaseController
 	 */
 	protected function deleteForm()
 	{
-		if(isset($_POST['del']) && ($_POST['del']) && ($this->formId)) {
-			if (base64_decode($_POST['del']) == $this->formId) {
+		if(isset($_GET['del']) && ($_GET['del']) && ($this->formId)) {
+			if (base64_decode($_GET['del']) == $this->formId) {
+				$this->assign('success_message', $this->displaySuccess($this->l('Form deleted')));
 				return Db::getInstance()->delete('egoi_forms', 'form_id='.(int)$this->formId);
 			}
 		}

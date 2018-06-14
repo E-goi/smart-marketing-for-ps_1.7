@@ -15,6 +15,9 @@ class AccountController extends SmartMarketingBaseController
 	{
 		parent::__construct();
 
+		// instantiate API
+		$this->activateApi();
+
 		$this->bootstrap = true;
 		$this->cfg = 0;
 		
@@ -34,8 +37,7 @@ class AccountController extends SmartMarketingBaseController
 
 		if ($this->isValid()) {
 			
-			$api = new SmartApi();
-			if($data = $api->getClientData()) {
+			if($data = $this->api->getClientData()) {
 				$this->assign('clientData', $data);
 			} else {
 				$this->assign('clientData', false);
@@ -58,8 +60,7 @@ class AccountController extends SmartMarketingBaseController
 			$msg = $this->postList();
 		}
 		
-		$api = new SmartApi();
-		if($data = $api->getLists()) {
+		if($data = $this->api->getLists()) {
 			$this->assign('lists', $data);
 		} else {
 			$this->assign('lists', false);
@@ -84,11 +85,10 @@ class AccountController extends SmartMarketingBaseController
 	 */
 	protected function postList() 
 	{
-		$name = $_POST['egoi_ps_title'];
+		$name = trim($_POST['egoi_ps_title']);
 		$lang = $_POST['egoi_ps_lang'];
 
-		$api = new EgoiAPIV2();
-		$result = $api->createList($name, $lang);
+		$result = $this->api->createList($name, $lang);
 		if($result) {
 			return $result;
 		}

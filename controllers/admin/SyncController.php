@@ -15,6 +15,9 @@ class SyncController extends SmartMarketingBaseController
 	{
 		parent::__construct();
 
+		// instantiate API
+		$this->activateApi();
+
 		$this->bootstrap = true;
 		$this->cfg = 0;
 		$this->meta_title = $this->l('E-goi Sync Contacts').' - '.$this->module->displayName;
@@ -35,7 +38,6 @@ class SyncController extends SmartMarketingBaseController
 	public function setMedia()
 	{
 		$this->addJS($this->_path. '/views/assets/js/sync.js');
-
 		return parent::setMedia();
 	}
 
@@ -70,10 +72,7 @@ class SyncController extends SmartMarketingBaseController
 				$this->saveSync();
 			}
 
-			$api = new SmartApi();
-
-			$data_lists = $api->getLists();
-			$this->assign('lists', $data_lists);
+			$this->assign('lists', $this->api->getLists());
 
 			$rq = Db::getInstance(_PS_USE_SQL_SLAVE_)
 					->getRow('SELECT * FROM '._DB_PREFIX_.'egoi where client_id!="" order by egoi_id DESC');
@@ -87,7 +86,7 @@ class SyncController extends SmartMarketingBaseController
 
 			if(isset($list_id) && ($list_id)) {
 				
-				$this->assign('subscribers', $api->getSubscribersFromListId($list_id));
+				$this->assign('subscribers', $this->api->getSubscribersFromListId($list_id));
 				$this->assign('list_id', $list_id);
 				$this->assign('sync', $sync);
 				$this->assign('track', $track);
@@ -103,7 +102,7 @@ class SyncController extends SmartMarketingBaseController
 					'birth_date' => 'Birth Date'
 				);
 
-				foreach($api->getExtraFields($list_id) as $key => $extra_field) {
+				foreach($this->api->getExtraFields($list_id) as $key => $extra_field) {
 					$egoi_fields['extra_'.$key] = $extra_field['NAME'];
 				}
 				
@@ -114,7 +113,7 @@ class SyncController extends SmartMarketingBaseController
 
 				$this->assign('select', $option);
 				
-				$mapped_fields = $api->getMappedFields();
+				$mapped_fields = $this->api->getMappedFields();
 				$this->assign('mapped_fields', $mapped_fields);
 			}
 
@@ -138,8 +137,7 @@ class SyncController extends SmartMarketingBaseController
 			$track = isset($_POST['track']) ? $_POST['track'] : 1;
 
 			// compare client ID -> API with DB
-			$api = new SmartApi();
-			$client_data = $api->getClientData();
+			$client_data = $this->api->getClientData();
 			$client = $client_data['CLIENTE_ID'];
 
 			$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
