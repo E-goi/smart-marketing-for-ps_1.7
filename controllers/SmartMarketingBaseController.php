@@ -14,6 +14,11 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	/**
 	 * @var string
 	 */
+	protected $admin_path = _PS_ADMIN_DIR_;
+
+	/**
+	 * @var string
+	 */
 	protected $has_api_key;
 
 	/**
@@ -120,6 +125,35 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	{
 		return parent::displayWarning($message);
 	}
+
+	/**
+	 * Get custom Controller Route
+	 * 
+	 * @param  string $controller
+	 * @param  string $withAdmin
+	 * @return string
+	 */
+	protected function getControllerRoute($controller, $withAdmin = false)
+	{
+		if ($withAdmin) {
+			$path = explode('/', $this->admin_path);
+		 	$adminPath = array_pop($path);
+		 	return $adminPath.'/index.php?controller='.$controller.'&token='.Tools::getAdminTokenLite($controller);
+		}
+
+		return 'index.php?controller='.$controller.'&token='.Tools::getAdminTokenLite($controller);
+	}
+
+	/**
+	 * Redirect to custom Controller
+	 * 
+	 * @param url
+	 * @return mixed
+	 */
+	protected function redirectTo($url)
+    {
+        return Tools::redirectAdmin($url);
+    }
 
 	/**
 	 * Redirect to Configuration Page on Failure

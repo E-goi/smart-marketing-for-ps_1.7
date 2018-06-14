@@ -22,7 +22,7 @@ class FormsController extends SmartMarketingBaseController
 		'enable' => '', 
 		'form_title' => '', 
 		'form_content' => '', 
-		'boot' => '', 
+		'is_bootstrap' => '', 
 		'msg_gen' => '', 
 		'msg_invalid' => '',
 		'msg_exists' => '', 
@@ -201,8 +201,15 @@ class FormsController extends SmartMarketingBaseController
 	{
 		if(isset($_GET['del']) && ($_GET['del']) && ($this->formId)) {
 			if (base64_decode($_GET['del']) == $this->formId) {
-				$this->assign('success_message', $this->displaySuccess($this->l('Form deleted')));
-				return Db::getInstance()->delete('egoi_forms', 'form_id='.(int)$this->formId);
+				
+				$res = Db::getInstance()->delete('egoi_forms', 'form_id='.(int)$this->formId);
+				if ($res) {
+					$this->assign('success_message', $this->displaySuccess($this->l('Form deleted')));
+					return $this->redirectTo($this->getControllerRoute('Forms'));
+				}
+
+				$this->assign('error_message', $this->displayError($this->l('Error')));
+				return false;
 			}
 		}
 	}
