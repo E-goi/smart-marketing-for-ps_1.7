@@ -136,9 +136,9 @@
 						</div>
 						<p>{l s='Use Bootstrap?' mod='smartmarketingps'} &nbsp;
 							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="boot" id="doptin0" value="1" {if $boot eq '1'} checked {/if}>
+								<input type="radio" name="is_bootstrap" id="doptin0" value="1" {if $is_bootstrap eq '1'} checked {/if}>
 								<label for="doptin0">{l s='Yes' mod='smartmarketingps'}</label>
-								<input type="radio" name="boot" id="doptin1" value="0" {if $boot eq '0' or $boot eq ''} checked {/if}>
+								<input type="radio" name="is_bootstrap" id="doptin1" value="0" {if $is_bootstrap eq '0' or $is_bootstrap eq ''} checked {/if}>
 								<label for="doptin1">{l s='No' mod='smartmarketingps'}</label>
 								<a class="slide-button btn"></a>
 							</span>
@@ -369,7 +369,7 @@
 							</td>
 							<td>
 								<a href="{$smarty.server.REQUEST_URI}&form={$forms.form_id}&type={$forms.form_type}">
-									<i class="icon-edit egoi-icon"></i>
+									<i class="material-icons action-enabled egoi-icon">edit</i>
 								</a>
 							</td>
 							<td>
