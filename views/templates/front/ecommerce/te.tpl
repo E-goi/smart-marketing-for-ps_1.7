@@ -1,5 +1,5 @@
 	
 
 {if isset($activate) and ($activate eq 1)}
-	{$te}
+	{$te nofilter}
 {/if}

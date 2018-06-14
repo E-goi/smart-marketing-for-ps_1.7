@@ -373,7 +373,7 @@
 								</a>
 							</td>
 							<td>
-								<a id="del-form" href="{$smarty.server.REQUEST_URI}&form={$forms.form_id}&del={base64_encode($forms.form_id)}">
+								<a class="del-form" href="{$smarty.server.REQUEST_URI}&form={$forms.form_id}&del={base64_encode($forms.form_id)}">
 									{l s='Delete' mod='smartmarketingps'}
 								</a>
 							</td>

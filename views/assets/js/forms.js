@@ -53,7 +53,7 @@ $(document).ready(function() {
 
 	});
 
-	$('#del-form').click(function(e) {
+	$('.del-form').click(function(e) {
 		e.preventDefault();
 
 		var text = $('#del-info').text();

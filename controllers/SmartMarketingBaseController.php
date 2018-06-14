@@ -51,6 +51,19 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	}
 
 	/**
+     * Inject Dependencies
+     * 
+     * @return void
+     */
+	public function setMedia() 
+	{
+		$this->addJquery();
+		$this->addCSS($this->_path. '/views/assets/css/main.css');
+		$this->addJS($this->_path. '/views/assets/js/config.js');
+		return parent::setMedia();
+    }
+
+	/**
 	 * Activate E-goi API
 	 * 
 	 * @return void

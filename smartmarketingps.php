@@ -68,8 +68,20 @@ class SmartMarketingPs extends Module
 	    }
 
 	    $this->validateApiKey();
+		
+		$this->registerHook('cart');
+		$this->registerHook('actionCartSave');
+
+		if(Tools::getIsset('id_cart') && (Tools::getValue('id_order')) && (Tools::getValue('key'))) {
+			$this->teOrder();
+		}
 	}
 
+	/**
+	 * Autoload API
+	 * 
+	 * @return void
+	 */
 	public function autoloadApi() 
 	{
         $classFile = __DIR__ . '/lib/SmartApi.php';
@@ -85,7 +97,7 @@ class SmartMarketingPs extends Module
 	 */
 	public function install()
 	{
-	  	if (!parent::install() || !$this->installDb() || !$this->createMenu()
+	  	if (!parent::install() || !$this->installDb() //|| !$this->createMenu()
 	  		|| !$this->registerHook('actionObjectCustomerAddAfter')
 	  		|| !$this->registerHook('actionValidateOrder')
 	  		|| !$this->registerHook('displayTop')
@@ -149,7 +161,7 @@ class SmartMarketingPs extends Module
 	 */
 	public function uninstall()
 	{
-	  	if (!parent::uninstall() || !$this->uninstallDb() || !$this->deleteMenu())
+	  	if (!parent::uninstall() || !$this->uninstallDb())
 	    	return false;
 
 	  	return true;
@@ -177,23 +189,6 @@ class SmartMarketingPs extends Module
         return parent::disable($force_all);
     }
 
-    /**
-     * Dependencies
-     * 
-     * @return void
-     */
-    public function hookDisplayHeader($params) 
-	{
-		$this->context->controller->addCSS(($this->_path.$this->csspath). 'main.css');
-		$this->context->controller->addJS(($this->_path.$this->jspath). 'config.js');
-	}
-
-	public function hookHeader() 
-	{
-		$this->context->controller->addCSS(($this->_path.$this->csspath). 'main.css');
-		$this->context->controller->addJS(($this->_path.$this->jspath). 'config.js');
-	}
-
 	/**
 	 * Register WebService Overrides
 	 * 
@@ -201,19 +196,18 @@ class SmartMarketingPs extends Module
 	 */
 	public function registerWebService() 
 	{
-		$sql = array(
+		Db::getInstance()->insert('webservice_account', array(
 			'key' => md5(time()),
 			'class_name' => "WebserviceRequest",
 			'description' => "E-goi",
 			'active' => 1
-		);
-		Db::getInstance()->insert('webservice_account', $sql);
+		));
 
-		$sql = 'SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"';
-		$row = Db::getInstance()->executeS($sql);
+		$row = Db::getInstance()
+					->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
 
 		if(!empty($row)) {
-			$id_webservice = $row[0]['id_webservice_account'];
+			$id_webservice = $row['id_webservice_account'];
 
 			// add webservice relation
 			Db::getInstance()->insert('webservice_account_shop', 
@@ -247,21 +241,18 @@ class SmartMarketingPs extends Module
 	 */
 	public function uninstallWebService() 
 	{
-		$sql = 'SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"';
-		$row = Db::getInstance()->executeS($sql);
+		$row = Db::getInstance()
+					->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
 
 		if(!empty($row)) {
-			$id_webservice = $row[0]['id_webservice_account'];
-			$sql = 'DELETE FROM '._DB_PREFIX_.'webservice_account WHERE id_webservice_account="'.$id_webservice.'"';
-			Db::getInstance()->executeS($sql);
+			$qry_webservice = 'id_webservice_account="'.$row['id_webservice_account'].'"';
+			Db::getInstance()->delete('webservice_account', $qry_webservice);
 
 			// remove webservice from Shop
-			$sql = 'DELETE FROM '._DB_PREFIX_.'webservice_account_shop WHERE id_webservice_account="'.$id_webservice.'"';
-			Db::getInstance()->executeS($sql);
+			Db::getInstance()->delete('webservice_account_shop', $qry_webservice);
 
 			// remove webservice permissions
-			$sql = 'DELETE FROM '._DB_PREFIX_.'webservice_permission WHERE id_webservice_account="'.$id_webservice.'"';
-			Db::getInstance()->executeS($sql);
+			Db::getInstance()->delete('webservice_permission', $qry_webservice);
 
 			return true;
 		}
@@ -335,7 +326,9 @@ class SmartMarketingPs extends Module
 	private function createMenu()
 	{
 		$subtabs = array(
-			'Account' => array('1' => $this->l('Account'))
+			'Account' => array('1' => $this->l('Account')),
+			'Sync' => array('1' => $this->l('Sync Contacts')),
+			'Forms' => array('1' => $this->l('Capture Contacts'))
 		);
 
 		$mainTab = Tab::getInstanceFromClassName('SmartMarketingPs');
@@ -381,25 +374,37 @@ class SmartMarketingPs extends Module
 		return true;
 	}
 
+	public function installTab()
+    {
+        $tab = new Tab();
+        $tab->active = 1;
+        $tab->class_name = 'SmartMarketingPs';
+        $tab->name = array();
+        foreach (Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = 'Smart Marketing';
+        }
+        
+        $tab->id_parent = 0;
+        $tab->module = $this->name;
+        return $tab->add();
+    }
+
 	/**
 	 * Delete menu
 	 * 
 	 * @return bool
 	 */
-	private function deleteMenu() 
-	{
-		$subtabs = array(
-			'Account'
-		);
-
-		if($subtabs){
-			foreach($subtabs as $className) {
-				$this->deleteSubmenu($className);
-			}
+	public function uninstallTab()
+    {
+        $id_tab = (int)Tab::getIdFromClassName('SmartMarketingPs');
+        
+        if ($id_tab) {
+            $tab = new Tab($id_tab);
+            return $tab->delete();
+        } else {
+            return false;
         }
-
-        return true;
-	}
+    }
 
 	/**
 	 * Delete submenu
@@ -411,6 +416,253 @@ class SmartMarketingPs extends Module
 	{
 		$subTab = Tab::getInstanceFromClassName($className);
 		return $subTab->delete();
+	}
+
+	/**
+   	 * Hook for display content in Top Page
+   	 * 
+   	 * @param array $params
+   	 * @return mixed
+   	 */
+   	public function hookDisplayTop($params)
+   	{
+		if(isset($_SESSION['order']) && ($_SESSION['order'])) {
+			unset($_SESSION['order']);
+		}else{
+
+			// assign t&e vars
+			$this->assign(
+		      	array(
+		          	'te' => $this->te(),
+		          	'activate' => 1
+		      	)
+		  	);
+			
+			// check if this block is activated 
+			if($this->processBlockOptions('header')) {
+				return $this->display(__FILE__, 'smartmarketingps.tpl');
+			}
+		}
+
+		return $this->display(__FILE__, 'ecommerce/te.tpl');
+	}
+
+	/**
+	 * Hook for display content in Bottom Page
+	 * 
+	 * @param  array $params
+	 * @return mixed        
+	 */
+	public function hookDisplayFooter($params)
+	{
+		// check if this block is activated 
+		if($this->processBlockOptions('footer')) {
+			return $this->display(__FILE__, 'smartmarketingps.tpl');
+		}
+	}
+
+	/**
+	 * Hook for display content in Home Page
+	 * 
+	 * @param  array $params
+	 * @return mixed
+	 */
+	public function hookDisplayHome($params)
+	{
+		// check if this block is activated 
+		if($this->processBlockOptions('home', 
+			array(
+	          'popup' => $popup,
+	          'once' => $once
+	      	))
+		) {
+			return $this->display(__FILE__, 'smartmarketingps.tpl');
+		}
+	}
+
+	/**
+	 * Track&Engage - Abandoned Cart
+	 * 
+	 * @return string|bool
+	 */
+	public function te()
+	{
+		$res = $this->getTrackingAuthorization();
+		if (!empty($res)) {
+			$list_id = $res['list_id'];
+			$client = $res['client_id'];
+			$track = $res['track'];
+			
+			if($client && $list_id && $track) {
+
+				// set customer email var to use in t&e
+				$customer = $this->context->cookie->email;
+
+				$cart = new Cart($this->getCartId($this->getCustomerId()));
+				$products = $cart->getProducts();
+
+				$this->removeCart();
+
+				include 'includes/te.php';
+				return $te;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Abandoned cart hook
+	 * 
+	 * @param  array $params
+	 * @return void        
+	 */
+	public function hookActionCartSave($params) 
+	{
+		$this->addToCart($params);
+	}
+
+	/**
+	 * Abandoned cart hook
+	 * 
+	 * @param  array $params
+	 * @return void        
+	 */
+	public function hookCart($params) 
+	{
+		$this->addToCart($params);
+	}
+
+	/**
+	 * Add to Cart
+	 * 
+	 * @param array $params
+	 */
+	protected function addToCart($params) 
+	{
+	 	$json = is_array($params['json']) ? json_decode($params['json']['id']) : $params['cookie']->id_cart;
+
+	 	$res = $this->getTrackingAuthorization();
+
+		if (!empty($res)) {
+			$list_id = $sql['list_id'];
+			$track = $sql['track'];
+			$client = $sql['client_id'];
+			if($client && $track && $list_id){
+
+				// check if customer has products in the cart (has cart ID?)
+				if(isset($json) && ($json)) {
+					$idc = $this->getCustomerId();
+
+					if($this->getCartId($idc)) {
+						Db::getInstance()->insert('egoi_customers', array(
+							'customer' => $idc,
+							'id_cart' => (int)$json,
+							'estado' => 1
+						));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Track&Engage - TrackOrder
+	 * 
+	 * @return void
+	 */
+	public function teOrder() 
+	{
+		$res = $this->getTrackingAuthorization();
+
+		if (!empty($res)) {
+			$list_id = $sql['list_id'];
+			$track = $sql['track'];
+			$client = $sql['client_id'];
+
+			if($client && $track && $list_id) {
+
+				$cart = new Cart(Tools::getValue('id_cart'));
+				$customer = $this->context->cookie->email;
+
+				$order = $this->getOrderDetails(Tools::getValue('id_order'));
+				$order_id = $order['reference'];
+				$order_total = number_format($order['total_paid'], 0);
+				$order_subtotal = number_format($order['total_paid_tax_excl'], 0);
+				$order_tax = number_format($order['total_shipping'], 1);
+				$order_shipping = number_format($order['total_wrapping'], 1);
+				$order_discount = $order['total_discounts'];
+				$products = $cart->getProducts();
+
+				include 'includes/te.php';
+
+				$this->assign(
+			      	array(
+			          	'te' => $te,
+		          		'activate' => 1
+			      	)
+			  	);
+				
+				$_SESSION['order'] = 1;
+				$this->removeCart();
+			}
+		}
+	}
+
+	/**
+	 * Check for Tracking authorization
+	 * 
+	 * @return array|null
+	 */
+	private function getTrackingAuthorization()
+	{
+		return Db::getInstance(_PS_USE_SQL_SLAVE_)
+					->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id != "" and track="1" order by egoi_id DESC');
+	}
+
+	/**
+	 * Get Cart ID from Customer Id
+	 * 
+	 * @param  $customerId
+	 * @return mixed
+	 */
+	private function getCartId($customerId) 
+	{
+		return Db::getInstance(_PS_USE_SQL_SLAVE_)
+					->getValue("SELECT id_cart FROM "._DB_PREFIX_."egoi_customers WHERE customer='".$customerId."'");
+	}
+
+	/**
+	 * Get Order details from ID 
+	 * 
+	 * @param int $orderId
+	 * @return mixed     
+	 */
+	private function getOrderDetails($orderId)
+	{
+		return Db::getInstance(_PS_USE_SQL_SLAVE_)
+					->getRow("SELECT * FROM "._DB_PREFIX_."orders WHERE id_cart='$orderId' OR id_order='$orderId'");
+	}
+
+	/**
+	 * Get current customer ID from cookie or from session
+	 * 
+	 * @return int|null
+	 */
+	private function getCustomerId() 
+	{
+		return (int)$this->context->cookie->id_customer ?: (int)session_id();
+	}
+
+	/**
+	 * Remove customer cart from DB
+	 * 
+	 * @return bool
+	 */
+	private function removeCart() 
+	{
+		$idc = $this->getCustomerId();
+		return Db::getInstance()->delete('egoi_customers', "customer='$idc'");
 	}
 
 	/**
@@ -434,7 +686,54 @@ class SmartMarketingPs extends Module
     	exec('rm -f '.dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
     }
 
-    /**
+   	/**
+   	 * Process Block Options
+   	 * 
+   	 * @param  $blockName
+   	 * @param  $optionalArgs
+   	 * @return void
+   	 */
+   	private function processBlockOptions($blockName, $optionalArgs = false)
+   	{
+   		$block = 'block_'.$blockName;
+   		$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
+					->getRow('SELECT * FROM '._DB_PREFIX_.'egoi_forms WHERE '.$block.'="1"');
+		if (!empty($res)) {
+
+			$this->assign(
+		      	array(
+	          		'form_id' => $res['form_id'],
+		          	'bootstrap' => $res['bootstrap'],
+		          	'form_title' => $res['form_title'],
+		          	$block => $res[$block],
+		          	'form_type' => $form_type
+		      	)
+		  	);
+
+			if (!empty($optionalArgs) && is_array($optionalArgs)) {
+				$this->assign($optionalArgs);
+			}
+
+			/*if($res['popup']) {
+				$once = $res['once'];
+			} */
+
+			if($res['form_type'] == 'iframe') {
+				$content = '<iframe src="http://'.$res['url'].'" width="'.$res['style_width'].'" height="'.$res['style_height'].'" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>';
+			}else{
+				$content = html_entity_decode($res['content']);
+			}
+
+			if ($res['enable']) {
+				$this->assign('content', $content);
+				return true;
+			}
+		}
+
+		return false;
+   	}
+
+   	/**
      * Create an array with language key name and respective field
      * 
      * @param $field
@@ -449,6 +748,24 @@ class SmartMarketingPs extends Module
 
 		return $res;
    	}
+
+   	/**
+   	 * @param  array|bool $values
+   	 * @return void        
+   	 */
+   	private function assign($values, $key = false) 
+   	{
+    	if(!empty($values) && is_array($values)){
+	        foreach ($values as $key => $value) {
+	        	$this->smarty->assign($key, $value);
+	        }
+
+	    }else{
+	    	if ($key) {
+	    		$this->smarty->assign($key, $values);
+			}
+	    }
+    }
 
 
 }
