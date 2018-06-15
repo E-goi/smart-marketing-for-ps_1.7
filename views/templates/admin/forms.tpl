@@ -1,5 +1,5 @@
 
-{include file='./errors.tpl'}
+{include file='./alerts.tpl'}
 
 	<style>
 		.table {

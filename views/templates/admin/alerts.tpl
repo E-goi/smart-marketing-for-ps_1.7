@@ -3,6 +3,10 @@
 	{$error_msg}
 {/if}
 
+{if isset($success_msg) and ($success_msg)}
+	{$success_msg}
+{/if}
+
 {if isset($smart_api_key_error) and ($smart_api_key_error) and (!$config)}
 <div class="alert alert-warning" style="text-align:center;">
 	<p>

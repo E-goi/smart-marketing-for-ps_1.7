@@ -25,7 +25,43 @@ class AccountController extends SmartMarketingBaseController
 		if (!$this->module->active)
 			Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
 	}
+
+	/**
+     * Inject Dependencies
+     * 
+     * @return void
+     */
+	public function setMedia() 
+	{
+		parent::setMedia();
+		$this->addJS($this->_path. '/views/assets/js/account.js');
+    }
 	
+	 /**
+	 * Toolbar settings
+	 * 
+	 * @return void
+	 */
+	public function initPageHeaderToolbar()
+    {
+        parent::initPageHeaderToolbar();
+    	$this->page_header_toolbar_btn['new-list'] = array(
+		    'short' => $this->l('New List E-goi'),
+		    'icon' => 'process-icon-new',
+		    'href' => '#',
+		    'desc' => $this->l('New List E-goi'),
+		    'js' => $this->l('$( \'#add-list\' ).trigger("click");')
+		);
+
+    	$this->page_header_toolbar_btn['goto-egoi'] = array(
+		    'short' => $this->l('Go to E-goi'),
+		    'icon' => 'icon-external-link',
+		    'href' => 'https://login.egoiapp.com',
+		    'desc' => $this->l('Go to E-goi'),
+		    'js' => $this->l('$( \'#save-form\' ).click();')
+		);
+    }
+
 	/**
 	 * Initiate content
 	 * 
@@ -60,15 +96,11 @@ class AccountController extends SmartMarketingBaseController
 			$msg = $this->postList();
 		}
 		
-		if($data = $this->api->getLists()) {
-			$this->assign('lists', $data);
-		} else {
-			$this->assign('lists', false);
-		}
+		$this->assign('lists', $this->api->getLists() ?: false);
 
-		if($msg){
+		if($msg) {
 			if(is_numeric($msg)){
-				$this->assign('success_message', $msg);
+				$this->assign('success_message', 'ok');
 			}else{
 				$this->assign('error_message', $msg);
 			}
@@ -85,12 +117,14 @@ class AccountController extends SmartMarketingBaseController
 	 */
 	protected function postList() 
 	{
-		$name = trim($_POST['egoi_ps_title']);
-		$lang = $_POST['egoi_ps_lang'];
+		if (isset($_POST['add-list']) && ($_POST['add-list'])) {
+			$name = trim($_POST['egoi_ps_title']);
+			$lang = $_POST['egoi_ps_lang'];
 
-		$result = $this->api->createList($name, $lang);
-		if($result) {
-			return $result;
+			$result = $this->api->createList($name, $lang);
+			if($result) {
+				return $result;
+			}
 		}
 		return false;
 	}

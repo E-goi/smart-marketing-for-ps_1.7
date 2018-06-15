@@ -1,5 +1,5 @@
 
-{include file='./errors.tpl'}
+{include file='./alerts.tpl'}
 
 	
 {if isset($success_message) and ($success_message)}
@@ -39,7 +39,6 @@
 			<tr valign="top">
 				<th class="egoi-td" scope="row">{l s='Sync customers with this list' mod='smartmarketingps'}</th>
 				<td>
-
 					{if !$lists}
 						{l s='No lists found, are you connected to E-goi and/or have created lists?' mod='smartmarketingps'}
 					{else}
@@ -60,7 +59,6 @@
 						</select>
 						<p>{l s='Select the list to synchronize your PS customers base with.' mod='smartmarketingps'}</p>
 					{/if}
-
 				</td>
 			</tr>
 
@@ -103,7 +101,7 @@
 					<th class="egoi-td" scope="row">{l s='Sync existing customers' mod='smartmarketingps'}</th>
 					<td>
 						<button type="button" class="btn btn-info" id="button_old_subs">{l s='Sync Customers' mod='smartmarketingps'}</button>
-						<span class="loading"></span>
+						<span class="sync_customers"></span>
 						<p class="help">{l s='Sync already existing PrestaShop customers to E-goi List' mod='smartmarketingps'}</p>
 					</td>
 				</tr>

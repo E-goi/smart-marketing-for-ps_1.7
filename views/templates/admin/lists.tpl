@@ -1,12 +1,4 @@
 
-	{if isset($list_error_message) and ($list_error_message)}
-		{l s='Error:' mod='smartmarketingps'} {$egoi_error_message}
-	{/if}
-
-	{if isset($list_success_message) and ($list_success_message)}
-		{l s='List successfully created' mod='smartmarketingps'}
-	{/if}
-
 	<div class="panel">
 		<div class="egoi panel-heading"><span class="icon-list" id="lists"></span> <span class="baseline">{l s='My Lists' mod='smartmarketingps'}</span></div>
 		{if $lists}
@@ -41,14 +33,14 @@
 			<p>&nbsp;</p>
 
 			<h3>{l s='Create another list' mod='smartmarketingps'}</h3>
-			<form name='egoi_ps_createlist_form' method='post' action=''>
+			<form method="post">
 				<table class="table">
 				<tr>
 					<td>
 						<label for="egoi_ps_title">{l s='Name' mod='smartmarketingps'}</label>
 					</td>
 					<td>
-						<input type='text' size='60' name='egoi_ps_title' required="required" />
+						<input type='text' size='60' name='egoi_ps_title' id="egoi_ps_title" required="required" />
 					</td>
 				</tr>
 				<tr>
@@ -64,17 +56,12 @@
 						</select>
 					</td>
 				</tr>
-				<tr>
-					<td colspan="2" align="left">
-					<button type='submit' class="btn btn-primary" id='egoi_ps_createlist'>
-						<span class="icon-plus"></span> {l s='New List' mod='smartmarketingps'}
-					</button>
-					</td>
-				</tr>
 				</table>
+
+				<input type="submit" id="add-list" name="add-list" value="1" style="display: none;">
 			</form>
 		{else}
-			{l s='Error retrieving lists form E-goi' mod='smartmarketingps'}
+			{l s='Error retrieving lists from E-goi' mod='smartmarketingps'}
 		{/if}
 	</div>
 

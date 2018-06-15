@@ -67,8 +67,8 @@ class FormsController extends SmartMarketingBaseController
      */
 	public function setMedia() 
 	{
+		parent::setMedia();
 		$this->addJS($this->_path. '/views/assets/js/forms.js');
-		return parent::setMedia();
     }
 
     /**

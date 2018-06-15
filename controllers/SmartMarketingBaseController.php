@@ -59,7 +59,6 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	{
 		$this->addJquery();
 		$this->addCSS($this->_path. '/views/assets/css/main.css');
-		$this->addJS($this->_path. '/views/assets/js/config.js');
 		return parent::setMedia();
     }
 
@@ -85,7 +84,7 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 		// check if not have account configured
 		if (!$this->has_api_key) {
 			$this->assign('smart_api_key_error', true);
-			$this->assign('content', $this->fetch('errors.tpl'));
+			$this->assign('content', $this->fetch('alerts.tpl'));
 			return false;
 		}
 

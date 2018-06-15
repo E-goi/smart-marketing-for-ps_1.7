@@ -1,5 +1,5 @@
 
-{include file='./errors.tpl' config='true'}
+{include file='./alerts.tpl' config='true'}
 
 {if isset($success_msg) and ($success_msg)}
 	{$success_msg}
@@ -34,9 +34,12 @@
 
 		<div class="form-group">
 			<p>&nbsp;</p>
+			{l s='To get your API Key, login into your' mod='egoiforps'} <a target="_blank" href="https://login.egoiapp.com">BO Panel</a>, {l s='go to your user menu (upper right corner), select "Integrations" and copy the account API key' mod='smartmarketingps'}
+		</div>
+
+		<div class="form-group">
 			<input type="submit" name="submit_api_key" id="apikey_submit" value="{l s='Save' mod='smartmarketingps'}" class="btn btn-primary" style="display: none;" />
 			<a class="btn btn-default" id="account_button">{l s='Go to My Account' mod='smartmarketingps'} <span class="icon-external-link"></span></a>
-			<a target="_blank" href="https://login.egoiapp.com">{l s='Go to E-goi' mod='smartmarketingps'}</a>
 		</div>
 
 	</div>

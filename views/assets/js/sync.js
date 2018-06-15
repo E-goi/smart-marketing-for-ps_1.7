@@ -25,20 +25,21 @@ $(document).ready(function() {
 		var token_list = '1';
 		$('.loading').prop('id', 'load');
 
-			$.ajax({
-			    type: 'POST',
-			    data:({
-			        token_list: token_list,
-			        subs: subs
-			    }),
-			    success:function(data, status) {
-			    	$('.loading').prop('id', 'valid');
-			    },
-			    error:function(status){
-			    	$('.loading').prop('id', 'error');
-			    }
-			});
-
+		$.ajax({
+		    type: 'POST',
+		    data:({
+		        token_list: token_list,
+		        subs: subs
+		    }),
+		    success:function(data, status) {
+		    	if (data) {
+		    		$('.loading').prop('id', 'valid');
+		    	}
+		    },
+		    error:function(status){
+		    	$('.loading').prop('id', 'error');
+		    }
+		});
 	});
 
 	$('#ps_fields').change(function() {

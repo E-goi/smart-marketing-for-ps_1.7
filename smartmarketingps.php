@@ -26,15 +26,6 @@ class SmartMarketingPs extends Module
 	 */
 	protected $custom_override = '/../../override/classes/WebserviceSpecificManagementEgoi.php';
 
-	/*public $tabs = array(
-        array(
-            'name' => 'Smart Marketing',
-            'class_name' => 'SmartMarketingPs',
-            'parent_class_name' => 'AdminDashboard',
-            'visible' => true,
-        )
-    );*/
-
 	/**
 	* Module Constructor
 	*/
@@ -57,18 +48,26 @@ class SmartMarketingPs extends Module
 	   	// on uninstall
 	    $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
-	    // media path
-	    $this->jspath = 'views/assets/js/';
-        $this->csspath = 'views/assets/css/';
-
         spl_autoload_register(array($this, 'autoloadApi'));
 
 	    if (!Configuration::get('SMART_MARKETING')) {
 	      	$this->warning = $this->l('No name provided');
 	    }
 
+	    if(isset($_POST['deleteMode']) && ($_POST['deleteMode'] == 'real')){
+			$this->deleteCustomer();
+		}
+
+		if(isset($_GET['conf']) && ($_GET['conf'] == '4')) {
+			$this->updateCustomer();
+		}
+
+		if(isset($_POST['smart_api_key']) && ($_POST['smart_api_key'])){
+			$this->addClientId($_POST);
+		}
 	    $this->validateApiKey();
 		
+		// register hooks
 		$this->registerHook('cart');
 		$this->registerHook('actionCartSave');
 
@@ -101,9 +100,7 @@ class SmartMarketingPs extends Module
 	  		|| !$this->registerHook('actionObjectCustomerAddAfter')
 	  		|| !$this->registerHook('actionValidateOrder')
 	  		|| !$this->registerHook('displayTop')
-	  		|| !$this->registerHook('displayFooter')
-	  		|| !$this->registerHook('displayHeader')
-	  		|| !$this->registerHook('header'))
+	  		|| !$this->registerHook('displayFooter'))
 	    	return false;
 
 	    // register WebService
@@ -289,9 +286,10 @@ class SmartMarketingPs extends Module
 	 */
 	public function displayForm() 
 	{
-        $this->smarty->assign('success_msg', $this->success_msg);
-        $this->smarty->assign('error_msg', $this->error_msg);
-        $this->smarty->assign('smart_api_key_error', Configuration::get('smart_api_key') ? false : true);
+		$this->context->controller->addJS($this->_path. 'views/assets/js/config.js');
+        $this->assign($this->success_msg, 'success_msg');
+        $this->assign($this->error_msg, 'error_msg');
+        $this->assign(Configuration::get('smart_api_key') ? false : true, 'smart_api_key_error');
 
 	    return $this->display($this->name, 'views/templates/admin/config.tpl');
 	}
@@ -419,6 +417,153 @@ class SmartMarketingPs extends Module
 	}
 
 	/**
+    * Hook for Add customer
+    *
+    * @param array $params
+    * @return void
+    */
+    public function hookActionObjectCustomerAddAfter($params) 
+    {
+		return $this->addCustomer($params);
+	}
+
+	/**
+	 * Add customer
+	 * 
+	 * @param  $params
+	 * @return bool
+	 */
+	protected function addCustomer($params)
+	{
+		$api = new SmartApi();
+
+		$fields = array(
+			'email' => $params['object']->email
+		);
+		foreach ($params['object'] as $key => $value) {
+			$row = $api->getFieldMap(0, $key);
+			if($row) {
+				$fields[$row] = $value;
+			}
+		}
+		
+		$client_data = $api->getClientData();
+		$client = (int)$client_data['CLIENTE_ID'];
+
+		$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
+					->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id='.$client);		
+		
+		if($res['sync']) {
+
+			$fields['listID'] = $res['list_id'];
+			$fields['validate_email'] = '0';
+
+			/*if($res['doptin'] == '1') {
+				$fields['formID'] = $res['form_id'];
+			}*/
+
+			if($params['object']->newsletter == '0') {
+				$name = 'NO_Newsletter';
+				$get_tags = $api->getTags($name);
+				
+				
+				$tag = '';
+				foreach ($get_tags as $tags){
+					if($tags['NAME'] == $name) {
+						$tag = $tags['ID'];
+					}
+				}
+
+				if (!$tag) {
+					$add_tag = $api->addTag($name);
+					$tag = $add_tag['ID'];
+				}
+			}
+
+			$add = $api->addSubscriber($fields, array($tag));
+			if(isset($add['ERROR']) && ($add['ERROR'])) {
+				return false;
+			}		
+			
+			return Db::getInstance()->update('egoi', 
+				array(
+					'total' => (int)$res['total']
+				), "client_id = $client");
+		}
+	}
+
+	/**
+	 * Update customer
+	 * 
+	 * @return void
+	 */
+	protected function updateCustomer()
+	{
+		$res = $this->getClientData();
+		if($res['sync']) {
+
+			$id = isset($_GET['id_customer']) ? $_GET['id_customer'] : '';
+			if($id) {
+				$customer = new Customer((int)$id);
+
+				$fields = array();
+				foreach ($customer as $key => $value) {
+					$row = $api->getFieldMap(0, $key);
+
+					if($row){
+						$fields[$row] = $value;
+					}
+				}
+				
+				$fields['listID'] = $res['list_id'];
+
+				$api = new SmartApi();
+				$api->editSubscriber($fields);
+			}
+		}
+	}
+
+	/**
+	 * Delete customer
+	 * 
+	 * @return void
+	 */
+	protected function deleteCustomer()
+	{
+		$res = $this->getClientData();
+		if($res['sync']) {
+
+			if(Tools::isSubmit('submitBulkdeletecustomer')) {
+
+				$customer = array();
+				$ids = $_POST['customerBox'];
+				foreach ($ids as $key => $id_customer) {
+					$customer[] = new Customer((int)$id_customer);
+				}
+				
+				$api = new SmartApi();
+				foreach ($customer as $key => $email) {
+
+					$rm = $api->removeSubscriber($res['list_id'], $email->email);
+					
+					if(isset($rm['ERROR']) && ($rm['ERROR'])) {
+						return false;
+					}
+
+					$client_data = $api->getClientData();
+					$client = (int)$client_data['CLIENTE_ID'];
+
+					$where = "client_id = $client";
+					$sql_insert = array(
+						'total' => (int)($res['total']-1)
+					);
+					Db::getInstance()->update('egoi', $sql_insert, $where);
+				}
+			}
+		}
+	}
+
+	/**
    	 * Hook for display content in Top Page
    	 * 
    	 * @param array $params
@@ -426,6 +571,7 @@ class SmartMarketingPs extends Module
    	 */
    	public function hookDisplayTop($params)
    	{
+   		// check if the customer did any Order
 		if(isset($_SESSION['order']) && ($_SESSION['order'])) {
 			unset($_SESSION['order']);
 		}else{
@@ -487,7 +633,7 @@ class SmartMarketingPs extends Module
 	 */
 	public function te()
 	{
-		$res = $this->getTrackingAuthorization();
+		$res = $this->getClientData('track', 1);
 		if (!empty($res)) {
 			$list_id = $res['list_id'];
 			$client = $res['client_id'];
@@ -542,7 +688,7 @@ class SmartMarketingPs extends Module
 	{
 	 	$json = is_array($params['json']) ? json_decode($params['json']['id']) : $params['cookie']->id_cart;
 
-	 	$res = $this->getTrackingAuthorization();
+	 	$res = $this->getClientData('track', 1);
 
 		if (!empty($res)) {
 			$list_id = $sql['list_id'];
@@ -573,7 +719,7 @@ class SmartMarketingPs extends Module
 	 */
 	public function teOrder() 
 	{
-		$res = $this->getTrackingAuthorization();
+		$res = $this->getClientData('track', 1);
 
 		if (!empty($res)) {
 			$list_id = $sql['list_id'];
@@ -610,14 +756,18 @@ class SmartMarketingPs extends Module
 	}
 
 	/**
-	 * Check for Tracking authorization
+	 * Get Client Data from DB
 	 * 
 	 * @return array|null
 	 */
-	private function getTrackingAuthorization()
+	private function getClientData($field = false, $val = false)
 	{
-		return Db::getInstance(_PS_USE_SQL_SLAVE_)
-					->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id != "" and track="1" order by egoi_id DESC');
+		$instance = Db::getInstance(_PS_USE_SQL_SLAVE_);
+		if ($field && $val) {
+			$instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' and $field='$val' order by egoi_id DESC");
+		}
+		return $instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' order by egoi_id DESC");
+					
 	}
 
 	/**
@@ -766,6 +916,25 @@ class SmartMarketingPs extends Module
 			}
 	    }
     }
+
+    /**
+     * Add new Client ID
+     * 
+     * @param array $post
+     * @return bool
+     */
+    private function addClientId($post) 
+    {
+    	// clean table
+		Db::getInstance()->execute('TRUNCATE TABLE '._DB_PREFIX_.'egoi');
+		// then insert new data
+		Db::getInstance()->insert('egoi', 
+			array(
+				'client_id' => (int)$post['egoi_client_id']
+			)
+		);
+		return true;
+	}
 
 
 }
