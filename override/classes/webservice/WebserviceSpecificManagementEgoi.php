@@ -2,7 +2,9 @@
 if (!defined('_PS_VERSION_'))
     exit;
 
-
+/**
+ * @package override/classes/webservice/WebserviceSpecificManagementEgoi
+ */
 class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearchCore implements WebserviceSpecificManagementInterface 
 {
 
@@ -95,8 +97,7 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
         $ids = $this->wsObject->urlFragments['ids'];
         if(isset($ids) && ($ids)){
 
-            $ids = filter_var($ids, FILTER_SANITIZE_STRING);
-            $ids = str_replace(" ", "", $ids);
+            $ids = str_replace(" ", "", filter_var($ids, FILTER_SANITIZE_STRING));
 
             // verify if is numeric
             $each_id = explode("," ,$ids); 

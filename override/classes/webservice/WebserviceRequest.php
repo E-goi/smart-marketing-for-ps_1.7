@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @package override/classes/webservice/WebserviceRequest
+ */
 class WebserviceRequest extends WebserviceRequestCore 
 {
 

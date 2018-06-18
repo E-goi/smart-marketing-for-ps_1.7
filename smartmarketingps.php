@@ -278,7 +278,7 @@ class SmartMarketingPs extends Module
 			);
 
 			// install custom overrides
-			$this->installSmartOverrides();
+			//$this->installSmartOverrides();
 			return true;
 		}
 
@@ -776,9 +776,29 @@ class SmartMarketingPs extends Module
 		if ($field && $val) {
 			$instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' and $field='$val' order by egoi_id DESC");
 		}
-		return $instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' order by egoi_id DESC");
-					
+		return $instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' order by egoi_id DESC");	
 	}
+
+	/**
+     * Process Overrides
+     * 
+     * @return void
+     */
+    private function installSmartOverrides()
+    {
+    	exec('cp '.dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php '.dirname(__FILE__).'/../../override/classes/webservice/');
+		//exec('rm -f '.dirname(__FILE__).'/../../cache/class_index.php');
+    }
+
+    /**
+     * Remove overrides
+     * 
+     * @return void
+     */
+    private function uninstallSmartOverrides()
+    {
+    	exec('rm -f '.dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
+    }
 
 	/**
 	 * Get Cart ID from Customer Id
@@ -828,27 +848,6 @@ class SmartMarketingPs extends Module
 		$idc = $this->getCustomerId();
 		return Db::getInstance()->delete('egoi_customers', "customer='$idc'");
 	}
-
-	/**
-     * Process Overrides
-     * 
-     * @return void
-     */
-    private function installSmartOverrides()
-    {
-    	exec('cp '.dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php '.dirname(__FILE__).'/../../override/classes/webservice/');
-		exec('rm -f '.dirname(__FILE__).'/../../cache/class_index.php');
-    }
-
-    /**
-     * Remove overrides
-     * 
-     * @return void
-     */
-    private function uninstallSmartOverrides()
-    {
-    	exec('rm -f '.dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
-    }
 
    	/**
    	 * Process Block Options
