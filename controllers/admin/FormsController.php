@@ -125,9 +125,9 @@ class FormsController extends SmartMarketingBaseController
 			
 			$this->assign('form', $this->formId);
 			$this->assign('token', $_GET['token']);
-		}
 
-		return $this->displayForm();
+			return $this->displayForm();
+		}
 	}
 
 	/**

@@ -100,8 +100,10 @@
 				<tr valign="top">
 					<th class="egoi-td" scope="row">{l s='Sync existing customers' mod='smartmarketingps'}</th>
 					<td>
-						<button type="button" class="btn btn-info" id="button_old_subs">{l s='Sync Customers' mod='smartmarketingps'}</button>
-						<span class="sync_customers"></span>
+						<button type="button" class="btn btn-info" id="sync_old_subs">
+							{l s='Sync Customers' mod='smartmarketingps'}
+						</button>
+						<div class="sync_customers" style="display: none;"></div>
 						<p class="help">{l s='Sync already existing PrestaShop customers to E-goi List' mod='smartmarketingps'}</p>
 					</td>
 				</tr>

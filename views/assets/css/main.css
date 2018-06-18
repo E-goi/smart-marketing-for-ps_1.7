@@ -14,14 +14,6 @@
    background-size: 20px;
    vertical-align: inherit;
 }
-#load, #load_map, #valid_sync{
-   background: url('../img/loader.gif') no-repeat;
-   display: inline-block;
-   width: 15px;
-   height: 15px;
-   background-size: 15px;
-   vertical-align: inherit;
-}
 
 .col_map{
    margin-top: 10%;
@@ -72,31 +64,6 @@
 
 .egoi.panel-heading{
    height: 40px !important;
-}
-
-.img_account{
-   background: url('../img/myaccount.png') no-repeat;
-   padding-left: 30px;
-   padding-bottom: 20px;
-   font-size: 14px;
-}
-.img_lists{
-   background: url('../img/mylists.png') no-repeat;
-   padding-left: 30px;
-   padding-bottom: 20px;
-   font-size: 14px;
-}
-.img_forms{
-   background: url('../img/myforms.png') no-repeat;
-   padding-left: 30px;
-   padding-bottom: 20px;
-   font-size: 14px;
-}
-.img_subs{
-   background: url('../img/mysubscribers.png') no-repeat;
-   padding-left: 30px;
-   padding-bottom: 20px;
-   font-size: 14px;
 }
 
 .baseline{
@@ -163,4 +130,28 @@
 
 .icon-external-link{
    font-size: 30px;
+}
+
+.sync_customers {
+   border: 2px solid #f3f3f3;
+   position: absolute;
+   margin-left: 20px;
+   display: inline-block;
+   border-radius: 50%;
+   border-top: 2px solid #3498db;
+   width: 30px;
+   height: 30px;
+   -webkit-animation: spin 2s linear infinite; /* Safari */
+   animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

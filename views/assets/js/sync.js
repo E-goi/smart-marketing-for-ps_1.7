@@ -19,25 +19,27 @@ $(document).ready(function() {
     	}
     });
 
-	$("#button_old_subs").click(function() {
+	$("#sync_old_subs").click(function() {
 
-		var subs = 'OK';
-		var token_list = '1';
-		$('.loading').prop('id', 'load');
+		$('.sync_customers').show();
+		var btn_sync = $(this);
+		btn_sync.prop('disabled', true);
 
 		$.ajax({
 		    type: 'POST',
 		    data:({
-		        token_list: token_list,
-		        subs: subs
+		        token_list: '1',
+		        subs: 'OK'
 		    }),
 		    success:function(data, status) {
 		    	if (data) {
-		    		$('.loading').prop('id', 'valid');
+		    		btn_sync.prop('disabled', false);
+		    		$('.sync_customers').hide();
 		    	}
 		    },
 		    error:function(status){
-		    	$('.loading').prop('id', 'error');
+		    	btn_sync.prop('disabled', false);
+		    	$('.sync_customers').hide();
 		    }
 		});
 	});

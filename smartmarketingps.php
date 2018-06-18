@@ -96,7 +96,7 @@ class SmartMarketingPs extends Module
 	 */
 	public function install()
 	{
-	  	if (!parent::install() || !$this->installDb() //|| !$this->createMenu()
+	  	if (!parent::install() || !$this->installDb() || !$this->createMenu()
 	  		|| !$this->registerHook('actionObjectCustomerAddAfter')
 	  		|| !$this->registerHook('actionValidateOrder')
 	  		|| !$this->registerHook('displayTop')
@@ -126,6 +126,64 @@ class SmartMarketingPs extends Module
     }
 
     /**
+	 * Create menu
+	 * 
+	 * @return type
+	 */
+	private function createMenu()
+	{
+		$subtabs = array(
+			'Account' => $this->l('Account'),
+			'Sync' => $this->l('Sync Contacts'),
+			'Forms' => $this->l('Forms')
+		);
+
+		// main tab
+		Db::getInstance()->insert('tab', 
+			array(
+				'position' => '11',
+    			'module' => 'smartmarketingps',
+    			'class_name' => 'SmartMarketingPs',
+    			'active' => 1
+    		)
+		);
+		
+		// main tab lang
+		$main_id = Db::getInstance()->Insert_ID();
+		Db::getInstance()->insert('tab_lang', 
+			array(
+				'id_tab' => $main_id,
+    			'id_lang' => 1,
+    			'name' => 'Smart Marketing'
+    		)
+		);
+		
+		$index = 1;
+		foreach ($subtabs as $key => $val) {
+			Db::getInstance()->insert('tab', 
+				array(
+					'id_parent' => $main_id,
+					'position' => $index,
+	    			'module' => 'smartmarketingps',
+	    			'class_name' => $key,
+	    			'active' => 1
+	    		)
+			);
+
+			Db::getInstance()->insert('tab_lang', 
+				array(
+					'id_tab' => Db::getInstance()->Insert_ID(),
+	    			'id_lang' => 1,
+	    			'name' => $val
+	    		)
+			);
+			$index++;
+		}
+
+		return true;
+	}
+
+    /**
      * Uninstall required tables
      * 
      * @return type
@@ -140,8 +198,7 @@ class SmartMarketingPs extends Module
 
    		// remove menus
    		Db::getInstance()->delete('tab', "module = '$this->name'");
-   		Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account'");
-   		Db::getInstance()->delete('authorization_role', "slug like '%SMARTMARKETINGPS%'");
+   		Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='Forms'");
 
    		// remove API Key in cache
    		Configuration::deleteByName('smart_api_key');
@@ -317,106 +374,6 @@ class SmartMarketingPs extends Module
 	}
 
 	/**
-	 * Create menu
-	 * 
-	 * @return type
-	 */
-	private function createMenu()
-	{
-		$subtabs = array(
-			'Account' => array('1' => $this->l('Account')),
-			'Sync' => array('1' => $this->l('Sync Contacts')),
-			'Forms' => array('1' => $this->l('Capture Contacts'))
-		);
-
-		$mainTab = Tab::getInstanceFromClassName('SmartMarketingPs');
-		$mainTab->active = 1;
-		$mainTab->class_name = 'SmartMarketingPs';
-		$mainTab->id_parent = 0;
-		$mainTab->module = $this->name;
-		$mainTab->name = $this->createMultiLangField('Smart Marketing');
-		$mainTab->save();
-
-		foreach($subtabs as $className => $menuName) {
-			$this->createSubmenu($mainTab->id, $menuName[1], $className);
-		}
-
-		return true;
-	}
-
-	/**
-	 * Create submenu
-	 * 
-	 * @param type $parentId 
-	 * @param type $menuName 
-	 * @param type $className 
-	 * @return type
-	 */
-	private function createSubmenu($parentId, $menuName, $className) 
-	{
-		$subTab = Tab::getInstanceFromClassName($className);
-		if(!Validate::isLoadedObject($subTab)) {
-
-			$subTab->active = 1;
-			$subTab->class_name = $className;
-			$subTab->id_parent = $parentId;
-			$subTab->module = $this->name;
-			$subTab->name = $this->createMultiLangField($menuName);
-			return $subTab->save();
-
-		}else if($subTab->id_parent != $parentId) {
-
-			$subTab->id_parent = $parentId;
-			return $subTab->save();
-		}
-		return true;
-	}
-
-	public function installTab()
-    {
-        $tab = new Tab();
-        $tab->active = 1;
-        $tab->class_name = 'SmartMarketingPs';
-        $tab->name = array();
-        foreach (Language::getLanguages(true) as $lang) {
-            $tab->name[$lang['id_lang']] = 'Smart Marketing';
-        }
-        
-        $tab->id_parent = 0;
-        $tab->module = $this->name;
-        return $tab->add();
-    }
-
-	/**
-	 * Delete menu
-	 * 
-	 * @return bool
-	 */
-	public function uninstallTab()
-    {
-        $id_tab = (int)Tab::getIdFromClassName('SmartMarketingPs');
-        
-        if ($id_tab) {
-            $tab = new Tab($id_tab);
-            return $tab->delete();
-        } else {
-            return false;
-        }
-    }
-
-	/**
-	 * Delete submenu
-	 * 
-	 * @param string $className 
-	 * @return mixed
-	 */
-	private function deleteSubmenu($className) 
-	{
-		$subTab = Tab::getInstanceFromClassName($className);
-		return $subTab->delete();
-	}
-
-	/**
     * Hook for Add customer
     *
     * @param array $params
@@ -506,7 +463,9 @@ class SmartMarketingPs extends Module
 			if($id) {
 				$customer = new Customer((int)$id);
 
-				$fields = array();
+				$fields = array(
+					'email' => $customer->email
+				);
 				foreach ($customer as $key => $value) {
 					$row = $api->getFieldMap(0, $key);
 
