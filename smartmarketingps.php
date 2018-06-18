@@ -649,21 +649,20 @@ class SmartMarketingPs extends Module
 	 */
 	protected function addToCart($params) 
 	{
-	 	$json = is_array($params['json']) ? json_decode($params['json']['id']) : $params['cookie']->id_cart;
+	 	$json = isset($params['json']) && is_array($params['json']) ? json_decode($params['json']['id']) : $params['cookie']->id_cart;
 
 	 	$res = $this->getClientData('track', 1);
-
 		if (!empty($res)) {
-			$list_id = $sql['list_id'];
-			$track = $sql['track'];
-			$client = $sql['client_id'];
+			$list_id = $res['list_id'];
+			$track = $res['track'];
+			$client = $res['client_id'];
 			if($client && $track && $list_id){
 
 				// check if customer has products in the cart (has cart ID?)
-				if(isset($json) && ($json)) {
+				if($json) {
 					$idc = $this->getCustomerId();
-
-					if($this->getCartId($idc)) {
+					
+					if(empty($this->getCartId($idc))) {
 						Db::getInstance()->insert('egoi_customers', array(
 							'customer' => $idc,
 							'id_cart' => (int)$json,
@@ -685,9 +684,9 @@ class SmartMarketingPs extends Module
 		$res = $this->getClientData('track', 1);
 
 		if (!empty($res)) {
-			$list_id = $sql['list_id'];
-			$track = $sql['track'];
-			$client = $sql['client_id'];
+			$list_id = $res['list_id'];
+			$track = $res['track'];
+			$client = $res['client_id'];
 
 			if($client && $track && $list_id) {
 
@@ -764,7 +763,11 @@ class SmartMarketingPs extends Module
 	 */
 	private function getCustomerId() 
 	{
-		return (int)$this->context->cookie->id_customer ?: (int)session_id();
+		if(!session_id()){
+			session_start();
+		}
+
+		return (int)$this->context->cookie->id_customer ?: session_id();
 	}
 
 	/**

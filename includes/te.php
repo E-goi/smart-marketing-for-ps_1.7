@@ -2,7 +2,7 @@
 
 $te = "<script type='text/javascript'>
 		var _egoiaq = _egoiaq || [];
-		var u=((\"https:\" == document.location.protocol) ? \"https://egoimmerce.e-goi.com/\" : \"http://egoimmerce.e-goi.com/\");
+		var u=((\"https:\" == document.location.protocol) ? \"https://te.e-goi.com/\" : \"http://te.e-goi.com/\");
 		_egoiaq.push(['setClientId', \"$client\"]);
 		_egoiaq.push(['setListId', \"$list_id\"]);
 		_egoiaq.push(['setSubscriber', \"$customer\"]);
@@ -14,9 +14,9 @@ $te = "<script type='text/javascript'>
 			foreach($products as $key => $product){
 			
 				$product_id = $product['id_product'];
-		 		$product_name = $product['name'];
+		 		$product_name = htmlentities($product['name']);
 		 		$product_cat = '-';
-		 		$product_price = $product['price_wt'];
+		 		$product_price = floatval($product['price_wt']);
 		 		$product_quantity = $product['quantity'];
 
 		 		$sum_price += floatval(round(($product_price * $product_quantity), 2));

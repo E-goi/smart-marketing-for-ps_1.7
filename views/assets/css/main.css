@@ -121,6 +121,10 @@
    font-size: 30px;
 }
 
+.icon-desktop{
+   font-size: 30px;
+}
+
 .sync_customers, .sync_api_key {
    border: 2px solid #f3f3f3;
    position: absolute;

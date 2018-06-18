@@ -87,6 +87,13 @@ class FormsController extends SmartMarketingBaseController
 			    'desc' => $this->l('Save form'),
 			    'js' => $this->l('$( \'#save-form\' ).click();')
 			);
+			$this->page_header_toolbar_btn['form-preview'] = array(
+			    'short' => $this->l('Preview form'),
+			    'icon' => 'icon-desktop',
+			    'href' => '#',
+			    'desc' => $this->l('Preview form'),
+			    'js' => $this->l('$( \'#preview-form\' ).click();')
+			);
         }else{
         	 $this->page_header_toolbar_btn['new-form'] = array(
 			    'short' => $this->l('Add new Form'),
