@@ -590,37 +590,6 @@ class SmartMarketingPs extends Module
 	}
 
 	/**
-	 * Track&Engage - Abandoned Cart
-	 * 
-	 * @return string|bool
-	 */
-	public function te()
-	{
-		$res = $this->getClientData('track', 1);
-		if (!empty($res)) {
-			$list_id = $res['list_id'];
-			$client = $res['client_id'];
-			$track = $res['track'];
-			
-			if($client && $list_id && $track) {
-
-				// set customer email var to use in t&e
-				$customer = $this->context->cookie->email;
-
-				$cart = new Cart($this->getCartId($this->getCustomerId()));
-				$products = $cart->getProducts();
-
-				$this->removeCart();
-
-				include 'includes/te.php';
-				return $te;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Abandoned cart hook
 	 * 
 	 * @param  array $params
@@ -640,6 +609,49 @@ class SmartMarketingPs extends Module
 	public function hookCart($params) 
 	{
 		$this->addToCart($params);
+	}
+
+	/**
+	 * Track&Engage - check is customer has an Abandoned Cart
+	 * 
+	 * @return string|bool
+	 */
+	public function te()
+	{
+		$res = $this->getClientData('track', 1);
+		if (!empty($res)) {
+			$list_id = $res['list_id'];
+			$client = $res['client_id'];
+			$track = $res['track'];
+			
+			if($client && $list_id && $track) {
+
+				if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
+					return false;
+				}
+
+				// set customer email var to use in t&e
+				$customer = $this->context->cookie->email;
+
+				$cart_id = $this->getCartId($this->getCustomerId());
+				$cart = new Cart($cart_id);
+				$products = $cart->getProducts();
+				
+				$cart_zero = 0;
+				if ($cart_id) {
+					if (empty($products)) {
+						$cart_zero = 1;
+					}
+				}
+
+				$this->removeCart();
+
+				include 'includes/te.php';
+				return $te;
+			}
+		}
+
+		return false;
 	}
 
 	/**
