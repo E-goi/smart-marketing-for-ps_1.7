@@ -54,14 +54,6 @@ class SmartMarketingPs extends Module
 	      	$this->warning = $this->l('No name provided');
 	    }
 
-	    if(isset($_POST['deleteMode']) && ($_POST['deleteMode'] == 'real')){
-			$this->deleteCustomer();
-		}
-
-		if(isset($_GET['conf']) && ($_GET['conf'] == '4')) {
-			$this->updateCustomer();
-		}
-
 		if(isset($_POST['smart_api_key']) && ($_POST['smart_api_key'])){
 			$this->addClientId($_POST);
 		}
@@ -98,6 +90,8 @@ class SmartMarketingPs extends Module
 	{
 	  	if (!parent::install() || !$this->installDb() || !$this->createMenu()
 	  		|| !$this->registerHook('actionObjectCustomerAddAfter')
+	  		|| !$this->registerHook('actionObjectCustomerUpdateAfter')
+	  		|| !$this->registerHook('actionObjectCustomerDeleteAfter')
 	  		|| !$this->registerHook('actionValidateOrder')
 	  		|| !$this->registerHook('displayTop')
 	  		|| !$this->registerHook('displayFooter'))
@@ -346,8 +340,11 @@ class SmartMarketingPs extends Module
 	 */
 	public function displayForm() 
 	{
+		//add headers
 		$this->context->controller->addJS($this->_path. 'views/assets/js/config.js');
 		$this->context->controller->addCSS($this->_path. 'views/assets/css/main.css');
+		
+		// assign vars
         $this->assign($this->success_msg, 'success_msg');
         $this->assign($this->error_msg, 'error_msg');
         $this->assign(Configuration::get('smart_api_key') ? false : true, 'smart_api_key_error');
@@ -389,6 +386,28 @@ class SmartMarketingPs extends Module
 	}
 
 	/**
+	 * Hook for Update customer
+	 * 
+	 * @param array $params
+	 * @return void
+	 */
+	public function hookActionObjectCustomerUpdateAfter($params)
+	{
+		return $this->updateCustomer($params);
+	}
+
+	/**
+	 * Hook for Delete customer
+	 * 
+	 * @param array $params
+	 * @return void
+	 */
+	public function hookActionObjectCustomerDeleteAfter($params)
+	{
+		return $this->deleteCustomer($params);
+	}
+
+	/**
 	 * Add customer
 	 * 
 	 * @param  $params
@@ -398,6 +417,9 @@ class SmartMarketingPs extends Module
 	{
 		$api = new SmartApi();
 		
+		$fields = array(
+			'email' => $params['object']->email
+		);
 		foreach ($params['object'] as $key => $value) {
 			$row = $api->getFieldMap(0, $key);
 			if($row) {
@@ -407,11 +429,12 @@ class SmartMarketingPs extends Module
 
 		if (count($fields) <= 1) {
 			// default fields to be passed to E-goi in case the fields are not mapped
-			$fields = array(
-				'email' => $params['object']->email,
-				'first_name' => $params['object']->firstname,
-				'last_name' => $params['object']->lastname,
-				'birth_date' => $params['object']->birthday
+			$fields = array_merge($fields, 
+				array(
+					'first_name' => $params['object']->firstname,
+					'last_name' => $params['object']->lastname,
+					'birth_date' => $params['object']->birthday
+				)
 			);
 		}
 		
@@ -465,15 +488,21 @@ class SmartMarketingPs extends Module
 	 * 
 	 * @return void
 	 */
-	protected function updateCustomer()
+	protected function updateCustomer($params)
 	{
 		$res = $this->getClientData();
 		if($res['sync']) {
 
-			$id = isset($_GET['id_customer']) ? $_GET['id_customer'] : '';
+			$id = isset($params['object']->id) && ($params['object']->id) ? $params['object']->id : false;
 			if($id) {
 				$customer = new Customer((int)$id);
+
 				if (!empty($customer)) {
+
+					$api = new SmartApi();
+					$fields = array(
+						'email' => $customer->email
+					);
 					foreach ($customer as $key => $value) {
 						$row = $api->getFieldMap(0, $key);
 
@@ -484,19 +513,21 @@ class SmartMarketingPs extends Module
 
 					if (count($fields) <= 1) {
 						// default fields to be passed to E-goi in case the fields are not mapped
-						$fields = array(
-							'email' => $customer->email,
-							'first_name' => $customer->firstname,
-							'last_name' => $customer->lastname,
-							'birth_date' => $customer->birthday
+						$fields = array_merge($fields, 
+							array(
+								'first_name' => $customer->firstname,
+								'last_name' => $customer->lastname,
+								'birth_date' => $customer->birthday
+							)
 						);
 					}
 				}
 				
 				$fields['listID'] = $res['list_id'];
-
-				$api = new SmartApi();
-				$api->editSubscriber($fields);
+			 	$result = $api->editSubscriber($fields);
+				if (isset($result['ERROR']) && ($result['ERROR'])) {
+					$api->addSubscriber($fields);
+				}
 			}
 		}
 	}
@@ -506,37 +537,27 @@ class SmartMarketingPs extends Module
 	 * 
 	 * @return void
 	 */
-	protected function deleteCustomer()
+	protected function deleteCustomer($params)
 	{
 		$res = $this->getClientData();
 		if($res['sync']) {
 
-			if(Tools::isSubmit('submitBulkdeletecustomer')) {
+			$api = new SmartApi();
 
-				$customer = array();
-				$ids = $_POST['customerBox'];
-				foreach ($ids as $key => $id_customer) {
-					$customer[] = new Customer((int)$id_customer);
+			$email = isset($params['object']->email) && ($params['object']->email) ? $params['object']->email : false;
+			if ($email) {
+				$rm = $api->removeSubscriber($res['list_id'], $email);
+				if(isset($rm['ERROR']) && ($rm['ERROR'])) {
+					return false;
 				}
-				
-				$api = new SmartApi();
-				foreach ($customer as $key => $email) {
 
-					$rm = $api->removeSubscriber($res['list_id'], $email->email);
-					
-					if(isset($rm['ERROR']) && ($rm['ERROR'])) {
-						return false;
-					}
+				$client_data = $api->getClientData();
+				$client = (int)$client_data['CLIENTE_ID'];
 
-					$client_data = $api->getClientData();
-					$client = (int)$client_data['CLIENTE_ID'];
-
-					$where = "client_id = $client";
-					$sql_insert = array(
-						'total' => (int)($res['total']-1)
-					);
-					Db::getInstance()->update('egoi', $sql_insert, $where);
-				}
+				return Db::getInstance()->update('egoi', 
+						array(
+							'total' => (int)($res['total']-1)
+						), "client_id = $client");
 			}
 		}
 	}
