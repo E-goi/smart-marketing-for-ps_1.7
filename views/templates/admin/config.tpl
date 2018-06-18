@@ -1,10 +1,6 @@
 
 {include file='./alerts.tpl' config='true'}
 
-{if isset($success_msg) and ($success_msg)}
-	{$success_msg}
-{/if}
-
 <form method="post" action="" autocomplete="off">
 	<div class="panel" id="panel_egbody">
 		<div class="egoi panel-heading">
@@ -13,7 +9,6 @@
 		
 		<div class="form-group">
 			<label class="control-label col-lg-3">
-
 				<div>
 					<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='To get your API Key, login into your E-goi Account' mod='smartmarketingps'} BO Panel, {l s='go to your user menu (upper right corner), select <<Integrations>> and copy the account API key' mod='smartmarketingps'}">
 						{l s='Your API Key' mod='smartmarketingps'}
@@ -25,10 +20,12 @@
 				<input type="hidden" id="egoi_client_id" name="egoi_client_id">
 				<input type="password" style="width:50%;display:-webkit-inline-box;" name="smart_api_key" id="smart_api_key" size="55" value="{Configuration::get('smart_api_key')}" disabled />
 
-				<div id="load" style="display:none;"></div>
-				<div id="valid" style="display:none;"></div>
-				<div id="error" style="display:none;"></div>
+				<div class="sync_api_key" style="display:none;"></div>
+				<div id="error" style="display:none;">
+					<i class="material-icons action-enabled">error</i>
+				</div>
 				<a class="btn btn-info" id="edit_key">Edit API Key</a>
+				<input type="submit" name="submit_api_key" id="apikey_submit" value="{l s='Save' mod='smartmarketingps'}" class="btn btn-primary" style="display: none;">
 			</div>
 		</div>
 
@@ -38,8 +35,9 @@
 		</div>
 
 		<div class="form-group">
-			<input type="submit" name="submit_api_key" id="apikey_submit" value="{l s='Save' mod='smartmarketingps'}" class="btn btn-primary" style="display: none;" />
-			<a class="btn btn-default" id="account_button">{l s='Go to My Account' mod='smartmarketingps'} <span class="icon-external-link"></span></a>
+			<a class="btn btn-default" id="account_button">
+				{l s='Go to My Account' mod='smartmarketingps'} <i class="material-icons action-enabled">navigate_next</i>
+			</a>
 		</div>
 
 	</div>

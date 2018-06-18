@@ -104,7 +104,7 @@ class SmartMarketingPs extends Module
 	    	return false;
 
 	    // register WebService
-		//$this->registerWebService();
+		$this->registerWebService();
 	  	return true;
 	}
 
@@ -202,6 +202,9 @@ class SmartMarketingPs extends Module
 
    		// remove API Key in cache
    		Configuration::deleteByName('smart_api_key');
+		
+		// remove webservice
+		$this->uninstallWebService();
 
    		// remove custom override file
    		@unlink(dirname(__FILE__).$this->custom_override);
@@ -344,6 +347,7 @@ class SmartMarketingPs extends Module
 	public function displayForm() 
 	{
 		$this->context->controller->addJS($this->_path. 'views/assets/js/config.js');
+		$this->context->controller->addCSS($this->_path. 'views/assets/css/main.css');
         $this->assign($this->success_msg, 'success_msg');
         $this->assign($this->error_msg, 'error_msg');
         $this->assign(Configuration::get('smart_api_key') ? false : true, 'smart_api_key_error');

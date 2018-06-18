@@ -16,9 +16,8 @@ $(document).ready(function($) {
 
 		var api_key = $(this).val();
 
-		$("#load").show();
+		$(".sync_api_key").prop('style', '');
 		$("#error").hide();
-		$("#valid").hide();
 
 		if(api_key.length == 40){
 
@@ -30,35 +29,29 @@ $(document).ready(function($) {
 			    }),
 			    success:function(data, status) {
 			        
-			        $("#load").hide();
+			        $(".sync_api_key").hide();
 			        if(status == '403'){
 			        	$("#apikey_submit").hide();
-			        	
-			        	$("#error").show();
-			        	$("#valid").hide();
+			        	$("#error").prop('style', 'display:inline-block');
 			        }else{
 			        	$('#egoi_client_id').val(data.CLIENTE_ID);
 			        	$("#apikey_submit").show();
-			        	
-			        	$("#valid").show();
-			        	$("#error").hide();
+			        	$('#error').hide();
 			        }
 			    },
 			    error:function(status){
 			    	if(status){
 				    	$("#apikey_submit").hide();
-				    	
-				    	$("#valid").hide();
-				    	$("#error").show();
-				    	$("#load").hide();
+				    	$(".sync_api_key").hide();
+				    	$("#error").prop('style', 'display:inline-block');
 				    }
 			    }
 			});
 
 		}else{
+			$(".sync_api_key").hide();
 			$("#apikey_submit").hide();
-			$("#valid").hide();
-			$("#load").hide();
+			$('#error').hide();
 		}
 	})
 });

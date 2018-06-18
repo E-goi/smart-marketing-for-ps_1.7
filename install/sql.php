@@ -22,7 +22,7 @@ $sql[_DB_PREFIX_.'egoi_forms'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'ego
 			  `form_title` varchar(255) NOT NULL,
 			  `form_content` longtext NOT NULL,
 			  `doptin` int(11) NOT NULL,
-			  `bootstrap` int(11) NOT NULL,
+			  `is_bootstrap` int(11) NOT NULL,
 			  `msg_gen` varchar(255) NOT NULL,
 			  `msg_invalid` varchar(255) NOT NULL,
 			  `msg_exists` varchar(255) NOT NULL,

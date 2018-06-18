@@ -1,18 +1,7 @@
-#valid, #active{
-   background: url('../img/check.png') no-repeat;
-   display: inline-block;
-   width: 20px;
-   height: 20px;
-   background-size: 20px;
-   vertical-align: inherit;
-}
-#error, #inactive{
-   background: url('../img/error.png') no-repeat;
-   display: inline-block;
-   width: 20px;
-   height: 20px;
-   background-size: 20px;
-   vertical-align: inherit;
+#error{
+   position: absolute;
+   margin-left: 20px;
+   color: red;
 }
 
 .col_map{
@@ -132,7 +121,7 @@
    font-size: 30px;
 }
 
-.sync_customers {
+.sync_customers, .sync_api_key {
    border: 2px solid #f3f3f3;
    position: absolute;
    margin-left: 20px;
