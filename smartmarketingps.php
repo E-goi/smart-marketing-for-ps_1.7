@@ -397,15 +397,22 @@ class SmartMarketingPs extends Module
 	protected function addCustomer($params)
 	{
 		$api = new SmartApi();
-
-		$fields = array(
-			'email' => $params['object']->email
-		);
+		
 		foreach ($params['object'] as $key => $value) {
 			$row = $api->getFieldMap(0, $key);
 			if($row) {
 				$fields[$row] = $value;
 			}
+		}
+
+		if (count($fields) <= 1) {
+			// default fields to be passed to E-goi in case the fields are not mapped
+			$fields = array(
+				'email' => $params['object']->email,
+				'first_name' => $params['object']->firstname,
+				'last_name' => $params['object']->lastname,
+				'birth_date' => $params['object']->birthday
+			);
 		}
 		
 		$client_data = $api->getClientData();
@@ -466,15 +473,23 @@ class SmartMarketingPs extends Module
 			$id = isset($_GET['id_customer']) ? $_GET['id_customer'] : '';
 			if($id) {
 				$customer = new Customer((int)$id);
+				if (!empty($customer)) {
+					foreach ($customer as $key => $value) {
+						$row = $api->getFieldMap(0, $key);
 
-				$fields = array(
-					'email' => $customer->email
-				);
-				foreach ($customer as $key => $value) {
-					$row = $api->getFieldMap(0, $key);
+						if($row){
+							$fields[$row] = $value;
+						}
+					}
 
-					if($row){
-						$fields[$row] = $value;
+					if (count($fields) <= 1) {
+						// default fields to be passed to E-goi in case the fields are not mapped
+						$fields = array(
+							'email' => $customer->email,
+							'first_name' => $customer->firstname,
+							'last_name' => $customer->lastname,
+							'birth_date' => $customer->birthday
+						);
 					}
 				}
 				
