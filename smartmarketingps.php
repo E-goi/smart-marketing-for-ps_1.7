@@ -872,10 +872,10 @@ class SmartMarketingPs extends Module
 			$this->assign(
 		      	array(
 	          		'form_id' => $res['form_id'],
-		          	'bootstrap' => $res['bootstrap'],
+		          	'is_bootstrap' => $res['is_bootstrap'],
 		          	'form_title' => $res['form_title'],
 		          	$block => $res[$block],
-		          	'form_type' => $form_type
+		          	'form_type' => $res['form_type']
 		      	)
 		  	);
 
@@ -890,7 +890,7 @@ class SmartMarketingPs extends Module
 			if($res['form_type'] == 'iframe') {
 				$content = '<iframe src="http://'.$res['url'].'" width="'.$res['style_width'].'" height="'.$res['style_height'].'" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>';
 			}else{
-				$content = html_entity_decode($res['content']);
+				$content = html_entity_decode($res['form_content']);
 			}
 
 			if ($res['enable']) {

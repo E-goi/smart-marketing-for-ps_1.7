@@ -3,7 +3,7 @@
 
 	{include './ecommerce/te.tpl'}
 
-	{if $bootstrap}
+	{if $is_bootstrap}
 		<script type="text/javascript">
 			$(document).ready(function(){
 				$('input#egoi_form button').attr('class', 'form-control');
@@ -13,9 +13,9 @@
 		</script>
 	{/if}
 	
-	{if $popup}
+	{if isset($popup) and ($popup)}
 
-		{if $once}
+		{if isset($once) and ($once)}
 			<script type="text/javascript">
 				$(document).ready(function(){
 					if ($.cookie('show_popup') == null) {
@@ -45,18 +45,20 @@
 					<div class="modal-body">
 						<form method="post" action="">
 							<div id="egoi_form">
-								{if $error_submit} 
+								{if isset($error_submit) and ($error_submit)} 
 									<p class="egoi-error">
 										{$error_submit}
 									</p>
-								{elseif $success_submit}
+								{elseif isset($success_submit) and ($success_submit)}
 									<p class="egoi-success">
 										{$success_submit}
 									</p>
 								{/if}
 
 								<input type="hidden" name="form_id" value="{$form_id}">
-								{$content}
+								{if isset($content) and ($content)} 
+									{$content nofilter}
+								{/if}
 							</div>
 						</form>
 					</div>
@@ -65,22 +67,24 @@
 		</div>
 	{else}
 		
-		<div class="egoi_form" {if $header} style="width:50%;margin-left:25%;text-align:center;margin-top:10%;" {/if}>	
-			{if $form_type eq 'iframe'}
+		<div class="egoi_form" {if isset($header) and ($header)} style="width:50%;margin-left:25%;text-align:center;margin-top:10%;" {/if}>	
+			{if isset($form_type) and ($form_type eq 'iframe')}
 				{$content}
 			{else}
 
-				{if $error_submit} 
+				{if isset($error_submit) and ($error_submit)} 
 					<p class="egoi-error">
 						{$error_submit}
 					</p>
-				{elseif $success_submit}
+				{elseif isset($success_submit) and ($success_submit)}
 					<p class="egoi-success">
 						{$success_submit}
 					</p>
 				{/if}
-
-				{$content}
+				
+				{if isset($content) and ($content)} 
+					{$content nofilter}
+				{/if}
 			{/if}
 		</div>
 

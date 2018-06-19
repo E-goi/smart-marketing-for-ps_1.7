@@ -184,7 +184,11 @@ class FormsController extends SmartMarketingBaseController
 						->getRow('SELECT * FROM '._DB_PREFIX_.'egoi_forms WHERE form_id='.(int)$this->formId);
 
 			foreach ($post as $key => $value) {
-				$this->formOptions[$key] = is_numeric($value) ? (int)$value : pSQL($value);
+				if ($key == 'form_content') {
+					$this->formOptions[$key] = htmlentities(Tools::getValue('form_content'));
+				}else{
+					$this->formOptions[$key] = is_numeric($value) ? (int)$value : pSQL($value);
+				}
 			}
 
 			if($res['form_id']) {

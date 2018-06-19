@@ -303,7 +303,7 @@
 						<span><a data-toggle="modal" class="btn" data-target="#preview">{l s='Preview' mod='smartmarketingps'}</a></div>
 					{else}
 						{if $form_content}
-							<span><a class="btn" href="//{$smarty.server.SERVER_NAME}/index.php?fc=module&module=smartmarketingps&controller=egoi_forms&form={$form}" target="_blank">
+							<span><a style="display: none;" class="btn" href="//{$smarty.server.SERVER_NAME}/index.php?fc=module&module=smartmarketingps&controller=egoi_forms&form={$form}" target="_blank">
 							{l s='Preview' mod='smartmarketingps'}</a></div>
 						{/if}
 					{/if}
