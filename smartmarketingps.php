@@ -200,6 +200,9 @@ class SmartMarketingPs extends Module
 		// remove webservice
 		$this->uninstallWebService();
 
+		// remove overrides
+		$this->uninstallSmartOverrides();
+
    		// remove custom override file
    		@unlink(dirname(__FILE__).$this->custom_override);
     	return true;
@@ -278,7 +281,7 @@ class SmartMarketingPs extends Module
 			);
 
 			// install custom overrides
-			//$this->installSmartOverrides();
+			$this->installSmartOverrides();
 			return true;
 		}
 
@@ -787,7 +790,8 @@ class SmartMarketingPs extends Module
     private function installSmartOverrides()
     {
     	exec('cp '.dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php '.dirname(__FILE__).'/../../override/classes/webservice/');
-		//exec('rm -f '.dirname(__FILE__).'/../../cache/class_index.php');
+		@exec('rm -f '.dirname(__FILE__).'/../../app/cache/dev/class_index.php');
+		@exec('rm -f '.dirname(__FILE__).'/../../app/cache/prod/class_index.php');
     }
 
     /**
@@ -798,6 +802,8 @@ class SmartMarketingPs extends Module
     private function uninstallSmartOverrides()
     {
     	exec('rm -f '.dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
+    	@exec('rm -f '.dirname(__FILE__).'/../../app/cache/dev/class_index.php');
+    	@exec('rm -f '.dirname(__FILE__).'/../../app/cache/prod/class_index.php');
     }
 
 	/**
