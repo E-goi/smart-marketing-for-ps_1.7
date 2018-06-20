@@ -883,9 +883,9 @@ class SmartMarketingPs extends Module
 				$this->assign($optionalArgs);
 			}
 
-			/*if($res['popup']) {
-				$once = $res['once'];
-			} */
+			if($res['popup']) {
+				$this->assign($res['once'], 'once');
+			}
 
 			if($res['form_type'] == 'iframe') {
 				$content = '<iframe src="http://'.$res['url'].'" width="'.$res['style_width'].'" height="'.$res['style_height'].'" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>';
@@ -894,7 +894,7 @@ class SmartMarketingPs extends Module
 			}
 
 			if ($res['enable']) {
-				$this->assign('content', $content);
+				$this->assign($content, 'content');
 				return true;
 			}
 		}

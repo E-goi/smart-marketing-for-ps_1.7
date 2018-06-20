@@ -3,7 +3,7 @@
 
 	{include './ecommerce/te.tpl'}
 
-	{if $is_bootstrap}
+	{if isset($is_bootstrap) and ($is_bootstrap)}
 		<script type="text/javascript">
 			$(document).ready(function(){
 				$('input#egoi_form button').attr('class', 'form-control');
@@ -56,9 +56,7 @@
 								{/if}
 
 								<input type="hidden" name="form_id" value="{$form_id}">
-								{if isset($content) and ($content)} 
-									{$content nofilter}
-								{/if}
+								{$content nofilter}
 							</div>
 						</form>
 					</div>
@@ -82,9 +80,7 @@
 					</p>
 				{/if}
 				
-				{if isset($content) and ($content)} 
-					{$content nofilter}
-				{/if}
+				{$content nofilter}
 			{/if}
 		</div>
 
