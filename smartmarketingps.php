@@ -618,12 +618,7 @@ class SmartMarketingPs extends Module
 	public function hookDisplayHome($params)
 	{
 		// check if this block is activated 
-		if($this->processBlockOptions('home', 
-			array(
-	          'popup' => $popup,
-	          'once' => $once
-	      	))
-		) {
+		if($this->processBlockOptions('home')) {
 			return $this->display(__FILE__, 'smartmarketingps.tpl');
 		}
 	}
@@ -879,12 +874,10 @@ class SmartMarketingPs extends Module
 		      	)
 		  	);
 
-			if (!empty($optionalArgs) && is_array($optionalArgs)) {
-				$this->assign($optionalArgs);
-			}
-
 			if($res['popup']) {
-				$this->assign($res['once'], 'once');
+				if ($res['once']) {
+					$this->assign($res['once'], 'once');
+				}
 			}
 
 			if($res['form_type'] == 'iframe') {
