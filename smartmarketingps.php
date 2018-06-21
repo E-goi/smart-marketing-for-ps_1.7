@@ -132,6 +132,27 @@ class SmartMarketingPs extends Module
 			'Forms' => $this->l('Forms')
 		);
 
+		foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ') as $val) {
+			$result = Db::getInstance()->getValue("SELECT slug FROM "._DB_PREFIX_."authorization_role WHERE slug = 'ROLE_MOD_TAB_".$val."'");
+			
+			if (isset($result) && ($result)) {
+				break;
+			}
+
+			Db::getInstance()->insert('authorization_role', 
+				array(
+	    			'slug' => 'ROLE_MOD_TAB_'.$val
+	    		)
+			);
+
+			Db::getInstance()->insert('access', 
+				array(
+					'id_profile' => '1',
+	    			'id_authorization_role' => Db::getInstance()->Insert_ID()
+	    		)
+			);
+		}
+
 		// main tab
 		Db::getInstance()->insert('tab', 
 			array(

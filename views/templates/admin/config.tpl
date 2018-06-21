@@ -31,7 +31,7 @@
 
 		<div class="form-group">
 			<p>&nbsp;</p>
-			{l s='To get your API Key, login into your' mod='egoiforps'} <a target="_blank" href="https://login.egoiapp.com">BO Panel</a>, {l s='go to your user menu (upper right corner), select "Integrations" and copy the account API key' mod='smartmarketingps'}
+			{l s='To get your API Key, login into your' mod='smartmarketingps'} <a target="_blank" href="https://login.egoiapp.com">BO Panel</a>, {l s='go to your user menu (upper right corner), select "Integrations" and copy the account API key' mod='smartmarketingps'}
 		</div>
 
 		<div class="form-group">
