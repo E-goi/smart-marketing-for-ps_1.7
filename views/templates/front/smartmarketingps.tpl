@@ -1,17 +1,5 @@
 
 {if isset($form_id) and ($form_id)}
-
-	{include './ecommerce/te.tpl'}
-
-	{if isset($is_bootstrap) and ($is_bootstrap)}
-		<script type="text/javascript">
-			$(document).ready(function(){
-				$('input#egoi_form button').attr('class', 'form-control');
-				$('.egoi_form input').attr('class', 'form-control');
-				$('input[type="submit"]').attr('class', 'form-control');
-			});
-		</script>
-	{/if}
 	
 	{if isset($popup) and ($popup)}
 
@@ -44,7 +32,7 @@
 					</div>
 					<div class="modal-body">
 						<form method="post" action="">
-							<div id="egoi_form">
+							<div id="smart_form">
 								{if isset($error_submit) and ($error_submit)} 
 									<p class="egoi-error">
 										{$error_submit}
@@ -64,13 +52,13 @@
 			</div>
 		</div>
 	{else}
-		
-		<div class="egoi_form" {if isset($header) and ($header)} style="width:50%;margin-left:25%;text-align:center;margin-top:10%;" {/if}>	
+
+		<div id="smart_form" {if isset($header) and ($header)} style="width:50%;margin-left:25%;text-align:center;margin-top:10%;" {/if}>
 			{if isset($form_type) and ($form_type eq 'iframe')}
 				{$content}
 			{else}
 
-				{if isset($error_submit) and ($error_submit)} 
+				{if isset($error_submit) and ($error_submit)}
 					<p class="egoi-error">
 						{$error_submit}
 					</p>
@@ -79,11 +67,28 @@
 						{$success_submit}
 					</p>
 				{/if}
-				
+
 				{$content nofilter}
 			{/if}
 		</div>
-
 	{/if}
+
+    {if isset($is_bootstrap) and ($is_bootstrap)}
+		<script type="text/javascript">
+            var inputs = document.getElementById("smart_form").getElementsByTagName('input');
+            var btns = document.getElementById("smart_form").getElementsByTagName('button');
+            if (inputs) {
+            	for (var i = 0; i < inputs.length; i++) {
+                	inputs[i].className = 'form-control';
+            	}
+			}
+
+            if (btns) {
+                for (var j = 0; j < btns.length; j++) {
+                    btns[j].className = 'form-control';
+                }
+            }
+		</script>
+    {/if}
 
 {/if}
