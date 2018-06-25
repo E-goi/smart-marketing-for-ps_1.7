@@ -23,8 +23,8 @@
 						<td width="100">{$list.subs_total}</td>
 						<td width="100">{$list.idioma}</td>
 						<td width="100">
-							<a href="http://bo.e-goi.com/?from={$url_list}{$list.listnum}" class="btn btn-default" target="_blank" />
-							{l s='Change' mod='smartmarketingps'} <span class="icon-edit"></span>
+							<a href="http://bo.e-goi.com/?from={$url_list}{$list.listnum}" class="btn btn-default" target="_blank">
+								{l s='Change' mod='smartmarketingps'} <span class="icon-edit"></span>
 							</a>
 						</td>
 					</tr>
@@ -58,7 +58,7 @@
 				</tr>
 				</table>
 
-				<input type="submit" id="add-list" name="add-list" value="1" style="display: none;">
+				<input type="submit" id="add-list" name="add-list" value="{l s='Save List' mod='smartmarketingps'}" class="btn btn-primary">
 			</form>
 		{else}
 			{l s='Error retrieving lists from E-goi' mod='smartmarketingps'}

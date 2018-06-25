@@ -12,7 +12,7 @@
 				<th>
 					{l s='Client ID' mod='smartmarketingps'}
 				</th>
-				<th colspan="2">
+				<th>
 					{l s='Company Name' mod='smartmarketingps'}
 				</th>
 				<th>
@@ -27,7 +27,6 @@
 				<tr>
 					<td>{if isset($clientData['CLIENTE_ID'])} {$clientData['CLIENTE_ID']} {/if}</td>
 					<td>{if $clientData['COMPANY_NAME'] != "E-goi"} {$clientData['COMPANY_NAME']} {else} - {/if}</td>
-					<td>{if $clientData['COMPANY_LEGAL_NAME'] != "E-goi"} {$clientData['COMPANY_LEGAL_NAME']} {/if}</td>
 					<td>-</td>
 					<td>{if isset($clientData['DATE_REGISTRATION'])} {$clientData['DATE_REGISTRATION']} {/if}</td>
 					<td>

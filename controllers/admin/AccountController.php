@@ -45,13 +45,6 @@ class AccountController extends SmartMarketingBaseController
 	public function initPageHeaderToolbar()
     {
         parent::initPageHeaderToolbar();
-    	$this->page_header_toolbar_btn['new-list'] = array(
-		    'short' => $this->l('New List E-goi'),
-		    'icon' => 'process-icon-new',
-		    'href' => '#',
-		    'desc' => $this->l('New List E-goi'),
-		    'js' => $this->l('$( \'#add-list\' ).trigger("click");')
-		);
 
     	$this->page_header_toolbar_btn['goto-egoi'] = array(
 		    'short' => $this->l('Go to E-goi'),
