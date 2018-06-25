@@ -138,6 +138,14 @@
    animation: spin 2s linear infinite;
 }
 
+#sync_success{
+   position: absolute;
+   margin-left: 20px;
+   width: 30px;
+   height: 30px;
+   color: green;
+}
+
 /* Safari */
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); }

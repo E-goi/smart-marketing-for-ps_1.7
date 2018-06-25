@@ -1,11 +1,6 @@
 
 {include file='./alerts.tpl'}
 
-	
-{if isset($success_message) and ($success_message)}
-	{$success_message}
-{/if}
-
 <div class="panel">
 	<div class="egoi panel-heading"><span class="icon-group" id="subs"></span> <span class="baseline">{l s='My Subscribers' mod='smartmarketingps'}</span></div>
 	<form method="post">
@@ -104,6 +99,7 @@
 							{l s='Sync Customers' mod='smartmarketingps'}
 						</button>
 						<div class="sync_customers" style="display: none;"></div>
+						<i class="material-icons" id="sync_success" style="display: none;">beenhere</i>
 						<p class="help">{l s='Sync already existing PrestaShop customers to E-goi List' mod='smartmarketingps'}</p>
 					</td>
 				</tr>

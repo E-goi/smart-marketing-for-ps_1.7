@@ -1,3 +1,7 @@
+jQuery.fn.show = function() {
+	return this.prop('style', 'display:inline-block');
+};
+
 $(document).ready(function() {
 
 	var listID = $('#egoi_lists').val();
@@ -19,9 +23,10 @@ $(document).ready(function() {
     	}
     });
 
-	$("#sync_old_subs").click(function() {
+	$("#sync_old_subs").on('click', function() {
 
 		$('.sync_customers').show();
+        $('#sync_success').hide();
 		var btn_sync = $(this);
 		btn_sync.prop('disabled', true);
 
@@ -35,11 +40,13 @@ $(document).ready(function() {
 		    	if (data) {
 		    		btn_sync.prop('disabled', false);
 		    		$('.sync_customers').hide();
+		    		$('#sync_success').show();
 		    	}
 		    },
 		    error:function(status){
 		    	btn_sync.prop('disabled', false);
 		    	$('.sync_customers').hide();
+                $('#sync_success').hide();
 		    }
 		});
 	});
