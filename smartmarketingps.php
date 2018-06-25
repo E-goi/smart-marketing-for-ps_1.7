@@ -466,7 +466,7 @@ class SmartMarketingPs extends Module
 		if($res['sync']) {
 
             // check if is a role defined
-            if (!$this->getRole((int)$params['object']->email, $res['role'])) {
+            if (!$this->getRole((int)$params['object']->id, $res['role'])) {
                 return false;
             }
 
@@ -493,8 +493,11 @@ class SmartMarketingPs extends Module
 			$add = $api->addSubscriber($fields, array($tag));
 			if(isset($add['ERROR']) && ($add['ERROR'])) {
 				return false;
-			}		
-			
+			}
+
+            $client_data = $api->getClientData();
+            $client = (int)$client_data['CLIENTE_ID'];
+
 			return Db::getInstance()->update('egoi', 
 				array(
 					'total' => (int)$res['total']
@@ -519,7 +522,7 @@ class SmartMarketingPs extends Module
 				if (!empty($customer)) {
 
 				    // check if is a role defined
-                    if (!$this->getRole($customer->id, $res['role'])) {
+                    if (!$this->getRole((int)$customer->id, $res['role'])) {
 				        return false;
                     }
 
@@ -571,6 +574,12 @@ class SmartMarketingPs extends Module
 
 			$email = isset($params['object']->email) && ($params['object']->email) ? $params['object']->email : false;
 			if ($email) {
+
+                // check if is a role defined
+                if (!$this->getRole($params['object']->id, $res['role'])) {
+                    return false;
+                }
+
 				$rm = $api->removeSubscriber($res['list_id'], $email);
 				if(isset($rm['ERROR']) && ($rm['ERROR'])) {
 					return false;
