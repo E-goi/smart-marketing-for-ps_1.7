@@ -93,14 +93,13 @@ class AccountController extends SmartMarketingBaseController
 
 		if($msg) {
 			if(is_numeric($msg)){
-				$this->assign('success_message', 'ok');
+				$this->assign('success_msg', $this->displaySuccess('ok'));
 			}else{
-				$this->assign('error_message', $msg);
+				$this->assign('error_msg', $this->displayWarning($msg));
 			}
 		}
-		
-		$url_list = '/?action=lista_definicoes_principal&list=';
-		$this->assign('url_list', $url_list);
+
+		$this->assign('url_list', '/?action=lista_definicoes_principal&list=');
 	}
 	
 	/**

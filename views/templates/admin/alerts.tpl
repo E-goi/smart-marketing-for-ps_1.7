@@ -1,4 +1,4 @@
- 
+
 {if isset($error_msg) and ($error_msg)}
 	{$error_msg}
 {/if}

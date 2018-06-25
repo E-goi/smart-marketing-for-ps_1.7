@@ -131,7 +131,7 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	 * Display a closable Warning
 	 * 
 	 * @param  string $message
-	 * @return void        
+	 * @return mixed
 	 */
 	protected function displayWarning($message)
 	{
