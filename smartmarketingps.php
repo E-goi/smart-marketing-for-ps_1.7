@@ -122,7 +122,7 @@ class SmartMarketingPs extends Module
     /**
 	 * Create menu
 	 * 
-	 * @return type
+	 * @return bool
 	 */
 	private function createMenu()
 	{
@@ -201,7 +201,7 @@ class SmartMarketingPs extends Module
     /**
      * Uninstall required tables
      * 
-     * @return type
+     * @return bool
      */
     protected function uninstallDb() 
 	{
@@ -445,7 +445,7 @@ class SmartMarketingPs extends Module
 			'email' => $params['object']->email
 		);
 		foreach ($params['object'] as $key => $value) {
-			$row = $api->getFieldMap(0, $key);
+			$row = $this->getFieldMap(0, $key);
 			if($row) {
 				$fields[$row] = $value;
 			}
@@ -461,28 +461,23 @@ class SmartMarketingPs extends Module
 				)
 			);
 		}
-		
-		$client_data = $api->getClientData();
-		$client = (int)$client_data['CLIENTE_ID'];
 
-		$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
-					->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id='.$client);		
-		
+        $res = $this->getClientData();
 		if($res['sync']) {
+
+            // check if is a role defined
+            if (!$this->getRole((int)$params['object']->email, $res['role'])) {
+                return false;
+            }
 
 			$fields['listID'] = $res['list_id'];
 			$fields['validate_email'] = '0';
 
-			/*if($res['doptin'] == '1') {
-				$fields['formID'] = $res['form_id'];
-			}*/
-
+            $tag = '';
 			if($params['object']->newsletter == '0') {
 				$name = 'NO_Newsletter';
 				$get_tags = $api->getTags($name);
-				
-				
-				$tag = '';
+
 				foreach ($get_tags as $tags){
 					if($tags['NAME'] == $name) {
 						$tag = $tags['ID'];
@@ -509,8 +504,9 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Update customer
-	 * 
-	 * @return void
+	 *
+     * @param array $params
+	 * @return mixed
 	 */
 	protected function updateCustomer($params)
 	{
@@ -520,15 +516,19 @@ class SmartMarketingPs extends Module
 			$id = isset($params['object']->id) && ($params['object']->id) ? $params['object']->id : false;
 			if($id) {
 				$customer = new Customer((int)$id);
-
 				if (!empty($customer)) {
+
+				    // check if is a role defined
+                    if (!$this->getRole($customer->id, $res['role'])) {
+				        return false;
+                    }
 
 					$api = new SmartApi();
 					$fields = array(
 						'email' => $customer->email
 					);
 					foreach ($customer as $key => $value) {
-						$row = $api->getFieldMap(0, $key);
+						$row = $this->getFieldMap(0, $key);
 
 						if($row){
 							$fields[$row] = $value;
@@ -545,12 +545,12 @@ class SmartMarketingPs extends Module
 							)
 						);
 					}
-				}
-				
-				$fields['listID'] = $res['list_id'];
-			 	$result = $api->editSubscriber($fields);
-				if (isset($result['ERROR']) && ($result['ERROR'])) {
-					$api->addSubscriber($fields);
+
+                    $fields['listID'] = $res['list_id'];
+                    $result = $api->editSubscriber($fields);
+                    if (isset($result['ERROR']) && ($result['ERROR'])) {
+                        $api->addSubscriber($fields);
+                    }
 				}
 			}
 		}
@@ -558,8 +558,9 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Delete customer
-	 * 
-	 * @return void
+	 *
+     * @param array $params
+	 * @return bool
 	 */
 	protected function deleteCustomer($params)
 	{
@@ -585,6 +586,25 @@ class SmartMarketingPs extends Module
 			}
 		}
 	}
+
+    /**
+     * Get role from Customer
+     *
+     * @param $customer_id
+     * @param $customer_role
+     * @return bool
+     */
+	protected function getRole($customer_id, $customer_role)
+    {
+        if ($customer_role) {
+            $role = Db::getInstance()
+                ->getValue("SELECT COUNT(*) FROM "._DB_PREFIX_."customer_group WHERE id_customer='".$customer_id."' and id_group='$customer_role'");
+            if (!$role) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 	/**
    	 * Hook for display content in Top Page
@@ -784,9 +804,40 @@ class SmartMarketingPs extends Module
 		}
 	}
 
+    /**
+     * Get all mapped fields
+     *
+     * @return array
+     */
+    public function getMappedFields()
+    {
+        $sql = "SELECT * FROM " . _DB_PREFIX_ . "egoi_map_fields order by id DESC";
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+    }
+
+    /**
+     * Get field value map
+     *
+     * @param $name
+     * @param $field
+     * @return string
+     */
+    public function getFieldMap($name = false, $field = false)
+    {
+        if ($field) {
+            $sql = "SELECT * FROM " . _DB_PREFIX_ . "egoi_map_fields WHERE ps='" . pSQL($field) . "'";
+        } else {
+            $sql = "SELECT * FROM " . _DB_PREFIX_ . "egoi_map_fields WHERE egoi='" . pSQL($name) . "'";
+        }
+        $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
+        return $rq['egoi'];
+    }
+
 	/**
 	 * Get Client Data from DB
-	 * 
+	 *
+     * @param $field
+     * @param $val
 	 * @return array|null
 	 */
 	private function getClientData($field = false, $val = false)
@@ -876,7 +927,7 @@ class SmartMarketingPs extends Module
    	 * 
    	 * @param  $blockName
    	 * @param  $optionalArgs
-   	 * @return void
+   	 * @return bool
    	 */
    	private function processBlockOptions($blockName, $optionalArgs = false)
    	{

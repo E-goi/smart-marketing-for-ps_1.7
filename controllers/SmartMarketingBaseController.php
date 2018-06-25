@@ -108,7 +108,7 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	 * Assign a variable to a view
 	 * 
 	 * @param  string $key
-	 * @param  string $value
+	 * @param  string|array $value
 	 * @return object
 	 */
 	protected function assign($key, $value) 
