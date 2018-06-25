@@ -308,39 +308,10 @@ class SmartApi
     }
 
     /**
-     * Ger all mapped fields
-     * 
-     * @return array
-     */
-    public function getMappedFields()
-    {
-        $sql = "SELECT * FROM " . _DB_PREFIX_ . "egoi_map_fields order by id DESC";
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-    }
-
-    /**
-     * Get field value map
-     * 
-     * @param $name
-     * @param $field
-     * @return array
-     */
-    public function getFieldMap($name = false, $field = false)
-    {
-        if ($field) {
-            $sql = "SELECT * FROM " . _DB_PREFIX_ . "egoi_map_fields WHERE ps='" . pSQL($field) . "'";
-        } else {
-            $sql = "SELECT * FROM " . _DB_PREFIX_ . "egoi_map_fields WHERE egoi='" . pSQL($name) . "'";
-        }
-        $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
-        return $rq['egoi'];
-    }
-
-    /**
      * Get extra fields
      * 
      * @param $listID
-     * @return array
+     * @return array|null
      */
     public function getExtraFields($listID)
     {
@@ -351,7 +322,11 @@ class SmartApi
         $resultclient = $this->client->getExtraFields(
             array_merge($this->getBaseParams(), $params)
         );
-        return $resultclient['extra_fields'];
+
+        if (!empty($resultclient['extra_fields'])) {
+            return $resultclient['extra_fields'];
+        }
+        return null;
     }
 
     /**
