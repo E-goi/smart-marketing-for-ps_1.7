@@ -27,12 +27,18 @@ class SmartApi
     private $client;
 
     /**
-     * Constructor
+     * SmartApi constructor.
+     *
+     * @param bool $apikey
      */
     public function __construct($apikey = false)
     {
         $this->client = new SoapClient($this->api_url);
-        $this->apiKey = $this->apiKey ?: (Configuration::get('smart_api_key') ?: $apikey);
+        if ($apikey) {
+            $this->apiKey = $apikey;
+        }else{
+            $this->apiKey = $this->apiKey ?: Configuration::get('smart_api_key');
+        }
     }
 
     /**

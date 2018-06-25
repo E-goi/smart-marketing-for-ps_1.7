@@ -36,7 +36,8 @@
 
 		<div class="form-group">
 			<a class="btn btn-default" id="account_button">
-				{l s='Go to My Account' mod='smartmarketingps'} <i class="material-icons action-enabled">navigate_next</i>
+				<div style="font-size: 13px;display: inline-block;vertical-align: super;">{l s='Go to My Account' mod='smartmarketingps'}</div>
+				<i class="material-icons action-enabled" style="font-size: 18px;">navigate_next</i>
 			</a>
 		</div>
 

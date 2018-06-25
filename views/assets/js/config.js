@@ -10,16 +10,16 @@ $(document).ready(function($) {
 
 		$('#smart_api_key').focus();
 		$(this).hide();
-	})
+	});
 
-	$("#smart_api_key").on('input', function() {
+	$("#smart_api_key").on('input', function(e) {
 
 		var api_key = $(this).val();
 
 		$(".sync_api_key").prop('style', '');
 		$("#error").hide();
 
-		if(api_key.length == 40){
+		if(api_key.length === 40){
 
 			$.ajax({
 			    type: 'POST',
@@ -31,17 +31,17 @@ $(document).ready(function($) {
 			        
 			        $(".sync_api_key").hide();
 			        if(status == '403'){
-			        	$("#apikey_submit").hide();
+			        	$("#apikey_submit").prop('disabled', true).hide();
 			        	$("#error").prop('style', 'display:inline-block');
 			        }else{
 			        	$('#egoi_client_id').val(data.CLIENTE_ID);
-			        	$("#apikey_submit").show();
+			        	$("#apikey_submit").prop('disabled', false).show();
 			        	$('#error').hide();
 			        }
 			    },
 			    error:function(status){
 			    	if(status){
-				    	$("#apikey_submit").hide();
+				    	$("#apikey_submit").prop('disabled', true).hide();
 				    	$(".sync_api_key").hide();
 				    	$("#error").prop('style', 'display:inline-block');
 				    }
@@ -49,8 +49,9 @@ $(document).ready(function($) {
 			});
 
 		}else{
+
 			$(".sync_api_key").hide();
-			$("#apikey_submit").hide();
+			$("#apikey_submit").prop('disabled', true).hide();
 			$('#error').hide();
 		}
 	})
