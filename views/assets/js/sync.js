@@ -74,7 +74,7 @@ $(document).ready(function() {
 		var $egoi = $('#egoi');
 		var $egoi_name = $('#egoi option:selected');
 
-		if(($ps.val() != '') && ($egoi.val() != '')){
+		if(($ps.val() !== '') && ($egoi.val() !== '')) {
 
 			$('#load_map').show();
 
@@ -104,7 +104,6 @@ $(document).ready(function() {
 			    	if(status){
 				    	$("#error_map").show();
 				    	$('#load_map').hide();
-				    	$('.col_map').hide();
 				    }
 			    }
 			});

@@ -87,13 +87,13 @@ class FormsController extends SmartMarketingBaseController
 			    'desc' => $this->l('Save form'),
 			    'js' => $this->l('$( \'#save-form\' ).click();')
 			);
-			$this->page_header_toolbar_btn['form-preview'] = array(
+			/*$this->page_header_toolbar_btn['form-preview'] = array(
 			    'short' => $this->l('Preview form'),
 			    'icon' => 'icon-desktop',
 			    'href' => '#',
 			    'desc' => $this->l('Preview form'),
 			    'js' => $this->l('$( \'#preview-form\' ).click();')
-			);
+			);*/
         }else{
         	 $this->page_header_toolbar_btn['new-form'] = array(
 			    'short' => $this->l('Add new Form'),
@@ -108,7 +108,7 @@ class FormsController extends SmartMarketingBaseController
     /**
      * Initiate content
      * 
-     * @return void
+     * @return mixed
      */
 	public function initContent()
 	{
@@ -117,7 +117,7 @@ class FormsController extends SmartMarketingBaseController
 		if ($this->isValid()) {
 
 			if(!empty($_POST)) {
-				$this->saveForm();
+                $this->saveForm();
 			}
 
 			// delete form if is defined
@@ -140,7 +140,7 @@ class FormsController extends SmartMarketingBaseController
 	/**
 	 * Display form content if specified
 	 * 
-	 * @return void 
+	 * @return mixed
 	 */
 	protected function displayForm() 
 	{
@@ -150,7 +150,10 @@ class FormsController extends SmartMarketingBaseController
 			
 			$form = !empty($res) ? $res : $this->formOptions;
 			foreach ($form as $key => $val) {
-				$this->assign($key, $val);
+                if ($key == 'form_content') {
+                    $val = base64_decode($val);
+                }
+                $this->assign($key, $val);
 			}
 
 			// get forms from E-goi
@@ -162,7 +165,7 @@ class FormsController extends SmartMarketingBaseController
 			$this->assign('lists', $this->api->getLists());
 		}
 
-		$this->assign('content', $this->fetch('forms.tpl'));
+		return $this->assign('content', $this->fetch('forms.tpl'));
 	}
 
 	/**
@@ -176,31 +179,41 @@ class FormsController extends SmartMarketingBaseController
 			
 			$post = $_POST;
 			unset($post['save-form']);
-
-			$client_data = $this->api->getClientData();
-			$client = $client_data['CLIENTE_ID'];
 			
 			$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
 						->getRow('SELECT * FROM '._DB_PREFIX_.'egoi_forms WHERE form_id='.(int)$this->formId);
 
 			foreach ($post as $key => $value) {
 				if ($key == 'form_content') {
-					$this->formOptions[$key] = htmlentities(Tools::getValue('form_content'));
+					$this->formOptions[$key] = pSQL(
+					    base64_encode(
+					        htmlentities(Tools::getValue('form_content')
+                            )
+                        )
+                    );
 				}else{
 					$this->formOptions[$key] = is_numeric($value) ? (int)$value : pSQL($value);
 				}
 			}
 
 			if($res['form_id']) {
-				$this->assign('success_message', $this->displaySuccess($this->l('Form settings updated')));
-				return Db::getInstance()->update('egoi_forms', $this->formOptions, "form_id = ".(int)$this->formId);
+                $result = Db::getInstance()->update('egoi_forms', $this->formOptions, "form_id = ".(int)$this->formId);
+                if ($result) {
+                    $this->assign('success_msg', $this->displaySuccess($this->l('Form settings updated')));
+                }
+
 			}else{
-				$this->assign('success_message', $this->displaySuccess($this->l('Form settings saved')));
-				return Db::getInstance()->insert('egoi_forms', $this->formOptions);
+				$result = Db::getInstance()->insert('egoi_forms', $this->formOptions);
+				if ($result) {
+                    $this->assign('success_msg', $this->displaySuccess($this->l('Form settings saved')));
+                }
 			}
 
-			return false;
+            if (!$result) {
+                $this->assign('error_msg', $this->displayWarning($this->l('Form settings error')));
+            }
 		}
+		return false;
 	}
 
 	/**

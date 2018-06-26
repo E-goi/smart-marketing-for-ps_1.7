@@ -120,7 +120,6 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	 * Display a closable Success
 	 * 
 	 * @param  string $message
-	 * @return void
 	 */
 	protected function displaySuccess($message)
 	{
@@ -142,7 +141,7 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	 * Get custom Controller Route
 	 * 
 	 * @param  string $controller
-	 * @param  string $withAdmin
+	 * @param $withAdmin
 	 * @return string
 	 */
 	protected function getControllerRoute($controller, $withAdmin = false)

@@ -93,6 +93,7 @@ class SmartMarketingPs extends Module
 	  		|| !$this->registerHook('actionObjectCustomerUpdateAfter')
 	  		|| !$this->registerHook('actionObjectCustomerDeleteAfter')
 	  		|| !$this->registerHook('actionValidateOrder')
+	  		|| !$this->registerHook('displayHome')
 	  		|| !$this->registerHook('displayTop')
 	  		|| !$this->registerHook('displayFooter'))
 	    	return false;
@@ -935,10 +936,9 @@ class SmartMarketingPs extends Module
    	 * Process Block Options
    	 * 
    	 * @param  $blockName
-   	 * @param  $optionalArgs
    	 * @return bool
    	 */
-   	private function processBlockOptions($blockName, $optionalArgs = false)
+   	private function processBlockOptions($blockName)
    	{
    		$block = 'block_'.$blockName;
    		$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
@@ -964,7 +964,7 @@ class SmartMarketingPs extends Module
 			if($res['form_type'] == 'iframe') {
 				$content = '<iframe src="http://'.$res['url'].'" width="'.$res['style_width'].'" height="'.$res['style_height'].'" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>';
 			}else{
-				$content = html_entity_decode($res['form_content']);
+				$content = html_entity_decode(base64_decode($res['form_content']));
 			}
 
 			if ($res['enable']) {
@@ -977,24 +977,9 @@ class SmartMarketingPs extends Module
    	}
 
    	/**
-     * Create an array with language key name and respective field
-     * 
-     * @param $field
-     * @return array
-     */
-    private function createMultiLangField($field) 
-    {
-    	$res = array();
-		$languages = Language::getLanguages();
-		foreach ($languages as $lang)
-		    $res[$lang['id_lang']] = $field;
-
-		return $res;
-   	}
-
-   	/**
    	 * @param  array|bool $values
-   	 * @return void        
+   	 * @param $key
+   	 * @return void
    	 */
    	private function assign($values, $key = false) 
    	{

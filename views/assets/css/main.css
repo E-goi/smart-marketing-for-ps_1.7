@@ -4,10 +4,6 @@
    color: red;
 }
 
-.col_map{
-   margin-top: 10%;
-}
-
 .bootstrap.panel{
    margin-top: 13%;
    margin-bottom: -10%;
@@ -41,15 +37,10 @@
    padding-bottom: 20px;
    width: 75%;
 }
+
 .list-group-item{
    cursor:pointer;
 }
-
-.input_block{  
-   width: 10% !important;
-   display: inline-block !important;
-}
-
 
 .egoi.panel-heading{
    height: 40px !important;
@@ -83,17 +74,6 @@
    border: none !important;
 }
 
-.egoi-save{
-   display: block; 
-   width: 30px;
-   height: 30px; 
-   margin: 0 auto; 
-   font-size: 28px; 
-   background: transparent; 
-   background-size: 26px;
-   background-position: center;
-}
-
 .egoi-b{
    font-size: 14px;
    vertical-align: -webkit-baseline-middle;
@@ -110,7 +90,6 @@
 
 .egoi-map-header{
    background-color: #25b9d7;
-
 }
 
 .egoi-title{
