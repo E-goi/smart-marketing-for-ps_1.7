@@ -26,31 +26,12 @@ $(document).ready(function() {
 		return window.location.replace(url);
 	});
 
-	$('#formid_egoi').change(function() {
-		var e = document.getElementById('formid_egoi');
-		var result = e.options[e.selectedIndex].value;
-
-		if(result) {
-			$.ajax({
-			    url: 'http://'+window.location.host+'/modules/egoiforps/includes/forms.php',
-			    type: 'POST',
-			    data:({
-			        url: result
-			    }),
-			    success:function(data, status) {
-			        $('#egoi_form_inter').html(data);
-			        $('#preview').modal('show');
-			    },
-			    error:function(status){
-			    	if(status){
-				    	$("#egoi_ps_key").attr('disabled', 'disabled');
-				    	$("#valid").hide();
-				    	$("#error").show();
-				    }
-			    }
-			});
+	$('#formid_egoi').on('change', function() {
+		var url = $(this).val();
+		if(url) {
+			$('#prev_iframe').prop('src', '//'+url);
+            $('#preview').modal('show');
 		}
-
 	});
 
 	$('.del-form').click(function(e) {

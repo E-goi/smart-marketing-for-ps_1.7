@@ -9,13 +9,6 @@
 			font-size: 20px;
 		}
 
-		.col-lg-9{
-			width: 100% !important;
-		}
-		#mce_41-open{
-			display: none !important;
-		}
-
 		{if isset($type) and ($type eq 'iframe')}
 			#panel_egbody{
 				height: 400px;
@@ -110,7 +103,6 @@
 											{else}
 												<option value="{$form_egoi.url}">{$form_egoi.title}</option>
 											{/if}
-
 										{/foreach}
 									</select>
 								</div>
@@ -143,7 +135,6 @@
 								<a class="slide-button btn"></a>
 							</span>
 						</p>
-
 					{/if}
 
 					</div>
@@ -195,7 +186,7 @@
 							{else}
 								<div style="float:left;"><b>{l s='List' mod='smartmarketingps'}</b></div>
 								<div class="list">
-									<select name="list">
+									<select name="list_id" id="list">
 										<option disabled>
 											{l s='Select a list..' mod='smartmarketingps'}
 										</option>
@@ -205,7 +196,6 @@
 											{else}
 												<option value="{$list.listnum}">{$list.title}</option>
 											{/if}
-
 										{/foreach}
 									</select>
 								</div>
@@ -300,12 +290,7 @@
 				
 				<div>
 					{if $type eq 'iframe'}
-						<span><a data-toggle="modal" class="btn" data-target="#preview">{l s='Preview' mod='smartmarketingps'}</a></div>
-					{else}
-						{if $form_content}
-							<span><a style="display: none;" class="btn" href="//{$smarty.server.SERVER_NAME}/index.php?fc=module&module=smartmarketingps&controller=egoi_forms&form={$form}" target="_blank">
-							{l s='Preview' mod='smartmarketingps'}</a></div>
-						{/if}
+						<span><a data-toggle="modal" class="btn" data-target="#preview">{l s='Preview Iframe' mod='smartmarketingps'}</a></div>
 					{/if}
 				</div>
 				
@@ -321,20 +306,14 @@
 			    <div class="modal-dialog" style="width:730px;height:400px;">
 			     	<div class="modal-content">
 				        <div class="modal-body">
-				        	{if $form_data}
-				        		<div id="egoi_form_inter">
-				        			<iframe src="//{$url}" width="700" height="600" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>
-				        		</div>
-							{else}
-				        		<div id="egoi_form_inter"></div>
-				        	{/if}
-
+							<div id="egoi_form_inter">
+								<iframe id="prev_iframe" src="" width="700" height="600" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>
+							</div>
 				        </div>
 				        <div class="modal-footer">
 				          <button type="button" class="btn btn-default" id="close_fields" data-dismiss="modal">{l s='Close' mod='smartmarketingps'}</button>
 				        </div>
 			      	</div>
-
 			    </div>
 			</div>
 		{/if}
@@ -350,6 +329,7 @@
 					<tr>
 						<th>{l s='Form ID' mod='smartmarketingps'}</th>
 						<th>{l s='Form Title' mod='smartmarketingps'}</th>
+						<th>{l s='Form Type' mod='smartmarketingps'}</th>
 						<th>{l s='Active' mod='smartmarketingps'}</th>
 						<th colspan="2">{l s='Options' mod='smartmarketingps'}</th>
 					</tr>
@@ -360,7 +340,8 @@
 						<tr>
 							<td>{$forms.form_id}</td>
 							<td>{$forms.form_title}</td>
-							<td> 
+							<td>{$forms.form_type}</td>
+							<td>
 								{if $forms.enable}
 									<i class="material-icons action-enabled egoi-icon" style="color:#78d07d;">check</i> 
 								{else} 
