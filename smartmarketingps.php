@@ -361,7 +361,7 @@ class SmartMarketingPs extends Module
 	/**
 	 * Show Configuration Form
 	 * 
-	 * @return type
+	 * @return mixed
 	 */
 	public function displayForm() 
 	{
@@ -403,7 +403,7 @@ class SmartMarketingPs extends Module
     * Hook for Add customer
     *
     * @param array $params
-    * @return void
+    * @return bool
     */
     public function hookActionObjectCustomerAddAfter($params) 
     {
@@ -414,7 +414,7 @@ class SmartMarketingPs extends Module
 	 * Hook for Update customer
 	 * 
 	 * @param array $params
-	 * @return void
+	 * @return bool
 	 */
 	public function hookActionObjectCustomerUpdateAfter($params)
 	{
@@ -425,7 +425,7 @@ class SmartMarketingPs extends Module
 	 * Hook for Delete customer
 	 * 
 	 * @param array $params
-	 * @return void
+	 * @return bool
 	 */
 	public function hookActionObjectCustomerDeleteAfter($params)
 	{
@@ -956,6 +956,10 @@ class SmartMarketingPs extends Module
 		  	);
 
 			if($res['popup']) {
+                $this->context->controller->addJS($this->_path. 'views/assets/js/modal.js');
+                $this->context->controller->addCSS($this->_path. 'views/assets/css/modal.css');
+
+                $this->assign($res['popup'], 'popup');
 				if ($res['once']) {
 					$this->assign($res['once'], 'once');
 				}

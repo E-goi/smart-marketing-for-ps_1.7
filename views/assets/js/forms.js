@@ -1,27 +1,27 @@
 $(document).ready(function() {
 
-	$("#home1").click(function() {
+	$("#home1").on('click', function() {
 		$('#popup_form').show();
 	});
-	$("#home2").click(function() {
+	$("#home2").on('click', function() {
 	    $('#popup_form').hide();
 	});
 
-	$("#footer0").click(function() {
+	$("#footer0").on('click', function() {
 	    $('#help_footer').show();
 	});
-	$("#footer1").click(function() {
+	$("#footer1").on('click', function() {
 	    $('#help_footer').hide();
 	});
 
-	$("#popup1").click(function() {
+	$("#popup1").on('click', function() {
 	    $('#once').show();
 	});
-	$("#popup2").click(function() {
+	$("#popup2").on('click', function() {
 	    $('#once').hide();
 	});
 
-	$('#add-form').click(function() {
+	$('#add-form').on('click', function() {
 		var url = $(this).data('href');
 		return window.location.replace(url);
 	});
@@ -34,7 +34,7 @@ $(document).ready(function() {
 		}
 	});
 
-	$('.del-form').click(function(e) {
+	$('.del-form').on('click', function(e) {
 		e.preventDefault();
 
 		var text = $('#del-info').text();

@@ -107,7 +107,7 @@
 									</select>
 								</div>
 							{else}
-								<b>{l s='No forms found, you must set your list in Settings' mod='smartmarketingps'}</b>
+								<b>{l s='No forms found, you must set your list in Settings, then save it to select a Form' mod='smartmarketingps'}</b>
 							{/if}
 
 						</div>
@@ -118,7 +118,6 @@
 							<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="Height" maxlength="5" name="style_height" value="{$style_height}">
 							<p class="egoi-help">(values in px)</p>
 						</div>
-						
 
 					{elseif $type eq 'popup' or $type eq 'html'}
 
@@ -257,31 +256,33 @@
 						</div>
 					</div>
 
-					<div class="reg" {if !$block_home} style="display: none;" {/if} id="popup_form">
-						<div style="float:left;"><b>{l s='Show in Popup?' mod='smartmarketingps'}</b></div>
-						<div class="register">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="popup" id="popup1" value="1" {if $popup eq '1'} checked {/if}>
-								<label for="popup1">{l s='Yes' mod='smartmarketingps'}</label>
-								<input type="radio" name="popup" id="popup2" value="0" {if $popup eq '0' or $popup eq ''} checked {/if}>
-								<label for="popup2">{l s='No' mod='smartmarketingps'}</label>
-								<a class="slide-button btn"></a>
-							</span>
+					{if $type eq 'html'}
+						<div class="reg" {if !$block_home} style="display: none;" {/if} id="popup_form">
+							<div style="float:left;"><b>{l s='Show in Popup?' mod='smartmarketingps'}</b></div>
+							<div class="register">
+								<span class="switch prestashop-switchgit status fixed-width-lg">
+									<input type="radio" name="popup" id="popup1" value="1" {if $popup eq '1'} checked {/if}>
+									<label for="popup1">{l s='Yes' mod='smartmarketingps'}</label>
+									<input type="radio" name="popup" id="popup2" value="0" {if $popup eq '0' or $popup eq ''} checked {/if}>
+									<label for="popup2">{l s='No' mod='smartmarketingps'}</label>
+									<a class="slide-button btn"></a>
+								</span>
+							</div>
 						</div>
-					</div>
 
-					<div class="reg" {if !$popup} style="display: none;" {/if} id="once">
-						<div style="float:left;"><b>{l s='Show only Once?' mod='smartmarketingps'}</b></div>
-						<div class="register">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="once" id="once1" value="1" {if $once eq '1'} checked {/if}>
-								<label for="once1">{l s='Yes' mod='smartmarketingps'}</label>
-								<input type="radio" name="once" id="once2" value="0" {if $once eq '0' or $once eq ''} checked {/if}>
-								<label for="once2">{l s='No' mod='smartmarketingps'}</label>
-								<a class="slide-button btn"></a>
-							</span>
+						<div class="reg" {if !$popup} style="display: none;" {/if} id="once">
+							<div style="float:left;"><b>{l s='Show only Once?' mod='smartmarketingps'}</b></div>
+							<div class="register">
+								<span class="switch prestashop-switch fixed-width-lg">
+									<input type="radio" name="once" id="once1" value="1" {if $once eq '1'} checked {/if}>
+									<label for="once1">{l s='Yes' mod='smartmarketingps'}</label>
+									<input type="radio" name="once" id="once2" value="0" {if $once eq '0' or $once eq ''} checked {/if}>
+									<label for="once2">{l s='No' mod='smartmarketingps'}</label>
+									<a class="slide-button btn"></a>
+								</span>
+							</div>
 						</div>
-					</div>
+					{/if}
 
 					<div class="reg">
 						<p>&nbsp;</p>
