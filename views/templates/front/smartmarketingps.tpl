@@ -3,46 +3,34 @@
 	
 	{if isset($popup) and ($popup)}
 
-        {if isset($once) and ($once)}
-			<script type="text/javascript">
-                $(document).ready(function(){
-                    if ($.cookie('show_popup') == null) {
-                        $.cookie('show_popup', 'yes', { expires: 7, path: '/' });
-                        $('#egoi-form').modal({
-                            show: true
-                        });
-                    }
-                });
-			</script>
-        {else}
+		<div data-modal-show="egoi-show-once" style="display: none;">{if isset($once) and ($once)} 1 {/if}</div>
 
-			<div class="modal fade" data-modal-name="egoi-form">
-				<div class="modal__dialog">
-					<button class="modal__close" data-modal-dismiss>×</button>
-					<header class="modal__header">
-						<h3 class="modal__title">{$form_title}</h3>
-					</header>
-					<div class="modal__content">
-						<div id="smart_form">
-							{if isset($error_submit) and ($error_submit)}
-								<p class="egoi-error">
-									{$error_submit}
-								</p>
-							{elseif isset($success_submit) and ($success_submit)}
-								<p class="egoi-success">
-									{$success_submit}
-								</p>
-							{/if}
+		<div class="modal fade" data-modal-name="egoi-form">
+			<div class="modal__dialog">
+				<button class="modal__close" data-modal-dismiss>×</button>
+				<header class="modal__header">
+					<h3 class="modal__title">{$form_title}</h3>
+				</header>
+				<div class="modal__content">
+					<div id="smart_form">
+						{if isset($error_submit) and ($error_submit)}
+							<p class="egoi-error">
+								{$error_submit}
+							</p>
+						{elseif isset($success_submit) and ($success_submit)}
+							<p class="egoi-success">
+								{$success_submit}
+							</p>
+						{/if}
 
-							<input type="hidden" name="form_id" value="{$form_id}">
-							{$content nofilter}
-						</div>
+						<input type="hidden" name="form_id" value="{$form_id}">
+						{$content nofilter}
 					</div>
-					<footer class="modal__footer">
-					</footer>
 				</div>
+				<footer class="modal__footer">
+				</footer>
 			</div>
-        {/if}
+		</div>
 
 	{else}
 

@@ -260,7 +260,7 @@
 						<div class="reg" {if !$block_home} style="display: none;" {/if} id="popup_form">
 							<div style="float:left;"><b>{l s='Show in Popup?' mod='smartmarketingps'}</b></div>
 							<div class="register">
-								<span class="switch prestashop-switchgit status fixed-width-lg">
+								<span class="switch prestashop-switch status fixed-width-lg">
 									<input type="radio" name="popup" id="popup1" value="1" {if $popup eq '1'} checked {/if}>
 									<label for="popup1">{l s='Yes' mod='smartmarketingps'}</label>
 									<input type="radio" name="popup" id="popup2" value="0" {if $popup eq '0' or $popup eq ''} checked {/if}>
