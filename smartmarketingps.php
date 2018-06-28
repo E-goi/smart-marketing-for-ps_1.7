@@ -67,7 +67,7 @@ class SmartMarketingPs extends Module
 			$this->teOrder();
 		}
 
-        (new AdminController)->setMedia(true);
+        //$this->context->controller->addCSS(_PS_ADMIN_DIR_.'/themes/new-theme/public/theme.css', 'all', 1);
 	}
 
 	/**

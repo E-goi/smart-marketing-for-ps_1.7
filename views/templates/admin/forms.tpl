@@ -7,6 +7,10 @@
 			height: 75px;
 		}
 
+		.form_type{
+			width: 25% !important;
+		}
+
 		select{
 			width: 50% !important;
 			display: inline-block !important;
@@ -61,14 +65,14 @@
 				</div>
 			</div>
 
-			<div style="height:40px;">
+			<div style="height:40px; margin-top:20px;">
 				<form method="get" action="">
 					<input type="hidden" name="controller" value="Forms">
 					<input type="hidden" name="token" value="{$token}">
 					<input type="hidden" name="form" value="{$form}">
 					<span class="label_span col-md-3"><b class="egoi-b">{l s='Select the Form Type you want' mod='smartmarketingps'}</b></span>
 					<div class="form_name_egoi" style="padding:0 14px;">
-						<select name="type" style="width: 250px;" onchange="this.form.submit();">
+						<select name="type" class="form_type" onchange="this.form.submit();">
 							<option value="popup" {if isset($type) and ($type eq 'popup')} selected {/if}>{l s='E-goi Form Popup' mod='smartmarketingps'}</option>
 							<option value="html" {if isset($type) and ($type eq 'html')} selected {/if}>{l s='E-goi Form HTML' mod='smartmarketingps'}</option>
 							<option value="iframe" {if isset($type) and ($type eq 'iframe')} selected {/if}>{l s='E-goi Form IFRAME' mod='smartmarketingps'}</option>
@@ -84,12 +88,17 @@
 				<div id="content_egoi" style="padding-left: 20px;">
 					<table class="table">
 						<tr>
-							<td colspan="2">
-								<input type="text" name="form_title" placeholder="{l s='My Form Name' mod='smartmarketingps'}" value="{$form_title}" required>
+							<td>
+								<b>{l s='Form Name' mod='smartmarketingps'}</b>
+							</td>
+							<td>
+								<input style="width: 75%;" type="text" name="form_title" placeholder="{l s='My Form Name' mod='smartmarketingps'}" value="{$form_title}" required>
 							</td>
 						</tr>
 						<tr>
-							<td style="width: 26%;"><b>{l s='Enable this Form' mod='smartmarketingps'}</b></td>
+							<td style="width: 26%;">
+								<b>{l s='Enable this Form' mod='smartmarketingps'}</b>
+							</td>
 							<td>
 								<span class="switch prestashop-switch fixed-width-lg">
 									<input type="radio" name="enable" id="enable0" value="1" {if $enable eq '1'} checked {/if}>
