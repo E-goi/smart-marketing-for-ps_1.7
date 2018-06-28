@@ -41,7 +41,7 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
      * Get WebService Object
      * 
      * @param WebserviceRequestCore $obj 
-     * @return type
+     * @return object
      */
     public function setWsObject(WebserviceRequestCore $obj)
     {
@@ -66,6 +66,7 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
     }
 
     /**
+     * @param $segments
      * @return object
      */
     public function setUrlSegment($segments)
@@ -140,15 +141,15 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
                     'sale_price' => $sale_price,
                     'sale_dates_from' => intval($product_data['wholesale_price']) ? $product_data['date_add'] : null,
                     'sale_dates_to' => null,
-                    'image_thumbnail' => "<img src='".$this->getImageLink($product_data['link_rewrite'], $product_data['id_product'], 'small_default')."' />",
-                    'image_medium' => "<img src='".$this->getImageLink($product_data['link_rewrite'], $product_data['id_product'], 'medium_default')."' />",
-                    'image_medium_large' => "<img src='".$this->getImageLink($product_data['link_rewrite'], $product_data['id_product'], 'large_default')."' />",
-                    'image_large' => "<img src='".$this->getImageLink($product_data['link_rewrite'], $product_data['id_product'])."' />",
-                    'image_home-blog-post' => "<img src='".$this->getImageLink($product_data['link_rewrite'], $product_data['id_product'], 'home_default')."' />",
-                    'image_home-event-post' => "<img src='".$this->getImageLink($product_data['link_rewrite'], $product_data['id_product'], 'home_default')."' />",
-                    'image_event-detail-post' => "<img src='".$this->getImageLink($product_data['link_rewrite'], $product_data['id_product'], 'home_default')."' />",
-                    'image_shop_thumbnail' => "<img src='".$this->getImageLink($product_data['link_rewrite'], $product_data['id_product'], 'cart_default')."' />",
-                    'image_shop_catalog' => "<img src='".$this->getImageLink($product_data['link_rewrite'], $product_data['id_product'], 'home_default')."' />",
+                    'image_thumbnail' => "<img src='".$this->getImageLink($product_data['id_product'], 'small_default')."' />",
+                    'image_medium' => "<img src='".$this->getImageLink($product_data['id_product'], 'medium_default')."' />",
+                    'image_medium_large' => "<img src='".$this->getImageLink($product_data['id_product'], 'large_default')."' />",
+                    'image_large' => "<img src='".$this->getImageLink($product_data['id_product'])."' />",
+                    'image_home-blog-post' => "<img src='".$this->getImageLink($product_data['id_product'], 'home_default')."' />",
+                    'image_home-event-post' => "<img src='".$this->getImageLink($product_data['id_product'], 'home_default')."' />",
+                    'image_event-detail-post' => "<img src='".$this->getImageLink($product_data['id_product'], 'home_default')."' />",
+                    'image_shop_thumbnail' => "<img src='".$this->getImageLink($product_data['id_product'], 'cart_default')."' />",
+                    'image_shop_catalog' => "<img src='".$this->getImageLink($product_data['id_product'], 'home_default')."' />",
                     'upsell_ids' => [],
                     'crosssell_ids' => [],
                     'manage_stock' => "no",
@@ -163,7 +164,6 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
                     'categories' => $this->getCategoryInfo(intval($product_data['id_category_default'])),
                     'tags' => false,
                     'virtual' => false,
-                    'downloadable' => "no",
                     'downloadable' => "no",
                     'download_limit' => "-1",
                     'download_expiry' => "-1",
@@ -186,7 +186,6 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
     private function getCategoryInfo($category_id = false)
     {
         if($category_id) {
-
             $sql = 'SELECT '._DB_PREFIX_.'category.*, '._DB_PREFIX_.'category_lang.*
                     FROM '._DB_PREFIX_.'category, '._DB_PREFIX_.'category_lang 
                     WHERE '._DB_PREFIX_.'category.id_category = '._DB_PREFIX_.'category_lang.id_category 
@@ -229,19 +228,18 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
      */
     private function getGroups($category_id)
     {
-        $sql = 'SELECT id_group FROM '._DB_PREFIX_.'category_group WHERE id_category = '.$category_id.'';
+        $sql = 'SELECT id_group FROM '._DB_PREFIX_.'category_group WHERE id_category = '.$category_id;
         return Db::getInstance()->executeS($sql);
     }
 
     /**
      * Get Image from Product ID
-     * 
-     * @param  $name
+     *
      * @param  $id  
      * @param  $type
      * @return string      
      */
-    private function getImageLink($name, $id, $type = null)
+    private function getImageLink($id, $type = null)
     {
         return $_SERVER['SERVER_NAME']._THEME_PROD_DIR_.$id.'/'.$id.($type ? '-'.$type : '').'.jpg';
     }

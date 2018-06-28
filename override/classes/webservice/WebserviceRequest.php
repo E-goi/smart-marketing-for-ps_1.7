@@ -9,7 +9,7 @@ class WebserviceRequest extends WebserviceRequestCore
     /**
      * Get Resources from Web Service Overrides
      * 
-     * @return type
+     * @return array
      */
 	public static function getResources()
     {
