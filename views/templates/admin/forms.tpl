@@ -83,8 +83,6 @@
 			<hr/>
 
 			<form name="form1" id="form1" action="" method="post">
-
-				{* Editor Content *}
 				<div id="content_egoi" style="padding-left: 20px;">
 					<table class="table">
 						<tr>

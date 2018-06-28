@@ -10,7 +10,7 @@
 		<div class="form-group">
 			<label class="control-label col-lg-3">
 				<div>
-					<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='To get your API Key, login into your E-goi Account' mod='smartmarketingps'} BO Panel, {l s='go to your user menu (upper right corner), select <<Integrations>> and copy the account API key' mod='smartmarketingps'}">
+					<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='This key is to use E-goi API' mod='smartmarketingps'}">
 						{l s='Your API Key' mod='smartmarketingps'}
 					</span>
 				</div>
