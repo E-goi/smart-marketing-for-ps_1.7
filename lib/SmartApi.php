@@ -252,13 +252,14 @@ class SmartApi
     /**
      * Edit subscriber
      * 
-     * @param  array  $fields
+     * @param array $fields
+     * @param array $tags
      * @return array
      */
-    public function editSubscriber($fields)
+    public function editSubscriber($fields, $tags = array())
     {
         return $this->client->editSubscriber(
-            array_merge($this->getBaseParams(), $fields)
+            array_merge($this->getBaseParams(), $fields, array('tags' => $tags))
         );
     }
 

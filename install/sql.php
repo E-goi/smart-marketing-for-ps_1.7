@@ -9,6 +9,7 @@ $sql[_DB_PREFIX_.'egoi'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi` (
 			  `total` varchar(255) NOT NULL,
 			  `track` varchar(255) NOT NULL DEFAULT \'1\',
 			  `role` varchar(255) NOT NULL,
+			  `optin` int(11) NOT NULL DEFAULT \'0\',
 			  `estado` int(1) NOT NULL,
 			  PRIMARY KEY (`egoi_id`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';

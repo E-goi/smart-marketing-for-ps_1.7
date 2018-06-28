@@ -115,6 +115,30 @@
 						<p class="help">{l s='Sync custom fields from PrestaShop to E-goi List' mod='smartmarketingps'}</p>
 					</td>
 				</tr>
+
+				<tr>
+					<th class="egoi-td" scope="row">
+						<label class="control-label">
+							<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Newsletter module block' mod='smartmarketingps'}">
+								{l s='Newsletter Optin' mod='smartmarketingps'}
+							</span>
+						</label>
+					</th>
+					<td class="nowrap input-group">
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="newsletter_optin" id="optin0" value="1" {if isset($optin) and ($optin eq '1')} checked {/if}>
+							<label for="optin0">{l s='Yes' mod='smartmarketingps'}</label>
+							<input type="radio" name="newsletter_optin" id="optin1" value="0" {if $optin eq '0' or $optin eq ''} checked {/if}>
+							<label for="optin1">{l s='No' mod='smartmarketingps'}</label>
+							<a class="slide-button btn"></a>
+						</span>
+						<p class="help">{l s='Select "yes" if you want to enable double optin when register in this' mod='smartmarketingps'}
+							<a target="_blank" href="index.php?controller=AdminModules&configure=ps_emailsubscription&token=f744a50172d26d9638122d2536f716a6">
+								{l s='module' mod='smartmarketingps'}
+							</a>
+						</p>
+					</td>
+				</tr>
 			{/if}
 
 			<tr>

@@ -83,6 +83,7 @@ class SyncController extends SmartMarketingBaseController
 				$sync = $rq['sync'];
 				$track = $rq['track'];
 				$role = $rq['role'];
+                $optin = $rq['optin'];
 			}
 
 			if(isset($list_id) && ($list_id)) {
@@ -92,6 +93,7 @@ class SyncController extends SmartMarketingBaseController
 				$this->assign('sync', $sync);
 				$this->assign('track', $track);
 				$this->assign('role_id', $role);
+				$this->assign('optin', $optin);
 
 				//map fields
 				$egoi_fields = array(
@@ -137,6 +139,7 @@ class SyncController extends SmartMarketingBaseController
 			$list = $_POST['list'];
 			$sync = $_POST['enable'];
 			$role = $_POST['role'];
+            $optin = $_POST['newsletter_optin'];
 			$track = isset($_POST['track']) ? $_POST['track'] : 1;
 
 			// compare client ID -> API with DB
@@ -152,6 +155,7 @@ class SyncController extends SmartMarketingBaseController
 				'sync' => (int)$sync,
 				'track' => (int)$track,
 				'role' => pSQL($role),
+				'optin' => (int)$optin,
 				'estado' => 1,
                 'total' => 0
 			);
