@@ -93,7 +93,6 @@ class SmartMarketingPs extends Module
 	  		    array(
 	  		        'cart',
 	  		        'actionCartSave',
-	  		        'actionCustomerAccountAdd',
 	  		        'actionObjectCustomerAddAfter',
                     'actionObjectCustomerUpdateAfter',
 	  		        'actionObjectCustomerDeleteAfter',
@@ -1022,12 +1021,6 @@ class SmartMarketingPs extends Module
 		);
 		return true;
 	}
-
-	public function hookActionCustomerAccountAdd($params)
-    {
-        var_dump($params);
-        exit;
-    }
 
     /**
      * @return mixed
