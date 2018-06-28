@@ -1,3 +1,7 @@
+jQuery.fn.nShow = function() {
+    return this.prop('style', 'display:inline-block');
+};
+
 $(document).ready(function() {
 
 	$("#home1").on('click', function() {
@@ -26,14 +30,6 @@ $(document).ready(function() {
 		return window.location.replace(url);
 	});
 
-	$('#formid_egoi').on('change', function() {
-		var url = $(this).val();
-		if(url) {
-			$('#prev_iframe').prop('src', '//'+url);
-            $('#preview').modal('show');
-		}
-	});
-
 	$('.del-form').on('click', function(e) {
 		e.preventDefault();
 
@@ -44,103 +40,73 @@ $(document).ready(function() {
 		}
 		return false;
 	});
+
+	$('.ps-tab').on('click', function () {
+        var current_tab = $(this);
+        var current_block = current_tab.data('block');
+
+        if (current_tab.hasClass('current')) {
+        	return false;
+		}
+
+        current_tab.addClass('current');
+        $('#'+current_block+'_egoi').show();
+
+        $.each($('.ps-tab').not("#"+this.id), function (index, el) {
+        	el_data = el.getAttribute('data-block');
+			el.className = 'ps-tab';
+			$('#'+el_data+'_egoi').hide();
+        });
+    });
+
+	$('#list_id').on('change', function () {
+		var list = $(this).val();
+		$('.sync_list').nShow();
+        $('#sync_success').hide();
+
+        var forms = $('#formid_egoi');
+        forms.html('');
+
+		$.ajax({
+            type: 'POST',
+            dataType: 'JSON',
+            data:({
+                list_id: list,
+                _get_forms: 1
+            }),
+            success:function(data) {
+                if (typeof data === "object") {
+                    $.each(data, function (index, el) {
+                        forms.append(
+                            $("<option />").val(el.url).text(el.title)
+                        ).trigger('change');
+                        $('#show_preview').nShow();
+                    });
+
+                }else {
+                    forms.append(
+                        $("<option />").val("").text(data)
+                    );
+                    $('#show_preview').hide();
+				}
+
+                $('.sync_list').hide();
+                $('#sync_success').nShow();
+            },
+            error:function(){
+                $('.sync_list').hide();
+                $('#sync_success').hide();
+                $('#show_preview').hide();
+            }
+        });
+    });
+
+    $('#formid_egoi').on('change', function() {
+        var url = $(this).val();
+        if(url) {
+            $('#prev_iframe').prop('src', '//'+url);
+            $('#preview').modal('show');
+        }
+    });
+
 });
-
-function form_egoi(args){
-	var arg = args;
-	var panel = document.getElementById('panel_egbody');
-	var edit = document.getElementById('editor_egoi');
-	var msg = document.getElementById('msg_egoi');
-	var sett = document.getElementById('settings_egoi');
-	var wid = document.getElementById('widgets_egoi');
-
-	var editor_link = document.getElementById('editor_link');
-	var msg_link = document.getElementById('msg_link');
-	var sett_link = document.getElementById('sett_link');
-	var widget_link = document.getElementById('widget_link');
-
-	if(arg == '1'){
-		edit.style.display = 'block';
-		editor_link.className += ' active';
-			msg.style.display = 'none';
-			msg_link.className = 'list-group-item';
-			sett.style.display = 'none';
-			sett_link.className = 'list-group-item';
-			wid.style.display = 'none';
-			widget_link.className = 'list-group-item';
-				panel.style.height = '';
-
-	}else if(arg == '2'){
-		msg.style.display = 'block';
-		msg_link.className += ' active';
-			edit.style.display = 'none';
-			editor_link.className = 'list-group-item';
-			sett.style.display = 'none';
-			sett_link.className = 'list-group-item';
-			wid.style.display = 'none';
-			widget_link.className = 'list-group-item';
-				panel.style.height = '';
-
-	}else if(arg == '3'){
-		sett.style.display = 'block';
-		sett_link.className += ' active';
-			msg.style.display = 'none';
-			msg_link.className = 'list-group-item';
-			edit.style.display = 'none';
-			editor_link.className = 'list-group-item';
-			wid.style.display = 'none';
-			widget_link.className = 'list-group-item';
-				panel.style.height = '';
-
-	}else if(arg == '4'){
-		wid.style.display = 'block';
-		widget_link.className += ' active';
-			msg.style.display = 'none';
-			msg_link.className = 'list-group-item';
-			edit.style.display = 'none';
-			editor_link.className = 'list-group-item';
-			sett.style.display = 'none';
-			sett_link.className = 'list-group-item';
-				panel.style.height = '';
-	}
-}
-
-function form_egoi_exc(args){
-	var arg = args;
-	var panel = document.getElementById('panel_egbody');
-	var edit = document.getElementById('editor_egoi');
-	var sett = document.getElementById('settings_egoi');
-	var wid = document.getElementById('widgets_egoi');
-
-	var editor_link = document.getElementById('editor_link');
-	var sett_link = document.getElementById('sett_link');
-	var widget_link = document.getElementById('widget_link');
-
-	if(arg == '1'){
-		edit.style.display = 'block';
-		editor_link.className += ' active';
-			sett.style.display = 'none';
-			sett_link.className = 'list-group-item';
-			wid.style.display = 'none';
-			widget_link.className = 'list-group-item';
-				panel.style.height = '';
-
-	}else if(arg == '3'){
-		sett.style.display = 'block';
-		sett_link.className += ' active';
-			edit.style.display = 'none';
-			editor_link.className = 'list-group-item';
-			wid.style.display = 'none';
-			widget_link.className = 'list-group-item';
-				panel.style.height = '';
-
-	}else if(arg == '4'){
-		wid.style.display = 'block';
-		widget_link.className += ' active';
-			edit.style.display = 'none';
-			editor_link.className = 'list-group-item';
-			sett.style.display = 'none';
-			sett_link.className = 'list-group-item';
-				panel.style.height = '';
-	}
-}

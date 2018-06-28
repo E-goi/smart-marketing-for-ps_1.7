@@ -13,17 +13,6 @@
 				</header>
 				<div class="modal__content">
 					<div id="smart_form">
-						{if isset($error_submit) and ($error_submit)}
-							<p class="egoi-error">
-								{$error_submit}
-							</p>
-						{elseif isset($success_submit) and ($success_submit)}
-							<p class="egoi-success">
-								{$success_submit}
-							</p>
-						{/if}
-
-						<input type="hidden" name="form_id" value="{$form_id}">
 						{$content nofilter}
 					</div>
 				</div>
@@ -36,19 +25,8 @@
 
 		<div id="smart_form" {if isset($header) and ($header)} style="width:50%;margin-left:25%;text-align:center;margin-top:10%;" {/if}>
 			{if isset($form_type) and ($form_type eq 'iframe')}
-				{$content}
+				{$content nofilter}
 			{else}
-
-				{if isset($error_submit) and ($error_submit)}
-					<p class="egoi-error">
-						{$error_submit}
-					</p>
-				{elseif isset($success_submit) and ($success_submit)}
-					<p class="egoi-success">
-						{$success_submit}
-					</p>
-				{/if}
-
 				{$content nofilter}
 			{/if}
 		</div>

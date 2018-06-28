@@ -1,5 +1,5 @@
-var showOnce = document.querySelector('[data-modal-show]');
 var _targettedModal,
+    showOnce = document.querySelector('[data-modal-show]'),
     _dismiss = document.querySelectorAll('[data-modal-dismiss]'),
     modalActiveClass = "is-modal-active";
 

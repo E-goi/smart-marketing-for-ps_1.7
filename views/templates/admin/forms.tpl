@@ -2,22 +2,38 @@
 {include file='./alerts.tpl'}
 
 	<style>
-		.table {
-			font-size: 14px;
+		.bootstrap .table tbody>tr>td{
+			padding: 16px 7px;
+			height: 75px;
 		}
+
+		select{
+			width: 50% !important;
+			display: inline-block !important;
+		}
+
+		.ps-tab{
+			padding-top: 10px;
+			font-size: 16px;
+		}
+		.current{
+			border-bottom: 3px solid #3ed2f0;
+		}
+
 		.egoi-icon{
 			font-size: 20px;
 		}
 
 		{if isset($type) and ($type eq 'iframe')}
 			#panel_egbody{
-				height: 400px;
+				height: 550px;
 			}
 		{else}
 			#panel_egbody{
-				height: 660px;
+				height: 720px;
 			}
 		{/if}
+
 		.bootstrap hr{
 			margin-top: 10px;
 		}
@@ -27,10 +43,25 @@
 
 		<div class="panel" id="panel_egbody">
 			<div class="egoi panel-heading">
-				<span class="icon-file-text" id="forms"></span> <span class="baseline">{l s='My Forms >> Form' mod='smartmarketingps'} {$form}</span>
+				<div class="col-md-8">
+					<span class="icon-file-text" id="forms"></span>
+					<span class="baseline">{l s='My Forms >> Form' mod='smartmarketingps'} {$form}</span>
+				</div>
+
+				<div class="col-md-2">
+					<div class="ps-tab current" id="content_link" data-block="content" style="cursor: pointer">
+						{l s='Content' mod='smartmarketingps'}
+					</div>
+				</div>
+
+				<div class="col-md-2">
+					<div class="ps-tab" id="widget_link" data-block="widgets" style="cursor: pointer">
+						{l s='Frontend Settings' mod='smartmarketingps'}
+					</div>
+				</div>
 			</div>
 
-			<div style="height:40px;" >
+			<div style="height:40px;">
 				<form method="get" action="">
 					<input type="hidden" name="controller" value="Forms">
 					<input type="hidden" name="token" value="{$token}">
@@ -49,75 +80,93 @@
 
 			<form name="form1" id="form1" action="" method="post">
 
-				<div class="categoriesTitle col-md-3" style="padding-right:20px;">
-					<div class="list-group">
-						<a class="list-group-item active" id="editor_link" {if $type eq 'iframe'} onclick="form_egoi_exc(1);" {else} onclick="form_egoi(1);" {/if}>
-							{l s='Content' mod='smartmarketingps'}
-						</a>
-						{if $type eq 'popup' or $type eq 'html'}
-							<a class="list-group-item" id="msg_link" onclick="form_egoi(2);">
-								{l s='Success/Error Messages' mod='smartmarketingps'}
-							</a>
-						{/if}
-						<a class="list-group-item" id="sett_link" {if $type eq 'iframe'} onclick="form_egoi_exc(3);" {else} onclick="form_egoi(3);" {/if}>
-							{l s='Settings' mod='smartmarketingps'}
-						</a>
-						<a class="list-group-item" id="widget_link" {if $type eq 'iframe'} onclick="form_egoi_exc(4);" {else} onclick="form_egoi(4);" {/if}>
-							{l s='Frontend Settings' mod='smartmarketingps'}
-						</a>
-					</div>
-				</div>
-
 				{* Editor Content *}
-				<div id="editor_egoi" style="padding-left: 20px;">
-					<div class="form_name_egoi">
-						<input type="text" name="form_title" placeholder="{l s='My Form Name' mod='smartmarketingps'}" value="{$form_title}" required>
-					</div>
-					<div style="float:right;width:75%;">
-
-						<div style="float:left;"><b>{l s='Enable this Form' mod='smartmarketingps'}</b></div>
-						<div class="enable">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="enable" id="enable0" value="1" {if $enable eq '1'} checked {/if}>
-								<label for="enable0">{l s='Yes' mod='smartmarketingps'}</label>
-								<input type="radio" name="enable" id="enable1" value="0" {if $enable eq '0' or $enable eq ''} checked {/if}>
-								<label for="enable1">{l s='No' mod='smartmarketingps'}</label>
-								<a class="slide-button btn"></a>
-							</span>
-						</div>
+				<div id="content_egoi" style="padding-left: 20px;">
+					<table class="table">
+						<tr>
+							<td colspan="2">
+								<input type="text" name="form_title" placeholder="{l s='My Form Name' mod='smartmarketingps'}" value="{$form_title}" required>
+							</td>
+						</tr>
+						<tr>
+							<td style="width: 26%;"><b>{l s='Enable this Form' mod='smartmarketingps'}</b></td>
+							<td>
+								<span class="switch prestashop-switch fixed-width-lg">
+									<input type="radio" name="enable" id="enable0" value="1" {if $enable eq '1'} checked {/if}>
+									<label for="enable0">{l s='Yes' mod='smartmarketingps'}</label>
+									<input type="radio" name="enable" id="enable1" value="0" {if $enable eq '0' or $enable eq ''} checked {/if}>
+									<label for="enable1">{l s='No' mod='smartmarketingps'}</label>
+									<a class="slide-button btn"></a>
+								</span>
+							</td>
+						</tr>
+					</table>
 
 					{if $type eq 'iframe'}
-						<div class="form-group" style="padding-bottom:40px;margin-top:50px;">							
-							{if isset($myforms) and ($myforms)}
-								<div style="float:left;"><b>{l s='E-goi Form..' mod='smartmarketingps'}</b></div>
-								<div class="form">
-									<select name="form" id="formid_egoi">
-										<option value="">
-											{l s='Select a Form..' mod='smartmarketingps'}
+
+						<table class="table">
+							<tr>
+								{if !$lists}
+									{l s='No lists found, are you connected to E-goi and/or have created lists?' mod='smartmarketingps'}
+								{else}
+									<td>
+										<b>{l s='Select your List' mod='smartmarketingps'}</b>
+									</td>
+									<td>
+										<select name="list_id" id="list_id" required>
+											<option value="" disabled selected>
+                                                {l s='Select List ...' mod='smartmarketingps'}
+											</option>
+											{foreach $lists as $list}
+												{if isset($list_id) and ($list_id eq $list.listnum)}
+													<option value="{$list.listnum}" selected="selected">{$list.title}</option>
+												{else}
+													<option value="{$list.listnum}">{$list.title}</option>
+												{/if}
+											{/foreach}
+										</select>
+										<div class="sync_list" style="display: none;"></div>
+										<i class="material-icons" id="sync_success" style="display: none;">beenhere</i>
+									</td>
+                                {/if}
+							</tr>
+							<tr>
+								<td>
+									<b>{l s='Select your Form' mod='smartmarketingps'}</b>
+								</td>
+								<td>
+									<select name="form" id="formid_egoi" required>
+										<option value="" disabled selected>
+											{l s='Select first your list ...' mod='smartmarketingps'}
 										</option>
-										{foreach $myforms as $form_egoi}
-											{if $form_data eq $form_egoi.url}
-												<option value="{$form_egoi.url}" selected="selected">
-													{$form_egoi.title}
-												</option>
-											{else}
-												<option value="{$form_egoi.url}">{$form_egoi.title}</option>
-											{/if}
-										{/foreach}
+										{if isset($myforms) and ($myforms)}
+											{foreach $myforms as $form_egoi}
+												{if $form_data eq $form_egoi.url}
+													<option value="{$form_egoi.url}" selected="selected">
+														{$form_egoi.title}
+													</option>
+												{else}
+													<option value="{$form_egoi.url}">{$form_egoi.title}</option>
+												{/if}
+											{/foreach}
+										{/if}
 									</select>
-								</div>
-							{else}
-								<b>{l s='No forms found, you must set your list in Settings, then save it to select a Form' mod='smartmarketingps'}</b>
-							{/if}
-
-						</div>
-
-						<div style="float:left;"><b>{l s='Box Width and Height' mod='smartmarketingps'}</b></div>
-						<div class="styles">
-							<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="Width" maxlength="5" name="style_width" value="{$style_width}">
-							<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="Height" maxlength="5" name="style_height" value="{$style_height}">
-							<p class="egoi-help">(values in px)</p>
-						</div>
+									<div id="show_preview" {if isset($list_id) and ($list_id)} {else} style="display: none; {/if}">
+										<a data-toggle="modal" class="btn" data-target="#preview">{l s='Preview' mod='smartmarketingps'}</a>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<b>{l s='Box Dimensions' mod='smartmarketingps'}</b>
+									<p class="egoi-help">Values in px</p>
+								</td>
+								<td>
+									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="Width" maxlength="5" name="style_width" value="{$style_width}">
+									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="Height" maxlength="5" name="style_height" value="{$style_height}">
+								</td>
+							</tr>
+						</table>
 
 					{elseif $type eq 'popup' or $type eq 'html'}
 
@@ -135,81 +184,6 @@
 							</span>
 						</p>
 					{/if}
-
-					</div>
-
-				</div>
-
-				{if $type eq 'popup' or $type eq 'html'}
-					{* Error messages *}
-					<div id="msg_egoi" style="display: none;padding-left: 20px;" class="form_egoi_main">
-						<div class="form-group">
-							<input type="text" name="msg_gen" class="form-control" placeholder="{l s='General error' mod='smartmarketingps'}" value="{$msg_gen}">
-							<p class="egoi-help">{l s='Ex: Error!' mod='smartmarketingps'}</p>
-						</div>
-						<div class="form-group">
-							<input type="text" name="msg_invalid" class="form-control" placeholder="{l s='Error when Email is invalid' mod='smartmarketingps'}" value="{$msg_invalid}">
-							<p class="egoi-help">{l s='Ex: Invalid Message!' mod='smartmarketingps'}</p>
-						</div>
-						<div class="form-group">
-							<input type="text" name="msg_exists" class="form-control" placeholder="{l s='Error when Subscriber Already exists' mod='smartmarketingps'}" value="{$msg_exists}">
-							<p class="egoi-help">{l s='Ex: Subscriber already exists!' mod='smartmarketingps'}</p>
-						</div>
-						<div class="form-group">
-							<input type="text" name="success" class="form-control" placeholder="{l s='To be displayed when form is successfull submitted' mod='smartmarketingps'}" value="{$success}">
-							<p class="egoi-help">{l s='Ex: User succesfully subscribed!' mod='smartmarketingps'}</p>
-						</div>
-						<p>&nbsp;</p>
-					</div>
-				{/if}
-
-				{* Settings *}
-				<div id="settings_egoi" style="display: none;" class="form_egoi_main">
-					<div class="sett">
-						<div style="float:left;"><b>{l s='Hide after Success' mod='smartmarketingps'}</b></div>
-						<div class="hide_form">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="hide" id="hide0" value="1" {if $hide eq '1'} checked {/if}>
-								<label for="hide0">{l s='Yes' mod='smartmarketingps'}</label>
-								<input type="radio" name="hide" id="hide1" value="0" {if $hide eq '0' or $hide eq ''} checked {/if}>
-								<label for="hide1">{l s='No' mod='smartmarketingps'}</label>
-								<a class="slide-button btn"></a>
-							</span>
-						</div>
-					</div>
-
-					{if $type eq 'iframe'}
-						<div class="sett">
-							{if !$lists}
-								{l s='No lists found, are you connected to E-goi and/or have created lists?' mod='smartmarketingps'}
-							{else}
-								<div style="float:left;"><b>{l s='List' mod='smartmarketingps'}</b></div>
-								<div class="list">
-									<select name="list_id" id="list">
-										<option disabled>
-											{l s='Select a list..' mod='smartmarketingps'}
-										</option>
-										{foreach $lists as $list}
-											{if isset($list_id) and ($list_id eq $list.listnum)}
-												<option value="{$list.listnum}" selected="selected">{$list.title}</option>
-											{else}
-												<option value="{$list.listnum}">{$list.title}</option>
-											{/if}
-										{/foreach}
-									</select>
-								</div>
-							{/if}
-						</div>
-					{else}
-						<div class="sett">
-						</div>
-					{/if}
-					
-					<div class="sett">
-						<input type="text" name="redirect" placeholder="{l s='Redirect to URL' mod='smartmarketingps'}" value="{$redirect}">
-						<p class="egoi-help">{l s='Use absolute url - example: http://yourdomain.com/page' mod='smartmarketingps'}</p>
-					</div>
-
 				</div>
 
 				{* Frontend *}
@@ -256,50 +230,37 @@
 						</div>
 					</div>
 
-					{if $type eq 'html'}
-						<div class="reg" {if !$block_home} style="display: none;" {/if} id="popup_form">
-							<div style="float:left;"><b>{l s='Show in Popup?' mod='smartmarketingps'}</b></div>
-							<div class="register">
-								<span class="switch prestashop-switch status fixed-width-lg">
-									<input type="radio" name="popup" id="popup1" value="1" {if $popup eq '1'} checked {/if}>
-									<label for="popup1">{l s='Yes' mod='smartmarketingps'}</label>
-									<input type="radio" name="popup" id="popup2" value="0" {if $popup eq '0' or $popup eq ''} checked {/if}>
-									<label for="popup2">{l s='No' mod='smartmarketingps'}</label>
-									<a class="slide-button btn"></a>
-								</span>
-							</div>
+					<div class="reg" {if !$block_home} style="display: none;" {/if} id="popup_form">
+						<div style="float:left;"><b>{l s='Show in Popup?' mod='smartmarketingps'}</b></div>
+						<div class="register">
+							<span class="switch prestashop-switch status fixed-width-lg">
+								<input type="radio" name="popup" id="popup1" value="1" {if $popup eq '1'} checked {/if}>
+								<label for="popup1">{l s='Yes' mod='smartmarketingps'}</label>
+								<input type="radio" name="popup" id="popup2" value="0" {if $popup eq '0' or $popup eq ''} checked {/if}>
+								<label for="popup2">{l s='No' mod='smartmarketingps'}</label>
+								<a class="slide-button btn"></a>
+							</span>
 						</div>
-
-						<div class="reg" {if !$popup} style="display: none;" {/if} id="once">
-							<div style="float:left;"><b>{l s='Show only Once?' mod='smartmarketingps'}</b></div>
-							<div class="register">
-								<span class="switch prestashop-switch fixed-width-lg">
-									<input type="radio" name="once" id="once1" value="1" {if $once eq '1'} checked {/if}>
-									<label for="once1">{l s='Yes' mod='smartmarketingps'}</label>
-									<input type="radio" name="once" id="once2" value="0" {if $once eq '0' or $once eq ''} checked {/if}>
-									<label for="once2">{l s='No' mod='smartmarketingps'}</label>
-									<a class="slide-button btn"></a>
-								</span>
-							</div>
-						</div>
-					{/if}
-
-					<div class="reg">
-						<p>&nbsp;</p>
 					</div>
-				</div>
-				
-				<div>
-					{if $type eq 'iframe'}
-						<span><a data-toggle="modal" class="btn" data-target="#preview">{l s='Preview Iframe' mod='smartmarketingps'}</a></div>
-					{/if}
+
+					<div class="reg" {if !$popup} style="display: none;" {/if} id="once">
+						<div style="float:left;"><b>{l s='Show only Once?' mod='smartmarketingps'}</b></div>
+						<div class="register">
+							<span class="switch prestashop-switch fixed-width-lg">
+								<input type="radio" name="once" id="once1" value="1" {if $once eq '1'} checked {/if}>
+								<label for="once1">{l s='Yes' mod='smartmarketingps'}</label>
+								<input type="radio" name="once" id="once2" value="0" {if $once eq '0' or $once eq ''} checked {/if}>
+								<label for="once2">{l s='No' mod='smartmarketingps'}</label>
+								<a class="slide-button btn"></a>
+							</span>
+						</div>
+					</div>
 				</div>
 				
 				<input type="hidden" name="form_type" value="{$type}">
 				<input type="hidden" name="form_id" value="{$form}">
 				<input type="submit" name="save-form" id="save-form" value="1" style="display: none;">
 			</form>
-		</div>
 
 		{if $type eq 'iframe'}
 			{* Modal Preview *}

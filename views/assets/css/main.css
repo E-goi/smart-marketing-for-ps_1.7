@@ -9,11 +9,6 @@
    margin-bottom: -10%;
 }
 
-.form_name_egoi{
-   float: right;
-   width: 75%;
-   padding-bottom: 30px;
-}
 .form_egoi_main{
    float: right;
    width: 75%;
@@ -104,7 +99,7 @@
    font-size: 30px;
 }
 
-.sync_customers, .sync_api_key {
+.sync_customers, .sync_api_key, .sync_list {
    border: 2px solid #f3f3f3;
    position: absolute;
    margin-left: 20px;

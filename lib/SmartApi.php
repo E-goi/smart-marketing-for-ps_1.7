@@ -116,7 +116,7 @@ class SmartApi
      * @param $option
      * @return array
      */
-    public function getForms($listId = '', $option = false)
+    public function getForms($listId, $option = false)
     {
         $forms = $this->client->getForms(
             array_merge($this->getBaseParams(), 
@@ -143,7 +143,7 @@ class SmartApi
      * 
      * @param $listId
      * @param $option
-     * @return array
+     * @return mixed
      */
     public function getSubscribersFromListId($listId, $option = '')
     {
@@ -192,7 +192,7 @@ class SmartApi
      * Get All subscribers from List
      * 
      * @param  string|int $listId
-     * @return array        
+     * @return int
      */
     public function getAllSubscribers($listId)
     {

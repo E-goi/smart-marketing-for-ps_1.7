@@ -66,6 +66,8 @@ class SmartMarketingPs extends Module
 		if(Tools::getIsset('id_cart') && (Tools::getValue('id_order')) && (Tools::getValue('key'))) {
 			$this->teOrder();
 		}
+
+        (new AdminController)->setMedia(true);
 	}
 
 	/**

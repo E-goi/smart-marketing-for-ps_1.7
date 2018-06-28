@@ -58,6 +58,8 @@ class FormsController extends SmartMarketingBaseController
 
 		if (!$this->module->active)
 			Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
+
+		$this->checkSelectedList();
 	}
 
 	/**
@@ -159,7 +161,11 @@ class FormsController extends SmartMarketingBaseController
 			// get forms from E-goi
 			$this->assign('form_data', $form['url']);
 			if (isset($form['list_id']) && ($form['list_id'])) {
-				$this->assign('myforms', $this->api->getForms($form['list_id']));
+
+                $forms = $this->api->getForms($form['list_id']);
+                if (!empty($forms)) {
+				    $this->assign('myforms', $forms);
+                }
 			}
 			$this->assign('type', Tools::getIsset('type') ? Tools::getValue('type') : '');
 			$this->assign('lists', $this->api->getLists());
@@ -237,5 +243,28 @@ class FormsController extends SmartMarketingBaseController
 			}
 		}
 	}
+
+    /**
+     * @return bool
+     */
+	protected function checkSelectedList()
+    {
+        if (!empty($_POST) && ($_POST['_get_forms'])) {
+            $forms = $this->api->getForms($_POST['list_id']);
+            if (!empty($forms)) {
+
+                if (isset($forms['ERROR']) && ($forms['ERROR'])) {
+                    echo json_encode($this->l('This list dont have any forms'));
+                    exit;
+                }
+
+                echo json_encode($forms);
+                exit;
+            }
+            echo $this->l('Error: The list chosen has an error');
+            exit;
+        }
+        return false;
+    }
 
 }

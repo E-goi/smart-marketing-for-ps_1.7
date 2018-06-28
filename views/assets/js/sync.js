@@ -52,7 +52,7 @@ $(document).ready(function() {
 	});
 
 	$('#ps_fields').change(function() {
-		if(($(this).val() != '') && ($('#egoi').val() != '')){
+		if(($(this).val() !== '') && ($('#egoi').val() !== '')){
 			$('#save_map_fields').prop('disabled', false);
 		}else{
 			$('#save_map_fields').prop('disabled', true);
@@ -60,7 +60,7 @@ $(document).ready(function() {
 	});
 
 	$('#egoi').change(function() {
-		if(($(this).val() != '') && ($('#ps_fields').val() != '')){
+		if(($(this).val() !== '') && ($('#ps_fields').val() !== '')){
 			$('#save_map_fields').prop('disabled', false);
 		}else{
 			$('#save_map_fields').prop('disabled', true);
@@ -112,12 +112,11 @@ $(document).ready(function() {
 	});
 
 
-	$('.egoi_fields').live('click', function(){
+	$('.egoi_fields').on('click', function(){
 
 		var id = $(this).data('target');
 		var tr = 'egoi_fields_'+id;
-		//$('#load_map').show();
-		
+
 		$.ajax({
 		    type: 'POST',
 		    data:({
@@ -125,12 +124,10 @@ $(document).ready(function() {
 		    }),
 		    success:function(data, status) {
 		       $('#'+tr).remove();
-		       //$('#load_map').hide();
 		    },
 		    error:function(status){
 		    	if(status){
 			    	$("#error").show();
-			    	//$('#load_map').hide();
 			    }
 		    }
 		});
