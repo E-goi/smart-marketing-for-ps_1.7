@@ -58,15 +58,13 @@ class SmartMarketingPs extends Module
 			$this->addClientId($_POST);
 		}
 	    $this->validateApiKey();
-		
-		// register hooks
-		$this->registerHook('cart');
-		$this->registerHook('actionCartSave');
 
 		if(Tools::getIsset('id_cart') && (Tools::getValue('id_order')) && (Tools::getValue('key'))) {
 			$this->teOrder();
 		}
 
+        // check newsletter submissions anywhere
+		$this->checkNewsletterSubmissions();
         //$this->context->controller->addCSS(_PS_ADMIN_DIR_.'/themes/new-theme/public/theme.css', 'all', 1);
 	}
 
@@ -91,13 +89,20 @@ class SmartMarketingPs extends Module
 	public function install()
 	{
 	  	if (!parent::install() || !$this->installDb() || !$this->createMenu()
-	  		|| !$this->registerHook('actionObjectCustomerAddAfter')
-	  		|| !$this->registerHook('actionObjectCustomerUpdateAfter')
-	  		|| !$this->registerHook('actionObjectCustomerDeleteAfter')
-	  		|| !$this->registerHook('actionValidateOrder')
-	  		|| !$this->registerHook('displayHome')
-	  		|| !$this->registerHook('displayTop')
-	  		|| !$this->registerHook('displayFooter'))
+	  		|| !$this->registerHook(
+	  		    array(
+	  		        'cart',
+	  		        'actionCartSave',
+	  		        'actionCustomerAccountAdd',
+	  		        'actionObjectCustomerAddAfter',
+                    'actionObjectCustomerUpdateAfter',
+	  		        'actionObjectCustomerDeleteAfter',
+                    'actionValidateOrder',
+	  		        'displayHome',
+	  		        'displayTop',
+	  		        'displayFooter'
+                )
+            ))
 	    	return false;
 
 	    // register WebService
@@ -321,7 +326,6 @@ class SmartMarketingPs extends Module
 	{
 		$row = Db::getInstance()
 					->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
-
 		if(!empty($row)) {
 			$qry_webservice = 'id_webservice_account="'.$row['id_webservice_account'].'"';
 			Db::getInstance()->delete('webservice_account', $qry_webservice);
@@ -331,7 +335,6 @@ class SmartMarketingPs extends Module
 
 			// remove webservice permissions
 			Db::getInstance()->delete('webservice_permission', $qry_webservice);
-
 			return true;
 		}
 
@@ -916,7 +919,7 @@ class SmartMarketingPs extends Module
 	 */
 	private function getCustomerId() 
 	{
-		if(!session_id()){
+		if(!session_id()) {
 			session_start();
 		}
 
@@ -1019,6 +1022,39 @@ class SmartMarketingPs extends Module
 		);
 		return true;
 	}
+
+	public function hookActionCustomerAccountAdd($params)
+    {
+        var_dump($params);
+        exit;
+    }
+
+    /**
+     * @return mixed
+     */
+	private function checkNewsletterSubmissions()
+    {
+        /*if (Tools::isSubmit('submitNewsletter')) {
+            if ($email = Tools::getValue('email')) {
+
+                $client = $this->getClientData();
+                if ($client['sync']) {
+
+                    if (Validate::isEmail($email)) {
+                        return (new SmartApi)
+                            ->addSubscriber(
+                                array(
+                                    'listID' => $client['list_id'],
+                                    'email' => $email,
+                                    'status' => $client['optin'] ?: 1
+                                )
+                            );
+                    }
+                }
+            }
+            return false;
+        }*/
+    }
 
 
 }
