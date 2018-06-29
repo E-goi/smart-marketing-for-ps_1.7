@@ -478,24 +478,13 @@ class SmartMarketingPs extends Module
 			$fields['listID'] = $res['list_id'];
 			$fields['validate_email'] = '0';
 
-            $tag = '';
-			if($params['object']->newsletter == '0') {
-				$name = 'NO_Newsletter';
-				$get_tags = $api->getTags($name);
+            if($params['object']->newsletter == '0') {
+                $fields['status'] = 4;
+            }else{
+                $fields['status'] = 1;
+            }
 
-				foreach ($get_tags as $tags){
-					if($tags['NAME'] == $name) {
-						$tag = $tags['ID'];
-					}
-				}
-
-				if (!$tag) {
-					$add_tag = $api->addTag($name);
-					$tag = $add_tag['ID'];
-				}
-			}
-
-			$add = $api->addSubscriber($fields, array($tag));
+			$add = $api->addSubscriber($fields);
 			if(isset($add['ERROR']) && ($add['ERROR'])) {
 				return false;
 			}
@@ -553,6 +542,12 @@ class SmartMarketingPs extends Module
 							)
 						);
 					}
+
+                    if($params['object']->newsletter == '0') {
+                        $fields['status'] = 4;
+                    }else{
+                        $fields['status'] = 1;
+                    }
 
                     $fields['listID'] = $res['list_id'];
                     $result = $api->editSubscriber($fields);
@@ -1027,7 +1022,7 @@ class SmartMarketingPs extends Module
      */
 	private function checkNewsletterSubmissions()
     {
-        /*if (Tools::isSubmit('submitNewsletter')) {
+        if (Tools::isSubmit('submitNewsletter')) {
             if ($email = Tools::getValue('email')) {
 
                 $client = $this->getClientData();
@@ -1039,14 +1034,14 @@ class SmartMarketingPs extends Module
                                 array(
                                     'listID' => $client['list_id'],
                                     'email' => $email,
-                                    'status' => $client['optin'] ?: 1
+                                    'status' => $client['optin'] ? 0 : 1
                                 )
                             );
                     }
                 }
             }
             return false;
-        }*/
+        }
     }
 
 
