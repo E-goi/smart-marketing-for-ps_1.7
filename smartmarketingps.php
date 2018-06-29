@@ -479,9 +479,7 @@ class SmartMarketingPs extends Module
 			$fields['validate_email'] = '0';
 
             if($params['object']->newsletter == '0') {
-                $fields['status'] = 4;
-            }else{
-                $fields['status'] = 1;
+                return false;
             }
 
 			$add = $api->addSubscriber($fields);
@@ -520,7 +518,6 @@ class SmartMarketingPs extends Module
 				        return false;
                     }
 
-					$api = new SmartApi();
 					$fields = array(
 						'email' => $customer->email
 					);
@@ -543,16 +540,30 @@ class SmartMarketingPs extends Module
 						);
 					}
 
+                    $api = new SmartApi();
+
+                    $tag = '';
                     if($params['object']->newsletter == '0') {
-                        $fields['status'] = 4;
-                    }else{
-                        $fields['status'] = 1;
+                        $name = 'NO_Newsletter';
+                        $get_tags = $api->getTags();
+                        if (!empty($get_tags)) {
+                            foreach ($get_tags as $tags) {
+                                if ($tags['NAME'] == $name) {
+                                    $tag = $tags['ID'];
+                                }
+                            }
+                        }
+
+                        if (!$tag) {
+                            $add_tag = $api->addTag($name);
+                            $tag = $add_tag['ID'];
+                        }
                     }
 
                     $fields['listID'] = $res['list_id'];
-                    $result = $api->editSubscriber($fields);
+                    $result = $api->editSubscriber($fields, array($tag));
                     if (isset($result['ERROR']) && ($result['ERROR'])) {
-                        $api->addSubscriber($fields);
+                        $api->addSubscriber($fields, array($tag));
                     }
 				}
 			}
@@ -1022,6 +1033,19 @@ class SmartMarketingPs extends Module
      */
 	private function checkNewsletterSubmissions()
     {
+        /*
+        if (Tools::getValue('conf') == '4') {
+            if ($id = (int)Tools::getValue('id')) {
+                var_dump($id);
+                exit;
+
+                $subscriber = Db::getInstance(_PS_USE_SQL_SLAVE_)
+                    ->getValue("SELECT email FROM {_DB_PREFIX_}emailsubscription WHERE id='$id'");
+                var_dump($subscriber);
+                exit;
+            }
+        }*/
+
         if (Tools::isSubmit('submitNewsletter')) {
             if ($email = Tools::getValue('email')) {
 
