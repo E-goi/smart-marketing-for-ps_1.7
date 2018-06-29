@@ -139,7 +139,11 @@ class SyncController extends SmartMarketingBaseController
 			$list = $_POST['list'];
 			$sync = $_POST['enable'];
 			$role = $_POST['role'];
-            $optin = $_POST['newsletter_optin'];
+
+            $optin = 0;
+			if (isset($_POST['newsletter_optin'])) {
+                $optin = $_POST['newsletter_optin'];
+            }
 			$track = isset($_POST['track']) ? $_POST['track'] : 1;
 
 			// compare client ID -> API with DB
@@ -239,7 +243,6 @@ class SyncController extends SmartMarketingBaseController
 		         	Db::getInstance(_PS_USE_SQL_SLAVE_)
 		         				->getRow("SELECT * FROM "._DB_PREFIX_."egoi_map_fields order by id DESC");
 
-	         		//TODO - test this
 	         		$this->assign('post_id', Db::getInstance()->Insert_ID());
 	         		$this->assign('ps_name', $ps_name);
 	         		$this->assign('egoi_name', $egoi_name);
