@@ -9,11 +9,9 @@
 		
 		<div class="form-group">
 			<label class="control-label col-lg-3">
-				<div>
-					<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='This key is to use E-goi API' mod='smartmarketingps'}">
-						{l s='Your API Key' mod='smartmarketingps'}
-					</span>
-				</div>
+				<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='This key is used in your E-goi Account API' mod='smartmarketingps'}">
+					{l s='Your API Key' mod='smartmarketingps'}
+				</span>
 			</label>
 			
 			<div class="col-lg-9">	
@@ -21,7 +19,7 @@
 				<input type="password" style="width:50%;display:-webkit-inline-box;" name="smart_api_key" id="smart_api_key" size="55" value="{Configuration::get('smart_api_key')}" disabled />
 
 				<div class="sync_api_key" style="display:none;"></div>
-				<div id="error" style="display:none;">
+				<div data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='This key is invalid!' mod='smartmarketingps'}" id="error" style="display:none;">
 					<i class="material-icons action-enabled">error</i>
 				</div>
 				<a class="btn btn-info" id="edit_key">Edit API Key</a>

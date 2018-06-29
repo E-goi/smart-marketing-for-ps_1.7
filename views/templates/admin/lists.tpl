@@ -23,7 +23,7 @@
 						<td width="100">{$list.subs_total}</td>
 						<td width="100">{$list.idioma}</td>
 						<td width="100">
-							<a href="http://bo.e-goi.com/?from={$url_list}{$list.listnum}" class="btn btn-default" target="_blank">
+							<a href="http://login.egoiapp.com/?from={$url_list}{$list.listnum}" class="btn btn-default" target="_blank">
 								{l s='Change' mod='smartmarketingps'} <span class="icon-edit"></span>
 							</a>
 						</td>

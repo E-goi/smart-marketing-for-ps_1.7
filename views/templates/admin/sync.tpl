@@ -132,7 +132,7 @@
 							<label for="optin1">{l s='No' mod='smartmarketingps'}</label>
 							<a class="slide-button btn"></a>
 						</span>
-						<p class="help">{l s='Select "yes" if you want to enable double optin when register in this' mod='smartmarketingps'}
+						<p class="help">{l s='Select "yes" if you want to enable double optin when your subscribers register in this' mod='smartmarketingps'}
 							<a target="_blank" href="index.php?controller=AdminModules&configure=ps_emailsubscription&token=f744a50172d26d9638122d2536f716a6">
 								{l s='module' mod='smartmarketingps'}
 							</a>
