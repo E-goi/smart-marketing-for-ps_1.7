@@ -57,7 +57,7 @@ $_MODULE['<{smartmarketingps}prestashop>config_2c2bbd12654c5444546868b669c47585'
 $_MODULE['<{smartmarketingps}prestashop>config_9141c9b81f11035ebd08346e5deac639'] = 'Ir para A Minha Conta';
 $_MODULE['<{smartmarketingps}prestashop>forms_2b5b6d2f245dedd7e83bf0d564260886'] = 'Os meus Formulários >> Formulário';
 $_MODULE['<{smartmarketingps}prestashop>forms_f15c1cae7882448b3fb0404682e17e61'] = 'Conteúdo';
-$_MODULE['<{smartmarketingps}prestashop>forms_4fd03116724c253c914518ebd63fb95f'] = 'Configurações de front-end';
+$_MODULE['<{smartmarketingps}prestashop>forms_4fd03116724c253c914518ebd63fb95f'] = 'Config. de front-end';
 $_MODULE['<{smartmarketingps}prestashop>forms_fa8003fadc736998cb0a6dd7f60449e5'] = 'Selecione o tipo de formulário que você deseja';
 $_MODULE['<{smartmarketingps}prestashop>forms_8f8db06e0eecc374ed7c5d0c41278641'] = 'Formulário Popup E-goi ';
 $_MODULE['<{smartmarketingps}prestashop>forms_4cc2aefca6387386f10171c48e7706d7'] = 'Fromulário HTML E-goi';
@@ -78,12 +78,12 @@ $_MODULE['<{smartmarketingps}prestashop>forms_069355473fde9d6ea503035b9c1dd020']
 $_MODULE['<{smartmarketingps}prestashop>forms_76fda2e3bea9cc13504a959d609ebfa3'] = 'Conteúdo aqui';
 $_MODULE['<{smartmarketingps}prestashop>forms_90b6bbd79df49bdec6039252a8fd1cb1'] = 'Usar Bootstrap?';
 $_MODULE['<{smartmarketingps}prestashop>forms_f4c488887803de1f1460ab7ac5c5b805'] = 'Mostrar este formulário no cabeçalho';
+$_MODULE['<{smartmarketingps}prestashop>forms_1865f38540509136e3b8aa079f6cc68e'] = 'Para ser totalmente eficiente, precisa de alterar as posições do cabeçalho, em';
+$_MODULE['<{smartmarketingps}prestashop>forms_3160eb21973806e4291c3979d4aa242e'] = 'Posições';
 $_MODULE['<{smartmarketingps}prestashop>forms_47d3678bfb3ddbc9e1a51acb513d654f'] = 'Mostrar este formulário no rodapé';
 $_MODULE['<{smartmarketingps}prestashop>forms_d39bfac78567467c88514544d94b02de'] = 'Para ser totalmente eficiente, precisa de alterar as posições do rodapé, em';
-$_MODULE['<{smartmarketingps}prestashop>forms_3160eb21973806e4291c3979d4aa242e'] = 'Posições';
 $_MODULE['<{smartmarketingps}prestashop>forms_0e11df66d7f181e55c45ac2d344e8745'] = 'Mostrar este formulário na Home Page';
 $_MODULE['<{smartmarketingps}prestashop>forms_f58991f35370bdd099c596130c455abf'] = 'Mostrar no Popup?';
-$_MODULE['<{smartmarketingps}prestashop>forms_fdb2196d7d93510c4fb32be8655b04be'] = 'Mostrar apenas uma vez?';
 $_MODULE['<{smartmarketingps}prestashop>forms_d3d2e617335f08df83599665eef8a418'] = 'Fechar';
 $_MODULE['<{smartmarketingps}prestashop>forms_0db440636ae542b8adaf909cb08ad18b'] = 'Os meus Formulários';
 $_MODULE['<{smartmarketingps}prestashop>forms_7f33b6ddf3923f5771cce5c341c16aea'] = 'ID do formulário';
