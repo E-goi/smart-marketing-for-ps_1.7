@@ -78,9 +78,10 @@ $_MODULE['<{smartmarketingps}prestashop>forms_069355473fde9d6ea503035b9c1dd020']
 $_MODULE['<{smartmarketingps}prestashop>forms_76fda2e3bea9cc13504a959d609ebfa3'] = 'Contenido aquí';
 $_MODULE['<{smartmarketingps}prestashop>forms_90b6bbd79df49bdec6039252a8fd1cb1'] = 'Use Bootstrap?';
 $_MODULE['<{smartmarketingps}prestashop>forms_f4c488887803de1f1460ab7ac5c5b805'] = 'Mostrar este formulario en el encabezado';
+$_MODULE['<{smartmarketingps}prestashop>forms_1865f38540509136e3b8aa079f6cc68e'] = 'Para ser completamente eficiente necesita cambiar posiciones desde el encabezado en';
+$_MODULE['<{smartmarketingps}prestashop>forms_3160eb21973806e4291c3979d4aa242e'] = 'Posiciones';
 $_MODULE['<{smartmarketingps}prestashop>forms_47d3678bfb3ddbc9e1a51acb513d654f'] = 'Mostrar este formulario en pie de página';
 $_MODULE['<{smartmarketingps}prestashop>forms_d39bfac78567467c88514544d94b02de'] = 'Para ser completamente eficiente necesita cambiar posiciones desde el pie de página en';
-$_MODULE['<{smartmarketingps}prestashop>forms_3160eb21973806e4291c3979d4aa242e'] = 'Posiciones';
 $_MODULE['<{smartmarketingps}prestashop>forms_0e11df66d7f181e55c45ac2d344e8745'] = 'Mostrar este formulario en la página de inicio';
 $_MODULE['<{smartmarketingps}prestashop>forms_f58991f35370bdd099c596130c455abf'] = 'Mostrar en Popup?';
 $_MODULE['<{smartmarketingps}prestashop>forms_fdb2196d7d93510c4fb32be8655b04be'] = 'Mostrar solo una vez?';
