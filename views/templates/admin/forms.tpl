@@ -194,74 +194,88 @@
 				</div>
 
 				{* Frontend *}
-				<div id="widgets_egoi" style="display: none;" class="form_egoi_main">
-					<div class="reg">
-						<div style="float:left;"><b>{l s='Show this form in Header' mod='smartmarketingps'}</b></div>
-						<div class="register">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="block_header" id="header0" value="1" {if $block_header eq '1'} checked {/if}>
-								<label for="header0">{l s='Yes' mod='smartmarketingps'}</label>
-								<input type="radio" name="block_header" id="header1" value="0" {if $block_header eq '0' or $block_header eq ''} checked {/if}>
-								<label for="header1">{l s='No' mod='smartmarketingps'}</label>
-								<a class="slide-button btn"></a>
-							</span>
-						</div>
-					</div>
+				<div id="widgets_egoi" style="display: none; padding-left: 20px;">
+					<table class="table">
+						<tr>
+							<td>
+								<b>{l s='Show this form in Header' mod='smartmarketingps'}</b>
+								<p>
+								{l s='To be fully efficient you need change positions from header in' mod='smartmarketingps'} <a href="index.php?controller=AdminModulesPositions">{l s='Positions' mod='smartmarketingps'}</a>
+								</p>
+							</td>
+							<td>
+								<span class="switch prestashop-switch fixed-width-lg">
+									<input type="radio" name="block_header" id="header0" value="1" {if $block_header eq '1'} checked {/if}>
+									<label for="header0">{l s='Yes' mod='smartmarketingps'}</label>
+									<input type="radio" name="block_header" id="header1" value="0" {if $block_header eq '0' or $block_header eq ''} checked {/if}>
+									<label for="header1">{l s='No' mod='smartmarketingps'}</label>
+									<a class="slide-button btn"></a>
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<b>{l s='Show this form in Footer' mod='smartmarketingps'}</b>
+								<p>
+								{l s='To be fully efficient you need change positions from footer in' mod='smartmarketingps'} <a href="index.php?controller=AdminModulesPositions">{l s='Positions' mod='smartmarketingps'}</a>
+								</p>
+							</td>
+							<td>
+								<span class="switch prestashop-switch fixed-width-lg">
+									<input type="radio" name="block_footer" id="footer0" value="1" {if $block_footer eq '1'} checked {/if}>
+									<label for="footer0">{l s='Yes' mod='smartmarketingps'}</label>
+									<input type="radio" name="block_footer" id="footer1" value="0" {if $block_footer eq '0' or $block_footer eq ''} checked {/if}>
+									<label for="footer1">{l s='No' mod='smartmarketingps'}</label>
+									<a class="slide-button btn"></a>
+								</span>
+							</td>
+						</tr>
 
-					<div class="reg">
-						<div style="float:left;"><b>{l s='Show this form in Footer' mod='smartmarketingps'}</b></div>
-						<div class="register">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="block_footer" id="footer0" value="1" {if $block_footer eq '1'} checked {/if}>
-								<label for="footer0">{l s='Yes' mod='smartmarketingps'}</label>
-								<input type="radio" name="block_footer" id="footer1" value="0" {if $block_footer eq '0' or $block_footer eq ''} checked {/if}>
-								<label for="footer1">{l s='No' mod='smartmarketingps'}</label>
-								<a class="slide-button btn"></a>
-							</span>
-						</div>
-					</div>
-					<p class="egoi-help" style="text-indent:40px; {if $block_footer eq '0' or $block_footer eq ''} display:none; {/if}" id="help_footer">
-						<b>{l s='To be fully efficient you need change positions from footer in' mod='smartmarketingps'} <a href="index.php?controller=AdminModulesPositions">{l s='Positions' mod='smartmarketingps'}</a></b>
-					</p>
+						<tr>
+							<td>
+								<b>{l s='Show this form in Home Page' mod='smartmarketingps'}</b>
+							</td>
+							<td>
+								<span class="switch prestashop-switch fixed-width-lg">
+									<input type="radio" name="block_home" id="home1" value="1" {if $block_home eq '1'} checked {/if}>
+									<label for="home1">{l s='Yes' mod='smartmarketingps'}</label>
+									<input type="radio" name="block_home" id="home2" value="0" {if $block_home eq '0' or $block_home eq ''} checked {/if}>
+									<label for="home2">{l s='No' mod='smartmarketingps'}</label>
+									<a class="slide-button btn"></a>
+								</span>
+							</td>
+						</tr>
 
-					<div class="reg">
-						<div style="float:left;"><b>{l s='Show this form in Home Page' mod='smartmarketingps'}</b></div>
-						<div class="register">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="block_home" id="home1" value="1" {if $block_home eq '1'} checked {/if}>
-								<label for="home1">{l s='Yes' mod='smartmarketingps'}</label>
-								<input type="radio" name="block_home" id="home2" value="0" {if $block_home eq '0' or $block_home eq ''} checked {/if}>
-								<label for="home2">{l s='No' mod='smartmarketingps'}</label>
-								<a class="slide-button btn"></a>
-							</span>
-						</div>
-					</div>
+						<tr {if !$block_home} style="display: none;" {/if} id="popup_form">
+							<td>
+								<b>{l s='Show in Popup?' mod='smartmarketingps'}</b>
+							</td>
+							<td>
+								<span class="switch prestashop-switch status fixed-width-lg">
+									<input type="radio" name="popup" id="popup1" value="1" {if $popup eq '1'} checked {/if}>
+									<label for="popup1">{l s='Yes' mod='smartmarketingps'}</label>
+									<input type="radio" name="popup" id="popup2" value="0" {if $popup eq '0' or $popup eq ''} checked {/if}>
+									<label for="popup2">{l s='No' mod='smartmarketingps'}</label>
+									<a class="slide-button btn"></a>
+								</span>
+							</td>
+						</tr>
 
-					<div class="reg" {if !$block_home} style="display: none;" {/if} id="popup_form">
-						<div style="float:left;"><b>{l s='Show in Popup?' mod='smartmarketingps'}</b></div>
-						<div class="register">
-							<span class="switch prestashop-switch status fixed-width-lg">
-								<input type="radio" name="popup" id="popup1" value="1" {if $popup eq '1'} checked {/if}>
-								<label for="popup1">{l s='Yes' mod='smartmarketingps'}</label>
-								<input type="radio" name="popup" id="popup2" value="0" {if $popup eq '0' or $popup eq ''} checked {/if}>
-								<label for="popup2">{l s='No' mod='smartmarketingps'}</label>
-								<a class="slide-button btn"></a>
-							</span>
-						</div>
-					</div>
-
-					<div class="reg" {if !$popup} style="display: none;" {/if} id="once">
-						<div style="float:left;"><b>{l s='Show only Once?' mod='smartmarketingps'}</b></div>
-						<div class="register">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="once" id="once1" value="1" {if $once eq '1'} checked {/if}>
-								<label for="once1">{l s='Yes' mod='smartmarketingps'}</label>
-								<input type="radio" name="once" id="once2" value="0" {if $once eq '0' or $once eq ''} checked {/if}>
-								<label for="once2">{l s='No' mod='smartmarketingps'}</label>
-								<a class="slide-button btn"></a>
-							</span>
-						</div>
-					</div>
+						<tr {if !$block_home} style="display: none;" {/if} id="once">
+							<td>
+								<b>{l s='Show in Popup?' mod='smartmarketingps'}</b>
+							</td>
+							<td>
+								<span class="switch prestashop-switch fixed-width-lg">
+									<input type="radio" name="once" id="once1" value="1" {if $once eq '1'} checked {/if}>
+									<label for="once1">{l s='Yes' mod='smartmarketingps'}</label>
+									<input type="radio" name="once" id="once2" value="0" {if $once eq '0' or $once eq ''} checked {/if}>
+									<label for="once2">{l s='No' mod='smartmarketingps'}</label>
+									<a class="slide-button btn"></a>
+								</span>
+							</td>
+						</tr>
+					</table>
 				</div>
 				
 				<input type="hidden" name="form_type" value="{$type}">
