@@ -263,7 +263,7 @@
 
 						<tr {if !$block_home} style="display: none;" {/if} id="once">
 							<td>
-								<b>{l s='Show in Popup?' mod='smartmarketingps'}</b>
+								<b>{l s='Show only Once?' mod='smartmarketingps'}</b>
 							</td>
 							<td>
 								<span class="switch prestashop-switch fixed-width-lg">

@@ -84,6 +84,7 @@ $_MODULE['<{smartmarketingps}prestashop>forms_47d3678bfb3ddbc9e1a51acb513d654f']
 $_MODULE['<{smartmarketingps}prestashop>forms_d39bfac78567467c88514544d94b02de'] = 'Para ser totalmente eficiente, precisa de alterar as posições do rodapé, em';
 $_MODULE['<{smartmarketingps}prestashop>forms_0e11df66d7f181e55c45ac2d344e8745'] = 'Mostrar este formulário na Home Page';
 $_MODULE['<{smartmarketingps}prestashop>forms_f58991f35370bdd099c596130c455abf'] = 'Mostrar no Popup?';
+$_MODULE['<{smartmarketingps}prestashop>forms_fdb2196d7d93510c4fb32be8655b04be'] = 'Mostrar apenas uma vez?';
 $_MODULE['<{smartmarketingps}prestashop>forms_d3d2e617335f08df83599665eef8a418'] = 'Fechar';
 $_MODULE['<{smartmarketingps}prestashop>forms_0db440636ae542b8adaf909cb08ad18b'] = 'Os meus Formulários';
 $_MODULE['<{smartmarketingps}prestashop>forms_7f33b6ddf3923f5771cce5c341c16aea'] = 'ID do formulário';
