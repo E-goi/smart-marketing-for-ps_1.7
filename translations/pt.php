@@ -10,7 +10,7 @@ $_MODULE['<{smartmarketingps}prestashop>smartmarketingps_08bd40c7543007ad06e4fce
 $_MODULE['<{smartmarketingps}prestashop>smartmarketingps_d49b7c3dcae8daeba4dc868c13f3b23d'] = 'Sincronizar contactos';
 $_MODULE['<{smartmarketingps}prestashop>smartmarketingps_6450242531912981c3683cae88a32a66'] = 'Formulários';
 $_MODULE['<{smartmarketingps}prestashop>smartmarketingps_a87ecd5125c9ecfffe3df4f755836441'] = 'Indique a chave de API correta.';
-$_MODULE['<{smartmarketingps}prestashop>smartmarketingps_229630365cfc31edb1df933bd01708dc'] = 'Chave de API salva e atualizada';
+$_MODULE['<{smartmarketingps}prestashop>smartmarketingps_229630365cfc31edb1df933bd01708dc'] = 'Chave de API guardada e atualizada';
 $_MODULE['<{smartmarketingps}prestashop>accountcontroller_bea8d9e6a0d57c4a264756b4f9822ed9'] = 'A Minha Conta';
 $_MODULE['<{smartmarketingps}prestashop>accountcontroller_1a14ba31c663277458d667253a855c6e'] = 'Ir para o E-goi';
 $_MODULE['<{smartmarketingps}prestashop>accountcontroller_79c0665a32ebc8f1c83876a0aa018891'] = '$( \'#save-form\' ).click();';
@@ -48,12 +48,12 @@ $_MODULE['<{smartmarketingps}prestashop>alerts_714341d9339756588d1dc724991c2b9a'
 $_MODULE['<{smartmarketingps}prestashop>alerts_4c9eaf0f84c707e454972341e72a9285'] = 'Se quiser saber mais sobre E-goi';
 $_MODULE['<{smartmarketingps}prestashop>alerts_a4ea91cd0d1ea33d8113457644dd6157'] = 'Clique aqui';
 $_MODULE['<{smartmarketingps}prestashop>config_254f642527b45bc260048e30704edb39'] = 'Configuração';
-$_MODULE['<{smartmarketingps}prestashop>config_ab8897eb19c58160c6ad7e4bb314a7e8'] = 'Essa chave é usada em sua API de conta do E-goi';
-$_MODULE['<{smartmarketingps}prestashop>config_df450f0d7d14608dfd9c93b45e05a5db'] = 'Sua chave de API';
+$_MODULE['<{smartmarketingps}prestashop>config_ab8897eb19c58160c6ad7e4bb314a7e8'] = 'Essa chave API é usada na sua conta do E-goi';
+$_MODULE['<{smartmarketingps}prestashop>config_df450f0d7d14608dfd9c93b45e05a5db'] = 'Chave de API';
 $_MODULE['<{smartmarketingps}prestashop>config_2c43b531c26edc5b0df80b73c29e0d73'] = 'Esta chave é invalida!';
 $_MODULE['<{smartmarketingps}prestashop>config_b89c7320ff419cfd1e4372638278752e'] = 'Alterar chave';
 $_MODULE['<{smartmarketingps}prestashop>config_c9cc8cce247e49bae79f15173ce97354'] = 'Guardar';
-$_MODULE['<{smartmarketingps}prestashop>config_6d1f6d1035f02d2b8816ccdfc2e0e81e'] = 'Para obter sua chave de API, faça login no seu';
+$_MODULE['<{smartmarketingps}prestashop>config_6d1f6d1035f02d2b8816ccdfc2e0e81e'] = 'Para obter a chave de API, faça login no seu';
 $_MODULE['<{smartmarketingps}prestashop>config_2c2bbd12654c5444546868b669c47585'] = 'vá até o menu do utilizador (canto superior direito), selecione \"Integrações\" e copie a chave da API da conta';
 $_MODULE['<{smartmarketingps}prestashop>config_9141c9b81f11035ebd08346e5deac639'] = 'Ir para A Minha Conta';
 $_MODULE['<{smartmarketingps}prestashop>forms_2b5b6d2f245dedd7e83bf0d564260886'] = 'Os meus Formulários >> Formulário';
@@ -113,6 +113,8 @@ $_MODULE['<{smartmarketingps}prestashop>lists_49ee3087348e8d44e1feda1917443987']
 $_MODULE['<{smartmarketingps}prestashop>lists_0892190bc18561c90b56c5f18c169d50'] = 'Guardar Lista';
 $_MODULE['<{smartmarketingps}prestashop>lists_637a6e277bd2a985285f37cff9e5943f'] = 'Erro ao recuperar listas do E-goi';
 $_MODULE['<{smartmarketingps}prestashop>sync_528a93013b04d581c067f39e6c73ca9a'] = 'OS Meus Subscritores';
+$_MODULE['<{smartmarketingps}prestashop>sync_a2a2502ce2af7371eb0905fa590ba318'] = 'Subscritores no E-goi (Activos)';
+$_MODULE['<{smartmarketingps}prestashop>sync_27efa92dc9957febe76771d9eded8a2f'] = 'Subscritores no Prestashop';
 $_MODULE['<{smartmarketingps}prestashop>sync_c9ec0310ebd024dd198c82cf21cffe26'] = 'Sincronização ON';
 $_MODULE['<{smartmarketingps}prestashop>sync_63acc55b44c5678a583b2f3ed54c4c0f'] = 'A Carregar as informações dos subscritores ...';
 $_MODULE['<{smartmarketingps}prestashop>sync_d6e8277f739cbbcc56e74de1fdc81652'] = 'O módulo está a executar as alterações e automaticamente manterá seus clientes sincronizados com a lista E-goi selecionada';

@@ -113,6 +113,8 @@ $_MODULE['<{smartmarketingps}prestashop>lists_49ee3087348e8d44e1feda1917443987']
 $_MODULE['<{smartmarketingps}prestashop>lists_0892190bc18561c90b56c5f18c169d50'] = 'Save List';
 $_MODULE['<{smartmarketingps}prestashop>lists_637a6e277bd2a985285f37cff9e5943f'] = 'Error retrieving lists from E-goi';
 $_MODULE['<{smartmarketingps}prestashop>sync_528a93013b04d581c067f39e6c73ca9a'] = 'My Subscribers';
+$_MODULE['<{smartmarketingps}prestashop>sync_a2a2502ce2af7371eb0905fa590ba318'] = 'Subscribed in E-goi (Active)';
+$_MODULE['<{smartmarketingps}prestashop>sync_27efa92dc9957febe76771d9eded8a2f'] = 'Subscribed in PrestaShop';
 $_MODULE['<{smartmarketingps}prestashop>sync_c9ec0310ebd024dd198c82cf21cffe26'] = 'Syncronization ON';
 $_MODULE['<{smartmarketingps}prestashop>sync_63acc55b44c5678a583b2f3ed54c4c0f'] = 'Loading Subscribers Information...';
 $_MODULE['<{smartmarketingps}prestashop>sync_d6e8277f739cbbcc56e74de1fdc81652'] = 'The Module is listening to changes and will automatically keep your customers sync with the selected E-goi list';

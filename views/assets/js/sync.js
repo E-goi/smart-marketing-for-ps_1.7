@@ -5,8 +5,8 @@ jQuery.fn.show = function() {
 $(document).ready(function() {
 
 	var listID = $('#egoi_lists').val();
-	var sub_egoi = "Subscribed in E-goi (Active)'";
-	var sub_ps = "Subscribed in PrestaShop";
+	var sub_egoi = $("#sub_in_egoi").text();
+	var sub_ps = $("#sub_in_ps").text();
 
    	$.ajax({
 	    type: 'POST',

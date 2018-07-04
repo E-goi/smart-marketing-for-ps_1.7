@@ -209,6 +209,19 @@ class SmartMarketingPs extends Module
 	    			'name' => $val
 	    		)
 			);
+
+			// get spanish lang
+			$idlang = Db::getInstance()->getValue("SELECT id_lang FROM "._DB_PREFIX_."lang WHERE iso_code='es'");
+			if (isset($idlang) && ($idlang)) {
+				Db::getInstance()->insert('tab_lang', 
+					array(
+						'id_tab' => $tab_id,
+		    			'id_lang' => $idlang,
+		    			'name' => $val
+		    		)
+				);
+			}
+
 			$index++;
 		}
 

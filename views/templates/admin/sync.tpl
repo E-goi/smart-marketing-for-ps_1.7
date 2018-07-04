@@ -5,6 +5,9 @@
 	<div class="egoi panel-heading"><span class="icon-group" id="subs"></span> <span class="baseline">{l s='My Subscribers' mod='smartmarketingps'}</span></div>
     <form method="post">
 
+    	<span id="sub_in_egoi" style="display: none;">{l s='Subscribed in E-goi (Active)' mod='smartmarketingps'}</span>
+    	<span id="sub_in_ps" style="display: none;">{l s='Subscribed in PrestaShop' mod='smartmarketingps'}</span>
+
 		{if isset($sync) and ($sync)}
 			<div style="border:1px solid #ccc;text-align:center;margin-bottom: 20px;" class="alert alert-info">
 				<span style="background:#1e94ab;color:#fff;padding:5px;">{l s='Syncronization ON' mod='smartmarketingps'}</span>

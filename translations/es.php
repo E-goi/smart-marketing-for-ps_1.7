@@ -79,7 +79,7 @@ $_MODULE['<{smartmarketingps}prestashop>forms_817532cce0f7714710b228ef0b7dc429']
 $_MODULE['<{smartmarketingps}prestashop>forms_32954654ac8fe66a1d09be19001de2d4'] = 'Ancho';
 $_MODULE['<{smartmarketingps}prestashop>forms_eec6c4bdbd339edf8cbea68becb85244'] = 'Altura';
 $_MODULE['<{smartmarketingps}prestashop>forms_069355473fde9d6ea503035b9c1dd020'] = 'Insertar el';
-$_MODULE['<{smartmarketingps}prestashop>forms_76fda2e3bea9cc13504a959d609ebfa3'] = 'Contenido aquí';
+$_MODULE['<{smartmarketingps}prestashop>forms_76fda2e3bea9cc13504a959d609ebfa3'] = 'aquí';
 $_MODULE['<{smartmarketingps}prestashop>forms_90b6bbd79df49bdec6039252a8fd1cb1'] = 'Use Bootstrap?';
 $_MODULE['<{smartmarketingps}prestashop>forms_f4c488887803de1f1460ab7ac5c5b805'] = 'Mostrar este formulario en el encabezado';
 $_MODULE['<{smartmarketingps}prestashop>forms_1865f38540509136e3b8aa079f6cc68e'] = 'Para ser completamente eficiente necesita cambiar posiciones desde el encabezado en';
@@ -113,6 +113,8 @@ $_MODULE['<{smartmarketingps}prestashop>lists_49ee3087348e8d44e1feda1917443987']
 $_MODULE['<{smartmarketingps}prestashop>lists_0892190bc18561c90b56c5f18c169d50'] = 'Guardar lista';
 $_MODULE['<{smartmarketingps}prestashop>lists_637a6e277bd2a985285f37cff9e5943f'] = 'Error al recuperar listas de E-goi';
 $_MODULE['<{smartmarketingps}prestashop>sync_528a93013b04d581c067f39e6c73ca9a'] = 'Mis suscriptores';
+$_MODULE['<{smartmarketingps}prestashop>sync_a2a2502ce2af7371eb0905fa590ba318'] = 'Suscriptores E-goi (Activos)';
+$_MODULE['<{smartmarketingps}prestashop>sync_27efa92dc9957febe76771d9eded8a2f'] = 'Suscriptores Prestashop';
 $_MODULE['<{smartmarketingps}prestashop>sync_c9ec0310ebd024dd198c82cf21cffe26'] = 'Sincronización ON';
 $_MODULE['<{smartmarketingps}prestashop>sync_63acc55b44c5678a583b2f3ed54c4c0f'] = 'Cargando información de suscriptores ...';
 $_MODULE['<{smartmarketingps}prestashop>sync_d6e8277f739cbbcc56e74de1fdc81652'] = 'El Módulo está detectando los cambios y mantendrá automáticamente a sus clientes sincronizados con la lista de E-goi seleccionada';
@@ -136,16 +138,16 @@ $_MODULE['<{smartmarketingps}prestashop>sync_7c0b43201656f84c4ed2487a4548ff43'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_823e2334007d702211213b0d078362d4'] = 'Asignar campos personalizados';
 $_MODULE['<{smartmarketingps}prestashop>sync_43f8ad6b9575cc41e3823379b1f24908'] = 'Sincronizar campos personalizados desde PrestaShop a E-goi List';
 $_MODULE['<{smartmarketingps}prestashop>sync_7105a8c7eaaed1981b0dda5f44cedae8'] = 'Bloque de módulo de Newsletter';
-$_MODULE['<{smartmarketingps}prestashop>sync_ce76a5e8d6126dca6d4eb9231b5bee58'] = 'Boletín Optin';
+$_MODULE['<{smartmarketingps}prestashop>sync_ce76a5e8d6126dca6d4eb9231b5bee58'] = 'Doble Opt-in';
 $_MODULE['<{smartmarketingps}prestashop>sync_4940e96ce89f2252b9803365124f77e4'] = 'Seleccione \"sí\" si desea habilitar el doble opt-in cuando sus suscriptores se registren en este';
 $_MODULE['<{smartmarketingps}prestashop>sync_22884db148f0ffb0d830ba431102b0b5'] = 'módulo';
 $_MODULE['<{smartmarketingps}prestashop>sync_23aae2f77e88eb477aa99ba4c508f822'] = 'Campos de PrestaShop';
 $_MODULE['<{smartmarketingps}prestashop>sync_30924fddab24565087299f817bcd6a71'] = 'Seleccionar campo';
-$_MODULE['<{smartmarketingps}prestashop>sync_bc910f8bdf70f29374f496f05be0330c'] = 'Nombre de pila';
+$_MODULE['<{smartmarketingps}prestashop>sync_bc910f8bdf70f29374f496f05be0330c'] = 'Nombre';
 $_MODULE['<{smartmarketingps}prestashop>sync_77587239bf4c54ea493c7033e1dbf636'] = 'Apellido';
 $_MODULE['<{smartmarketingps}prestashop>sync_aac772216aecbeca0e86d06671fe985a'] = 'Cumpleaños';
 $_MODULE['<{smartmarketingps}prestashop>sync_ffb7e666a70151215b4c55c6268d7d72'] = 'Newsletter';
-$_MODULE['<{smartmarketingps}prestashop>sync_5455146337d77d4c1271350f7da83c4a'] = 'Optin';
+$_MODULE['<{smartmarketingps}prestashop>sync_5455146337d77d4c1271350f7da83c4a'] = 'Opt-in';
 $_MODULE['<{smartmarketingps}prestashop>sync_185b7133db22230701a857c059360cc2'] = 'Asignar';
 $_MODULE['<{smartmarketingps}prestashop>sync_234b6206205c09f587001fddeac2e314'] = 'Campos mapeados';
 $_MODULE['<{smartmarketingps}prestashop>sync_2c99d9e9d949e4feb67525256a7ea77d'] = '¡Los campos seleccionados ya están mapeados!';
