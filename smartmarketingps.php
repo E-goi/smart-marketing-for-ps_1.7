@@ -43,7 +43,7 @@ class SmartMarketingPs extends Module
 
 	    // Name & Description
 	    $this->displayName = $this->l('Smart Marketing for Prestashop');
-	    $this->description = $this->l('E-goi Syncronization for Lists and Subscribers');
+	    $this->description = $this->l('Easily sync your Prestashop contacts with E-goi.');
 
 	   	// on uninstall
 	    $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');

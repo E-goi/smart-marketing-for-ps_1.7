@@ -3,7 +3,7 @@
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{smartmarketingps}prestashop>smartmarketingps_b675735fe83deb139b484c777059c22b'] = 'Smart Marketing for Prestashop';
-$_MODULE['<{smartmarketingps}prestashop>smartmarketingps_cd327304bed1c717782d2cb27e2b10a8'] = 'E-goi Syncronization for Lists and Subscribers';
+$_MODULE['<{smartmarketingps}prestashop>smartmarketingps_b405c4f7b658aceb78e84dedf327d821'] = 'Easily sync your Prestashop contacts with E-goi.';
 $_MODULE['<{smartmarketingps}prestashop>smartmarketingps_876f23178c29dc2552c0b48bf23cd9bd'] = 'Are you sure you want to uninstall?';
 $_MODULE['<{smartmarketingps}prestashop>smartmarketingps_0f40e8817b005044250943f57a21c5e7'] = 'No name provided';
 $_MODULE['<{smartmarketingps}prestashop>smartmarketingps_08bd40c7543007ad06e4fce31618f6ec'] = 'Account';
