@@ -206,8 +206,8 @@
                             {/foreach}
                         {/if}
                     </div>
-                    <div id="error_map" class="alert col-md-8 col-md-offset-2" style="display:none;margin-top:10%;color:#900;font-size:16px;">
-                    {l s='The selected fields are already mapped!' mod='smartmarketingps'}
+                    <div id="error_map" class="alert alert-danger col-md-8 col-md-offset-2" style="display:none;">
+                    	{l s='The selected fields are already mapped!' mod='smartmarketingps'}
                     </div>
                 </div>
 

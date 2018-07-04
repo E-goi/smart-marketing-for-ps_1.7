@@ -51,7 +51,7 @@ $(document).ready(function() {
 		});
 	});
 
-	$('#ps_fields').change(function() {
+	$('#ps_fields').on('change', function() {
 		if(($(this).val() !== '') && ($('#egoi').val() !== '')){
 			$('#save_map_fields').prop('disabled', false);
 		}else{
@@ -59,7 +59,7 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#egoi').change(function() {
+	$('#egoi').on('change', function() {
 		if(($(this).val() !== '') && ($('#ps_fields').val() !== '')){
 			$('#save_map_fields').prop('disabled', false);
 		}else{
@@ -67,7 +67,7 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#save_map_fields').click(function() {
+	$('#save_map_fields').on('click', function() {
 		
 		var $ps = $('#ps_fields');
 		var $ps_name = $('#ps_fields option:selected');
@@ -112,7 +112,7 @@ $(document).ready(function() {
 	});
 
 
-	$('.egoi_fields').on('click', function(){
+	$('.modal').on('click', '.egoi_fields', function(){
 
 		var id = $(this).data('target');
 		var tr = 'egoi_fields_'+id;
