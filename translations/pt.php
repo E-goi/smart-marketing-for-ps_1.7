@@ -51,7 +51,8 @@ $_MODULE['<{smartmarketingps}prestashop>config_254f642527b45bc260048e30704edb39'
 $_MODULE['<{smartmarketingps}prestashop>config_ab8897eb19c58160c6ad7e4bb314a7e8'] = 'Essa chave é usada em sua API de conta do E-goi';
 $_MODULE['<{smartmarketingps}prestashop>config_df450f0d7d14608dfd9c93b45e05a5db'] = 'Sua chave de API';
 $_MODULE['<{smartmarketingps}prestashop>config_2c43b531c26edc5b0df80b73c29e0d73'] = 'Esta chave é invalida!';
-$_MODULE['<{smartmarketingps}prestashop>config_c9cc8cce247e49bae79f15173ce97354'] = 'Guardado';
+$_MODULE['<{smartmarketingps}prestashop>config_b89c7320ff419cfd1e4372638278752e'] = 'Alterar chave';
+$_MODULE['<{smartmarketingps}prestashop>config_c9cc8cce247e49bae79f15173ce97354'] = 'Guardar';
 $_MODULE['<{smartmarketingps}prestashop>config_6d1f6d1035f02d2b8816ccdfc2e0e81e'] = 'Para obter sua chave de API, faça login no seu';
 $_MODULE['<{smartmarketingps}prestashop>config_2c2bbd12654c5444546868b669c47585'] = 'vá até o menu do utilizador (canto superior direito), selecione \"Integrações\" e copie a chave da API da conta';
 $_MODULE['<{smartmarketingps}prestashop>config_9141c9b81f11035ebd08346e5deac639'] = 'Ir para A Minha Conta';
@@ -74,6 +75,9 @@ $_MODULE['<{smartmarketingps}prestashop>forms_68cf67bbe24304563f3e3be33aa62aa9']
 $_MODULE['<{smartmarketingps}prestashop>forms_9b23760db57180690f56ab0730c858dc'] = 'Selecione primeiro a lista ...';
 $_MODULE['<{smartmarketingps}prestashop>forms_31fde7b05ac8952dacf4af8a704074ec'] = 'Visualizar';
 $_MODULE['<{smartmarketingps}prestashop>forms_66619bf107e79ddb0b0735406749afd1'] = 'Dimensões da caixa';
+$_MODULE['<{smartmarketingps}prestashop>forms_817532cce0f7714710b228ef0b7dc429'] = 'Valores em px';
+$_MODULE['<{smartmarketingps}prestashop>forms_32954654ac8fe66a1d09be19001de2d4'] = 'Largura';
+$_MODULE['<{smartmarketingps}prestashop>forms_eec6c4bdbd339edf8cbea68becb85244'] = 'Altura';
 $_MODULE['<{smartmarketingps}prestashop>forms_069355473fde9d6ea503035b9c1dd020'] = 'Insira o';
 $_MODULE['<{smartmarketingps}prestashop>forms_76fda2e3bea9cc13504a959d609ebfa3'] = 'Conteúdo aqui';
 $_MODULE['<{smartmarketingps}prestashop>forms_90b6bbd79df49bdec6039252a8fd1cb1'] = 'Usar Bootstrap?';

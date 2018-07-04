@@ -192,10 +192,20 @@ class SmartMarketingPs extends Module
 	    		)
 			);
 
+			// insert 2 langs for Menus
+			$tab_id = Db::getInstance()->Insert_ID();
+
 			Db::getInstance()->insert('tab_lang', 
 				array(
-					'id_tab' => Db::getInstance()->Insert_ID(),
+					'id_tab' => $tab_id,
 	    			'id_lang' => 1,
+	    			'name' => $val
+	    		)
+			);
+			Db::getInstance()->insert('tab_lang', 
+				array(
+					'id_tab' => $tab_id,
+	    			'id_lang' => 2,
 	    			'name' => $val
 	    		)
 			);

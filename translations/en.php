@@ -51,6 +51,7 @@ $_MODULE['<{smartmarketingps}prestashop>config_254f642527b45bc260048e30704edb39'
 $_MODULE['<{smartmarketingps}prestashop>config_ab8897eb19c58160c6ad7e4bb314a7e8'] = 'This key is used in your E-goi Account API';
 $_MODULE['<{smartmarketingps}prestashop>config_df450f0d7d14608dfd9c93b45e05a5db'] = 'Your API Key';
 $_MODULE['<{smartmarketingps}prestashop>config_2c43b531c26edc5b0df80b73c29e0d73'] = 'This key is invalid!';
+$_MODULE['<{smartmarketingps}prestashop>config_b89c7320ff419cfd1e4372638278752e'] = 'Change API Key';
 $_MODULE['<{smartmarketingps}prestashop>config_c9cc8cce247e49bae79f15173ce97354'] = 'Save';
 $_MODULE['<{smartmarketingps}prestashop>config_6d1f6d1035f02d2b8816ccdfc2e0e81e'] = 'To get your API Key, login into your';
 $_MODULE['<{smartmarketingps}prestashop>config_2c2bbd12654c5444546868b669c47585'] = 'go to your user menu (upper right corner), select \"Integrations\" and copy the account API key';
@@ -74,6 +75,9 @@ $_MODULE['<{smartmarketingps}prestashop>forms_68cf67bbe24304563f3e3be33aa62aa9']
 $_MODULE['<{smartmarketingps}prestashop>forms_9b23760db57180690f56ab0730c858dc'] = 'Select first your list ...';
 $_MODULE['<{smartmarketingps}prestashop>forms_31fde7b05ac8952dacf4af8a704074ec'] = 'Preview';
 $_MODULE['<{smartmarketingps}prestashop>forms_66619bf107e79ddb0b0735406749afd1'] = 'Box Dimensions';
+$_MODULE['<{smartmarketingps}prestashop>forms_817532cce0f7714710b228ef0b7dc429'] = 'Values in px';
+$_MODULE['<{smartmarketingps}prestashop>forms_32954654ac8fe66a1d09be19001de2d4'] = 'Width';
+$_MODULE['<{smartmarketingps}prestashop>forms_eec6c4bdbd339edf8cbea68becb85244'] = 'Height';
 $_MODULE['<{smartmarketingps}prestashop>forms_069355473fde9d6ea503035b9c1dd020'] = 'Insert the';
 $_MODULE['<{smartmarketingps}prestashop>forms_76fda2e3bea9cc13504a959d609ebfa3'] = 'Content here';
 $_MODULE['<{smartmarketingps}prestashop>forms_90b6bbd79df49bdec6039252a8fd1cb1'] = 'Use Bootstrap?';

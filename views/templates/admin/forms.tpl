@@ -166,11 +166,11 @@
 							<tr>
 								<td>
 									<b>{l s='Box Dimensions' mod='smartmarketingps'}</b>
-									<p class="egoi-help">Values in px</p>
+									<p class="egoi-help">{l s='Values in px' mod='smartmarketingps'}</p>
 								</td>
 								<td>
-									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="Width" maxlength="5" name="style_width" value="{$style_width}">
-									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="Height" maxlength="5" name="style_height" value="{$style_height}">
+									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="{l s='Width' mod='smartmarketingps'}" maxlength="5" name="style_width" value="{$style_width}">
+									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="{l s='Height' mod='smartmarketingps'}" maxlength="5" name="style_height" value="{$style_height}">
 								</td>
 							</tr>
 						</table>
