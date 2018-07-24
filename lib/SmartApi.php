@@ -14,7 +14,7 @@ class SmartApi
     /**
      * @var string
      */
-    protected $plugin_key = 'e4bf5263e34400a6eda8a8d612e9b44b';
+    protected $plugin_key = 'b2d226e839b116c38f53204205c8410c';
 
     /**
      * @var string
