@@ -1,3 +1,11 @@
+/**
+ * Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ */
+
 jQuery.fn.show = function() {
 	return this.prop('style', 'display:inline-block');
 };

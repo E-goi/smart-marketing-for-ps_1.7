@@ -1,3 +1,10 @@
+{*
+* Smart Marketing
+*
+*  @author    E-goi
+*  @copyright 2018 E-goi
+*  @license   LICENSE.txt
+*}
 
 <div id='egoi_fields_{$post_id}'>
 	<div class='col-sm-5' style='font-size: 14px;padding-top: 10px;'>{$ps_name}</div> 

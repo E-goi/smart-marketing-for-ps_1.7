@@ -1,3 +1,10 @@
+{*
+* Smart Marketing
+*
+*  @author    E-goi
+*  @copyright 2018 E-goi
+*  @license   LICENSE.txt
+*}
 
 {if isset($error_msg) and ($error_msg)}
 	{$error_msg}

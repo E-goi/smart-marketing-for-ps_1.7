@@ -1,3 +1,10 @@
+{*
+* Smart Marketing
+*
+*  @author    E-goi
+*  @copyright 2018 E-goi
+*  @license   LICENSE.txt
+*}
 
 {include file='./alerts.tpl' config='true'}
 

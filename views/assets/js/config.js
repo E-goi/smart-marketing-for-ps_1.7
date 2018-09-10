@@ -1,3 +1,11 @@
+/**
+ * Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ */
+
 $(document).ready(function($) {
 	
 	var token = $('#subtab-Account > a').attr('href');

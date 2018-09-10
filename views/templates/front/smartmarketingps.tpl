@@ -1,3 +1,10 @@
+{*
+* Smart Marketing
+*
+*  @author    E-goi
+*  @copyright 2018 E-goi
+*  @license   LICENSE.txt
+*}
 
 {if isset($form_id) and ($form_id)}
 	

@@ -1,3 +1,10 @@
+{*
+* Smart Marketing
+*
+*  @author    E-goi
+*  @copyright 2018 E-goi
+*  @license   LICENSE.txt
+*}
 
 	<div class="panel">
 		<div class="egoi panel-heading"><span class="icon-list" id="lists"></span> <span class="baseline">{l s='My Lists' mod='smartmarketingps'}</span></div>

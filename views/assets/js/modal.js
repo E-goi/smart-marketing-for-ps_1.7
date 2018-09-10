@@ -1,3 +1,11 @@
+/**
+ * Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ */
+
 var _targettedModal,
     showOnce = document.querySelector('[data-modal-show]'),
     _dismiss = document.querySelectorAll('[data-modal-dismiss]'),
