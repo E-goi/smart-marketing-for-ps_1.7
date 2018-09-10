@@ -20,7 +20,7 @@
 				</header>
 				<div class="modal__content">
 					<div id="smart_form">
-						{$content nofilter}
+						{$content nofilter}{* No escape necessary for this code *}
 					</div>
 				</div>
 				<footer class="modal__footer">
@@ -32,9 +32,9 @@
 
 		<div id="smart_form" {if isset($header) and ($header)} style="width:50%;margin-left:25%;text-align:center;margin-top:10%;" {/if}>
 			{if isset($form_type) and ($form_type eq 'iframe')}
-				{$content nofilter}
+				{$content nofilter}{* No escape necessary for this code *}
 			{else}
-				{$content nofilter}
+				{$content nofilter}{* No escape necessary for this code *}
 			{/if}
 		</div>
 	{/if}
