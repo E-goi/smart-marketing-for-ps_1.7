@@ -1,8 +1,13 @@
 <?php
-
 /**
- * @package controllers/SmartMarketingBaseController
+ * Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ *  @package controllers/SmartMarketingBaseController
  */
+
 abstract class SmartMarketingBaseController extends ModuleAdminController 
 {
 	
@@ -58,7 +63,7 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	public function setMedia() 
 	{
 		$this->addJquery();
-		$this->addCSS($this->_path. '/views/assets/css/main.css');
+		$this->addCSS($this->_path. '/views/css/main.css');
 		return parent::setMedia();
     }
 
