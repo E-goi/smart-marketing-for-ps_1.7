@@ -1,10 +1,15 @@
 <?php
+/**
+ * Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ *  @package controllers/admin/AccountController
+ */
 
 include_once dirname(__FILE__).'/../SmartMarketingBaseController.php';
 
-/**
- * @package controllers/admin/AccountController
- */
 class AccountController extends SmartMarketingBaseController 
 {
 
@@ -109,13 +114,20 @@ class AccountController extends SmartMarketingBaseController
 	 */
 	protected function postList() 
 	{
-		if (isset($_POST['add-list']) && ($_POST['add-list'])) {
-			$name = trim($_POST['egoi_ps_title']);
-			$lang = $_POST['egoi_ps_lang'];
+		if (!empty(Tools::getValue('add-list'))) {
+			$name = trim(Tools::getValue('egoi_ps_title'));
+			$lang = Tools::getValue('egoi_ps_lang', 'en');
 
 			$result = $this->api->createList($name, $lang);
+            if (isset($result['ERROR'])) {
+                $this->assign('error_msg', $this->displayWarning(
+                    $this->l('Error on creating this list') . $result['ERROR']));
+                return null;
+            }
 			if($result) {
-				return $result;
+                $this->assign('success_msg', $this->displaySuccess(
+                    $this->l('List "'.$name.'" successfully created')));
+				return null;
 			}
 		}
 		return false;
