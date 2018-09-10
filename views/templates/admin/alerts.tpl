@@ -7,11 +7,11 @@
 *}
 
 {if isset($error_msg) and ($error_msg)}
-	{$error_msg|escape:'htmlall':'UTF-8'}
+	{$error_msg}{* No escape necessary for this code*}
 {/if}
 
 {if isset($success_msg) and ($success_msg)}
-	{$success_msg|escape:'htmlall':'UTF-8'}
+	{$success_msg}{* No escape necessary for this code*}
 {/if}
 
 {if isset($smart_api_key_error) and ($smart_api_key_error) and (!$config)}
