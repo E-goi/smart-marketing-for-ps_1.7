@@ -58,9 +58,9 @@
 
 							{foreach $lists as $list}
 								{if isset($list_id) and ($list_id eq $list.listnum)}
-									<option value="{$list.listnum}" selected="selected">{$list.title}</option>
+									<option value="{$list.listnum|escape:'htmlall':'UTF-8'}" selected="selected">{$list.title|escape:'htmlall':'UTF-8'}</option>
 								{else}
-									<option value="{$list.listnum}">{$list.title}</option>
+									<option value="{$list.listnum|escape:'htmlall':'UTF-8'}">{$list.title|escape:'htmlall':'UTF-8'}</option>
 								{/if}
 
 							{/foreach}
@@ -78,9 +78,9 @@
 						<option value="">{l s='All roles' mod='smartmarketingps'}</option>
 						{foreach $roles as $role}?>
 							{if isset($role_id) and ($role_id eq $role.id_group)}
-								<option value="{$role.id_group}" selected="selected">{$role.name}</option>
+								<option value="{$role.id_group|escape:'htmlall':'UTF-8'}" selected="selected">{$role.name|escape:'htmlall':'UTF-8'}</option>
 							{else}
-								<option value="{$role.id_group}">{$role.name}</option>
+								<option value="{$role.id_group|escape:'htmlall':'UTF-8'}">{$role.name|escape:'htmlall':'UTF-8'}</option>
 							{/if}	
 						{/foreach}?>
 					</select>
@@ -153,7 +153,7 @@
 
 			<tr>
 				<td colspan="2" style="text-align: right;">
-					<input type="hidden" name="token" value="{$token}">
+					<input type="hidden" name="token" value="{$token|escape:'htmlall':'UTF-8'}">
 					<input type='submit' name='action_add' id='action_add' value="1" style="display: none;">
 				</td>
 			</tr>
@@ -204,12 +204,12 @@
                             <b>{l s='Mapped Fields' mod='smartmarketingps'}</b>
                         </div>
                         {if isset($mapped_fields) and (!empty($mapped_fields))}
-                            {foreach $mapped_fields as $key => $row}
+                            {foreach $mapped_fields as $row}
                                 <div id="egoi_fields_{$row['id']}">
-                                    <div class="col-sm-5" style='font-size: 14px;padding-top: 10px;'>{$row['ps_name']}</div>
-                                    <div class="col-sm-5" style='font-size: 14px;padding-top: 10px;'>{$row['egoi_name']}</div>
+                                    <div class="col-sm-5" style='font-size: 14px;padding-top: 10px;'>{$row['ps_name']|escape:'htmlall':'UTF-8'}</div>
+                                    <div class="col-sm-5" style='font-size: 14px;padding-top: 10px;'>{$row['egoi_name']|escape:'htmlall':'UTF-8'}</div>
                                     <div class="col-sm-2" style="padding-top: 10px;">
-                                        <button type='button' id="field_{$row['id']}" class='egoi_fields btn btn-default' data-target="{$row['id']}">
+                                        <button type='button' id="field_{$row['id']|escape:'htmlall':'UTF-8'}" class='egoi_fields btn btn-default' data-target="{$row['id']|escape:'htmlall':'UTF-8'}">
                                         <span class="icon-trash"></span></button>
                                     </div>
                                 </div>

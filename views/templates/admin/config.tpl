@@ -23,7 +23,7 @@
 			
 			<div class="col-lg-9">	
 				<input type="hidden" id="egoi_client_id" name="egoi_client_id">
-				<input type="password" style="width:50%;display:-webkit-inline-box;" name="smart_api_key" id="smart_api_key" size="55" value="{Configuration::get('smart_api_key')}" disabled />
+				<input type="password" style="width:50%;display:-webkit-inline-box;" name="smart_api_key" id="smart_api_key" size="55" value="{Configuration::get('smart_api_key')|escape:'htmlall':'UTF-8'}" disabled />
 
 				<div class="sync_api_key" style="display:none;"></div>
 				<div data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='This key is invalid!' mod='smartmarketingps'}" id="error" style="display:none;">

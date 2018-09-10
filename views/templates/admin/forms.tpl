@@ -56,7 +56,7 @@
 			<div class="egoi panel-heading">
 				<div class="col-md-8">
 					<span class="icon-file-text" id="forms"></span>
-					<span class="baseline">{l s='My Forms >> Form' mod='smartmarketingps'} {$form}</span>
+					<span class="baseline">{l s='My Forms >> Form' mod='smartmarketingps'} {$form|escape:'htmlall':'UTF-8'}</span>
 				</div>
 
 				<div class="col-md-2">
@@ -75,8 +75,8 @@
 			<div style="height:40px; margin-top:20px;">
 				<form method="get" action="">
 					<input type="hidden" name="controller" value="Forms">
-					<input type="hidden" name="token" value="{$token}">
-					<input type="hidden" name="form" value="{$form}">
+					<input type="hidden" name="token" value="{$token|escape:'htmlall':'UTF-8'}">
+					<input type="hidden" name="form" value="{$form|escape:'htmlall':'UTF-8'}">
 					<span class="label_span col-md-3"><b class="egoi-b">{l s='Select the Form Type you want' mod='smartmarketingps'}</b></span>
 					<div class="form_name_egoi" style="padding:0 14px;">
 						<select name="type" class="form_type" onchange="this.form.submit();">
@@ -97,7 +97,7 @@
 								<b>{l s='Form Name' mod='smartmarketingps'}</b>
 							</td>
 							<td>
-								<input style="width: 75%;" type="text" name="form_title" placeholder="{l s='My Form Name' mod='smartmarketingps'}" value="{$form_title}" required>
+								<input style="width: 75%;" type="text" name="form_title" placeholder="{l s='My Form Name' mod='smartmarketingps'}" value="{$form_title|escape:'htmlall':'UTF-8'}" required>
 							</td>
 						</tr>
 						<tr>
@@ -133,9 +133,9 @@
 											</option>
 											{foreach $lists as $list}
 												{if isset($list_id) and ($list_id eq $list.listnum)}
-													<option value="{$list.listnum}" selected="selected">{$list.title}</option>
+													<option value="{$list.listnum|escape:'htmlall':'UTF-8'}" selected="selected">{$list.title|escape:'htmlall':'UTF-8'}</option>
 												{else}
-													<option value="{$list.listnum}">{$list.title}</option>
+													<option value="{$list.listnum|escape:'htmlall':'UTF-8'}">{$list.title|escape:'htmlall':'UTF-8'}</option>
 												{/if}
 											{/foreach}
 										</select>
@@ -156,11 +156,11 @@
 										{if isset($myforms) and ($myforms)}
 											{foreach $myforms as $form_egoi}
 												{if $form_data eq $form_egoi.url}
-													<option value="{$form_egoi.url}" selected="selected">
-														{$form_egoi.title}
+													<option value="{$form_egoi.url|escape:'htmlall':'UTF-8'}" selected="selected">
+														{$form_egoi.title|escape:'htmlall':'UTF-8'}
 													</option>
 												{else}
-													<option value="{$form_egoi.url}">{$form_egoi.title}</option>
+													<option value="{$form_egoi.url|escape:'htmlall':'UTF-8'}">{$form_egoi.title|escape:'htmlall':'UTF-8'}</option>
 												{/if}
 											{/foreach}
 										{/if}
@@ -176,8 +176,8 @@
 									<p class="egoi-help">{l s='Values in px' mod='smartmarketingps'}</p>
 								</td>
 								<td>
-									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="{l s='Width' mod='smartmarketingps'}" maxlength="5" name="style_width" value="{$style_width}">
-									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="{l s='Height' mod='smartmarketingps'}" maxlength="5" name="style_height" value="{$style_height}">
+									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="{l s='Width' mod='smartmarketingps'}" maxlength="5" name="style_width" value="{$style_width|escape:'htmlall':'UTF-8'}">
+									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="{l s='Height' mod='smartmarketingps'}" maxlength="5" name="style_height" value="{$style_height|escape:'htmlall':'UTF-8'}">
 								</td>
 							</tr>
 						</table>
@@ -186,7 +186,7 @@
 
 						{* $editor *}
 						<div class="form-group">
-							<textarea placeholder="{l s='Insert the' mod='smartmarketingps'} {$type|upper} {l s='Content here' mod='smartmarketingps'}" name="form_content" id="form_content" cols="50" rows="20">{$form_content}</textarea>
+							<textarea placeholder="{l s='Insert the' mod='smartmarketingps'} {$type|upper|escape:'htmlall':'UTF-8'} {l s='Content here' mod='smartmarketingps'}" name="form_content" id="form_content" cols="50" rows="20">{$form_content}</textarea>
 						</div>
 						<p>{l s='Use Bootstrap?' mod='smartmarketingps'} &nbsp;
 							<span class="switch prestashop-switch fixed-width-lg">
@@ -339,12 +339,12 @@
 								{/if} 
 							</td>
 							<td>
-								<a href="{$smarty.server.REQUEST_URI}&form={$forms.form_id}&type={$forms.form_type}">
+								<a href="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}&form={$forms.form_id|escape:'htmlall':'UTF-8'}&type={$forms.form_type|escape:'htmlall':'UTF-8'}">
 									<i class="material-icons action-enabled egoi-icon">edit</i>
 								</a>
 							</td>
 							<td>
-								<a class="del-form" href="{$smarty.server.REQUEST_URI}&form={$forms.form_id}&del={base64_encode($forms.form_id)}">
+								<a class="del-form" href="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}&form={$forms.form_id|escape:'htmlall':'UTF-8'}&del={base64_encode($forms.form_id|escape:'htmlall':'UTF-8')}">
 									{l s='Delete' mod='smartmarketingps'}
 								</a>
 							</td>
@@ -359,7 +359,7 @@
 
 			<span id="del-info" style="display: none;">{l s='You are certain to remove this form?' mod='smartmarketingps'}</span>
 
-			<a id="add-form" data-href="{$smarty.server.REQUEST_URI}&form={if isset($totalforms)}{$totalforms+1}{else}1{/if}&type=html"></a>
+			<a id="add-form" data-href="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}&form={if isset($totalforms)}{$totalforms+1|escape:'htmlall':'UTF-8'}{else}1{/if}&type=html"></a>
 		</div>
 
 	{/if}
