@@ -1,10 +1,16 @@
 <?php
+/**
+ *  Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ *  @package override/classes/webservice/WebserviceSpecificManagementEgoi
+ */
+
 if (!defined('_PS_VERSION_'))
     exit;
 
-/**
- * @package override/classes/webservice/WebserviceSpecificManagementEgoi
- */
 class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearchCore implements WebserviceSpecificManagementInterface 
 {
 
@@ -100,7 +106,7 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
 
             $ids = str_replace(" ", "", filter_var($ids, FILTER_SANITIZE_STRING));
 
-            // verify if is numeric
+            // verify if value is numeric
             $each_id = explode("," ,$ids); 
             foreach ($each_id as $val) {
                 if (!is_numeric($val)) {
@@ -118,42 +124,42 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
             $url = explode('api', $_SERVER['REQUEST_URI']);
 
             $items = array();
-            foreach($products_info as $field => $product_data){
+            foreach($products_info as $product_data){
 
                 $price = number_format($product_data['price'], 2);
                 $sale_price = number_format($product_data['wholesale_price'], 2);
 
-                if (isset($_GET['decimal_space']) && is_numeric($_GET['decimal_space'])) {
-                    $price = number_format($price, $_GET['decimal_space']);
-                    $sale_price = number_format($sale_price, $_GET['decimal_space']);
+                if (!empty(Tools::getValue('decimal_space')) && is_numeric(Tools::getValue('decimal_space'))) {
+                    $price = number_format($price, Tools::getValue('decimal_space'));
+                    $sale_price = number_format($sale_price, Tools::getValue('decimal_space'));
                 }
 
-                if (isset($_GET['decimal_sep'])) {
-                    $price = str_replace('.', str_replace('"', '', $_GET['decimal_sep']), $price);
-                    $sale_price = str_replace('.', str_replace('"', '', $_GET['decimal_sep']), $sale_price);
+                if (!empty(Tools::getValue('decimal_sep'))) {
+                    $price = str_replace('.', str_replace('"', '', Tools::getValue('decimal_sep')), $price);
+                    $sale_price = str_replace('.', str_replace('"', '', Tools::getValue('decimal_sep')), $sale_price);
                 }
 
                 $items['items']['item'][] = array(
-                    'id' => intval($product_data['id_product']),
+                    'id' => (int)$product_data['id_product'],
                     'name' => $product_data['name'],
                     'sku' => $product_data['reference'],
                     'regular_price' => $price,
                     'sale_price' => $sale_price,
-                    'sale_dates_from' => intval($product_data['wholesale_price']) ? $product_data['date_add'] : null,
+                    'sale_dates_from' => (int)$product_data['wholesale_price'] ? $product_data['date_add'] : null,
                     'sale_dates_to' => null,
-                    'image_thumbnail' => "<img src='".$this->getImageLink($product_data['id_product'], 'small_default')."' />",
-                    'image_medium' => "<img src='".$this->getImageLink($product_data['id_product'], 'medium_default')."' />",
-                    'image_medium_large' => "<img src='".$this->getImageLink($product_data['id_product'], 'large_default')."' />",
+                    'image_thumbnail' => "<img src='".$this->getImageLink($product_data['id_product'], ImageType::getFormattedName('small'))."' />",
+                    'image_medium' => "<img src='".$this->getImageLink($product_data['id_product'], ImageType::getFormattedName('medium'))."' />",
+                    'image_medium_large' => "<img src='".$this->getImageLink($product_data['id_product'], ImageType::getFormattedName('large'))."' />",
                     'image_large' => "<img src='".$this->getImageLink($product_data['id_product'])."' />",
-                    'image_home-blog-post' => "<img src='".$this->getImageLink($product_data['id_product'], 'home_default')."' />",
-                    'image_home-event-post' => "<img src='".$this->getImageLink($product_data['id_product'], 'home_default')."' />",
-                    'image_event-detail-post' => "<img src='".$this->getImageLink($product_data['id_product'], 'home_default')."' />",
-                    'image_shop_thumbnail' => "<img src='".$this->getImageLink($product_data['id_product'], 'cart_default')."' />",
-                    'image_shop_catalog' => "<img src='".$this->getImageLink($product_data['id_product'], 'home_default')."' />",
-                    'upsell_ids' => [],
-                    'crosssell_ids' => [],
+                    'image_home-blog-post' => "<img src='".$this->getImageLink($product_data['id_product'], ImageType::getFormattedName('home'))."' />",
+                    'image_home-event-post' => "<img src='".$this->getImageLink($product_data['id_product'], ImageType::getFormattedName('home'))."' />",
+                    'image_event-detail-post' => "<img src='".$this->getImageLink($product_data['id_product'], ImageType::getFormattedName('home'))."' />",
+                    'image_shop_thumbnail' => "<img src='".$this->getImageLink($product_data['id_product'], ImageType::getFormattedName('cart'))."' />",
+                    'image_shop_catalog' => "<img src='".$this->getImageLink($product_data['id_product'], ImageType::getFormattedName('home'))."' />",
+                    'upsell_ids' => array(),
+                    'crosssell_ids' => array(),
                     'manage_stock' => "no",
-                    'stock_quantity' => intval($product_data['quantity']) ?: null,
+                    'stock_quantity' => (int)$product_data['quantity'] ?: null,
                     'stock_status' => $product_data['available_now'],
                     'weight' => $product_data['weight'],
                     'length' => $product_data['depth'],
@@ -161,7 +167,7 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
                     'height' => $product_data['height'],
                     'shipping_class' => null,
                     'excerpt' => $product_data['description_short'],
-                    'categories' => $this->getCategoryInfo(intval($product_data['id_category_default'])),
+                    'categories' => $this->getCategoryInfo((int)$product_data['id_category_default']),
                     'tags' => false,
                     'virtual' => false,
                     'downloadable' => "no",
@@ -195,7 +201,7 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
 
             if($category_info) {
                 
-                $groups = [];
+                $groups = array();
                 $raw_groups = $this->getGroups($category_id);
                 foreach ($raw_groups as $group) {
                     $groups[] = $group['id_group'];

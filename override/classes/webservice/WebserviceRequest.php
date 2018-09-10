@@ -1,8 +1,13 @@
 <?php
-
 /**
- * @package override/classes/webservice/WebserviceRequest
+ *  Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ *  @package override/classes/webservice/WebserviceRequest
  */
+
 class WebserviceRequest extends WebserviceRequestCore 
 {
 
