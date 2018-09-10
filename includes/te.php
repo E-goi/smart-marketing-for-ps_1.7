@@ -1,4 +1,11 @@
 <?php
+/**
+ * Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ */
 
 $te = "<script type='text/javascript'>
 		var _egoiaq = _egoiaq || [];
