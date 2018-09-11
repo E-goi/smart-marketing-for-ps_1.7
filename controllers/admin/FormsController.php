@@ -1,10 +1,15 @@
 <?php
+/**
+ *  Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ *  @package controllers/admin/FormsController
+ */
 
 include_once dirname(__FILE__).'/../SmartMarketingBaseController.php';
 
-/**
- * @package controllers/admin/FormsController
- */
 class FormsController extends SmartMarketingBaseController 
 {
 
@@ -70,7 +75,7 @@ class FormsController extends SmartMarketingBaseController
 	public function setMedia() 
 	{
 		parent::setMedia();
-		$this->addJS($this->_path. '/views/assets/js/forms.js');
+		$this->addJS($this->_path. '/views/js/forms.js');
     }
 
     /**
@@ -89,13 +94,6 @@ class FormsController extends SmartMarketingBaseController
 			    'desc' => $this->l('Save form'),
 			    'js' => $this->l('$( \'#save-form\' ).click();')
 			);
-			/*$this->page_header_toolbar_btn['form-preview'] = array(
-			    'short' => $this->l('Preview form'),
-			    'icon' => 'icon-desktop',
-			    'href' => '#',
-			    'desc' => $this->l('Preview form'),
-			    'js' => $this->l('$( \'#preview-form\' ).click();')
-			);*/
         }else{
         	 $this->page_header_toolbar_btn['new-form'] = array(
 			    'short' => $this->l('Add new Form'),
@@ -133,7 +131,7 @@ class FormsController extends SmartMarketingBaseController
 			}
 			
 			$this->assign('form', $this->formId);
-			$this->assign('token', $_GET['token']);
+			$this->assign('token', Tools::getValue('token'));
 
 			return $this->displayForm();
 		}
@@ -153,6 +151,7 @@ class FormsController extends SmartMarketingBaseController
 			$form = !empty($res) ? $res : $this->formOptions;
 			foreach ($form as $key => $val) {
                 if ($key == 'form_content') {
+                    // TODO - change this
                     $val = base64_decode($val);
                 }
                 $this->assign($key, $val);
@@ -181,7 +180,7 @@ class FormsController extends SmartMarketingBaseController
 	 */
 	protected function saveForm() 
 	{
-		if(isset($_POST['save-form']) && ($_POST['save-form'])) {
+		if(!empty(Tools::getValue('save-form'))) {
 			
 			$post = $_POST;
 			unset($post['save-form']);
@@ -191,6 +190,7 @@ class FormsController extends SmartMarketingBaseController
 
 			foreach ($post as $key => $value) {
 				if ($key == 'form_content') {
+				    // TODO - remove base64encode function
 					$this->formOptions[$key] = pSQL(
 					    base64_encode(
 					        htmlentities(Tools::getValue('form_content')
@@ -229,8 +229,8 @@ class FormsController extends SmartMarketingBaseController
 	 */
 	protected function deleteForm()
 	{
-		if(isset($_GET['del']) && ($_GET['del']) && ($this->formId)) {
-			if (base64_decode($_GET['del']) == $this->formId) {
+		if(!empty(Tools::getValue('del')) && ($this->formId)) {
+			if (base64_decode(Tools::getValue('del') == $this->formId)) {
 				
 				$res = Db::getInstance()->delete('egoi_forms', 'form_id='.(int)$this->formId);
 				if ($res) {
@@ -249,8 +249,8 @@ class FormsController extends SmartMarketingBaseController
      */
 	protected function checkSelectedList()
     {
-        if (!empty($_POST) && ($_POST['_get_forms'])) {
-            $forms = $this->api->getForms($_POST['list_id']);
+        if (!empty(Tools::getValue('_get_forms'))) {
+            $forms = $this->api->getForms(Tools::getValue('list_id'));
             if (!empty($forms)) {
 
                 if (isset($forms['ERROR']) && ($forms['ERROR'])) {

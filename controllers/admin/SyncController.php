@@ -1,10 +1,15 @@
 <?php
+/**
+ *  Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ *  @package controllers/admin/SyncController
+ */
 
 include_once dirname(__FILE__).'/../SmartMarketingBaseController.php';
 
-/**
- * @package controllers/admin/SyncController
- */
 class SyncController extends SmartMarketingBaseController 
 {
 
@@ -39,7 +44,7 @@ class SyncController extends SmartMarketingBaseController
 	public function setMedia()
 	{
 		parent::setMedia();
-		$this->addJS($this->_path. '/views/assets/js/sync.js');
+		$this->addJS($this->_path. '/views/js/sync.js');
 	}
 
 	/**
@@ -122,7 +127,7 @@ class SyncController extends SmartMarketingBaseController
 				$this->assign('mapped_fields', $this->getMappedFields());
 			}
 
-			$this->assign('token', $_GET['token']);
+			$this->assign('token', Tools::getValue('token'));
 			$this->assign('content', $this->fetch('sync.tpl'));
 		}
 	}
@@ -134,17 +139,14 @@ class SyncController extends SmartMarketingBaseController
 	 */
 	protected function saveSync() 
 	{
-		if(isset($_POST['action_add']) && ($_POST['action_add'])) {
+		if(!empty(Tools::getValue('action_add'))) {
 
-			$list = $_POST['list'];
-			$sync = $_POST['enable'];
-			$role = $_POST['role'];
+			$list = Tools::getValue('list');
+			$sync = Tools::getValue('enable');
+			$role = Tools::getValue('role');
 
-            $optin = 0;
-			if (isset($_POST['newsletter_optin'])) {
-                $optin = $_POST['newsletter_optin'];
-            }
-			$track = isset($_POST['track']) ? $_POST['track'] : 1;
+            $optin = Tools::getValue('newsletter_optin', 0);
+			$track = Tools::getValue('track', 1);
 
 			// compare client ID -> API with DB
 			$client_data = $this->api->getClientData();
@@ -214,15 +216,15 @@ class SyncController extends SmartMarketingBaseController
 	protected function mapFieldsEgoi() 
 	{
 		if (!empty($_POST)) {
-			$id = isset($_POST["id_egoi"]) ? (int)$_POST["id_egoi"] : '';
-			$token = isset($_POST["token_egoi_api"]) ? (int)$_POST["token_egoi_api"] : '';
-			$ps = isset($_POST["ps"]) ? pSQL($_POST["ps"]) : '';
-			$egoi = isset($_POST["egoi"]) ? pSQL($_POST["egoi"]) : '';
+			$id = (int)Tools::getValue("id_egoi", '');
+			$token = (int)Tools::getValue("token_egoi_api", '');
+			$ps = pSQL(Tools::getValue("ps", ''));
+			$egoi = pSQL(Tools::getValue("egoi", ''));
 
 			if(($token) && ($ps) && ($egoi)){
 
-				$ps_name = pSQL($_POST["ps_name"]);
-				$egoi_name = pSQL($_POST["egoi_name"]);
+				$ps_name = pSQL(Tools::getValue("ps_name"));
+				$egoi_name = pSQL(Tools::getValue("egoi_name"));
 				$status = 1;
 
 				$sql_exists = "SELECT id FROM "._DB_PREFIX_."egoi_map_fields WHERE ps='".$ps."' OR egoi='".$egoi."'";
@@ -270,7 +272,7 @@ class SyncController extends SmartMarketingBaseController
 		$count = 0;
 		$result = $this->api->getLists();
 
-		foreach ($result as $key => $value) {
+		foreach ($result as $value) {
 			if($value['listnum'] == $listID) {
 				$count = $value['subs_activos'];
 			}
@@ -286,22 +288,20 @@ class SyncController extends SmartMarketingBaseController
 	 */
 	protected function syncronizeEgoi()
 	{
-		if(!empty($_POST)) {
-			if(isset($_POST['action']) && ($_POST['action'] == 'synchronize')) {
+        if(!empty(Tools::getValue('action')) && (Tools::getValue('action') == 'synchronize')) {
 
-				if (isset($_POST['list']) && ($_POST['list'])) {
-					$total = array();
-					$exec = Db::getInstance(_PS_USE_SQL_SLAVE_)
-								->getRow('SELECT COUNT(*) AS CT FROM '._DB_PREFIX_.'customer WHERE active="1"');
+            if (!empty(Tools::getValue('list'))) {
+                $total = array();
+                $exec = Db::getInstance(_PS_USE_SQL_SLAVE_)
+                            ->getRow('SELECT COUNT(*) AS CT FROM '._DB_PREFIX_.'customer WHERE active="1"');
 
-					$total[] = $this->getEgoiSubscribers($_POST['list']);
-					$total[] = $exec['CT'];
+                $total[] = $this->getEgoiSubscribers(Tools::getValue('list'));
+                $total[] = $exec['CT'];
 
-					echo json_encode($total);
-					exit;
-				}
-			}
-		}
+                echo json_encode($total);
+                exit;
+            }
+        }
 	}
 
     /**
@@ -331,63 +331,61 @@ class SyncController extends SmartMarketingBaseController
 	 */
 	protected function sincronizeList()
 	{
-		if(!empty($_POST)) {
-			if(isset($_POST["token_list"]) && ($_POST["token_list"])) {
+        if(!empty(Tools::getValue("token_list"))) {
 
-		        $res = Db::getInstance(_PS_USE_SQL_SLAVE_)
-		        			->getRow('SELECT list_id, client_id, sync, role FROM '._DB_PREFIX_.'egoi WHERE client_id != "" and sync="1" order by egoi_id DESC');
-		        $sync = $res['sync'];
-		        $client_id = $res['client_id'];
-		        $list_id = $res['list_id'];
-                $role = $res['role'];
+            $res = Db::getInstance(_PS_USE_SQL_SLAVE_)
+                        ->getRow('SELECT list_id, client_id, sync, role FROM '._DB_PREFIX_.'egoi WHERE client_id != "" and sync="1" order by egoi_id DESC');
+            $sync = $res['sync'];
+            $client_id = $res['client_id'];
+            $list_id = $res['list_id'];
+            $role = $res['role'];
 
-		        if($sync) {
+            if($sync) {
 
-		            $sql = 'SELECT id, email, firstname, lastname, birthday, newsletter, optin FROM '._DB_PREFIX_.'customer WHERE active="1"';
-		            $customers = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+                $sql = 'SELECT id, email, firstname, lastname, birthday, newsletter, optin FROM '._DB_PREFIX_.'customer WHERE active="1"';
+                $customers = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
 
-		            $parent_subs = array();
-		            $subscribers = array();
+                $parent_subs = array();
+                $subscribers = array();
 
-		            if (!empty($customers)) {
-			            foreach($customers as $customer) {
+                if (!empty($customers)) {
+                    foreach($customers as $customer) {
 
-                            if (!$this->getRole((int)$customer['id'], $role)) {
-                                return false;
+                        if (!$this->getRole((int)$customer['id'], $role)) {
+                            return false;
+                        }
+
+                        $subscribers['email'] = $customer['email'];
+                        foreach ($customer as $key => $value) {
+                            $row_new_value = $this->getFieldMap(0, $key);
+
+                            if($row_new_value){
+                                $subscribers[$row_new_value] = $value;
                             }
+                        }
 
-			                $subscribers['email'] = $customer['email'];
-			                foreach ($customer as $key => $value) {
-			                    $row_new_value = $this->getFieldMap(0, $key);
+                        // check if this fields are not mapped
+                        if (count($subscribers) == 1) {
+                            $subscribers['first_name'] = $customer['firstname'];
+                            $subscribers['last_name'] = $customer['lastname'];
+                            $subscribers['birth_date'] = $customer['birthday'];
+                        }
 
-			                    if($row_new_value){
-			                        $subscribers[$row_new_value] = $value;
-			                    }
-			                }
+                        $parent_subs[] = $subscribers;
+                    }
 
-			                // check if this fields are not mapped
-			                if (count($subscribers) == 1) {
-                                $subscribers['first_name'] = $customer['firstname'];
-                                $subscribers['last_name'] = $customer['lastname'];
-                                $subscribers['birth_date'] = $customer['birthday'];
-                            }
+                    // add subscribers to E-goi
+                    $this->api->addSubscriberBulk($list_id, $parent_subs);
 
-                            $parent_subs[] = $subscribers;
-			            }
-
-			            // add subscribers to E-goi
-			            $this->api->addSubscriberBulk($list_id, $parent_subs);
-
-			            // update in DB
-			            echo Db::getInstance()->update('egoi',
-			            	array(
-			                	'total' => (int)count($customers) + count($parent_subs)
-			            	), "client_id = $client_id");
-                        exit;
-			        }
-		        }
-			}
-		}
+                    // update in DB
+                    echo Db::getInstance()->update('egoi',
+                        array(
+                            'total' => (int)count($customers) + count($parent_subs)
+                        ), "client_id = $client_id");
+                    exit;
+                }
+            }
+        }
 	}
 	
 }
