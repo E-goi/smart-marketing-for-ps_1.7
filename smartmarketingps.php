@@ -514,7 +514,6 @@ class SmartMarketingPs extends Module
 
         $res = $this->getClientData();
 		if($res['sync']) {
-
             // check if is a role defined
             if (!$this->getRole((int)$params['object']->id, $res['role'])) {
                 return false;
@@ -557,7 +556,6 @@ class SmartMarketingPs extends Module
 			if($id) {
 				$customer = new Customer((int)$id);
 				if (!empty($customer)) {
-
 				    // check if is a role defined
                     if (!$this->getRole((int)$customer->id, $res['role'])) {
 				        return false;
@@ -630,7 +628,6 @@ class SmartMarketingPs extends Module
 
 			$email = isset($params['object']->email) && ($params['object']->email) ? $params['object']->email : false;
 			if ($email) {
-
                 // check if is a role defined
                 if (!$this->getRole($params['object']->id, $res['role'])) {
                     return false;
@@ -645,9 +642,9 @@ class SmartMarketingPs extends Module
 				$client = (int)$client_data['CLIENTE_ID'];
 
 				return Db::getInstance()->update('egoi', 
-						array(
-							'total' => (int)($res['total']-1)
-						), "client_id = $client");
+                    array(
+                        'total' => (int)($res['total']-1)
+                    ), "client_id = $client");
 			}
 		}
 	}
@@ -683,10 +680,9 @@ class SmartMarketingPs extends Module
 		if(isset($this->context->cookie->order) && ($this->context->cookie->order)) {
 			$this->context->cookie->__unset('order');
 		}else{
-
 			// assign t&e vars
 			$this->assign(
-		      	array(
+			    array(
 		          	'te' => $this->te(),
 		          	'activate' => 1
 		      	)
@@ -765,7 +761,6 @@ class SmartMarketingPs extends Module
 			$track = $res['track'];
 			
 			if($client && $list_id && $track) {
-
 				if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
 					return false;
 				}
@@ -857,7 +852,7 @@ class SmartMarketingPs extends Module
 				include 'includes/te.php';
 
 				$this->assign(
-			      	array(
+				    array(
 			          	'te' => $te,
 		          		'activate' => 1
 			      	)
