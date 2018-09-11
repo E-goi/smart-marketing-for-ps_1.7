@@ -804,7 +804,6 @@ class SmartMarketingPs extends Module
 			$track = $res['track'];
 			$client = $res['client_id'];
 			if($client && $track && $list_id){
-
 				// check if customer has products in the cart (has cart ID?)
 				if($json) {
 					$idc = $this->getCustomerId();
@@ -1021,7 +1020,7 @@ class SmartMarketingPs extends Module
 		if (!empty($res)) {
 
 			$this->assign(
-		      	array(
+			    array(
 	          		'form_id' => $res['form_id'],
 		          	'is_bootstrap' => $res['is_bootstrap'],
 		          	'form_title' => $res['form_title'],
