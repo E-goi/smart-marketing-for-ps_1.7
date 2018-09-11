@@ -328,9 +328,9 @@
 				{if isset($allforms) and !empty($allforms)}
 					{foreach $allforms as $forms}
 						<tr>
-							<td>{$forms.form_id}</td>
-							<td>{$forms.form_title}</td>
-							<td>{$forms.form_type}</td>
+							<td>{$forms.form_id|escape:'htmlall':'UTF-8'}</td>
+							<td>{$forms.form_title|escape:'htmlall':'UTF-8'}</td>
+							<td>{$forms.form_type|escape:'htmlall':'UTF-8'}</td>
 							<td>
 								{if $forms.enable}
 									<i class="material-icons action-enabled egoi-icon" style="color:#78d07d;">check</i> 

@@ -16,7 +16,7 @@
 			<div class="modal__dialog">
 				<button class="modal__close" data-modal-dismiss>×</button>
 				<header class="modal__header">
-					<h3 class="modal__title">{$form_title}</h3>
+					<h3 class="modal__title">{$form_title|escape:'htmlall':'UTF-8'}</h3>
 				</header>
 				<div class="modal__content">
 					<div id="smart_form">
