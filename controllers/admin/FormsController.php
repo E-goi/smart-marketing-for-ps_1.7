@@ -150,10 +150,6 @@ class FormsController extends SmartMarketingBaseController
 			
 			$form = !empty($res) ? $res : $this->formOptions;
 			foreach ($form as $key => $val) {
-                if ($key == 'form_content') {
-                    // TODO - change this
-                    $val = base64_decode($val);
-                }
                 $this->assign($key, $val);
 			}
 
@@ -190,13 +186,7 @@ class FormsController extends SmartMarketingBaseController
 
 			foreach ($post as $key => $value) {
 				if ($key == 'form_content') {
-				    // TODO - remove base64encode function
-					$this->formOptions[$key] = pSQL(
-					    base64_encode(
-					        htmlentities(Tools::getValue('form_content')
-                            )
-                        )
-                    );
+					$this->formOptions[$key] = pSQL(htmlentities(Tools::getValue('form_content')));
 				}else{
 					$this->formOptions[$key] = is_numeric($value) ? (int)$value : pSQL($value);
 				}
