@@ -344,7 +344,7 @@
 								</a>
 							</td>
 							<td>
-								<a class="del-form" href="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}&form={$forms.form_id|escape:'htmlall':'UTF-8'}&del={base64_encode($forms.form_id|escape:'htmlall':'UTF-8')}">
+								<a class="del-form" href="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}&form={$forms.form_id|escape:'htmlall':'UTF-8'}&del={$forms.form_id|escape:'htmlall':'UTF-8'}">
 									{l s='Delete' mod='smartmarketingps'}
 								</a>
 							</td>

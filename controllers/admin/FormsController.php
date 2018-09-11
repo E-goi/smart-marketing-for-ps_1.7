@@ -230,8 +230,8 @@ class FormsController extends SmartMarketingBaseController
 	protected function deleteForm()
 	{
 		if(!empty(Tools::getValue('del')) && ($this->formId)) {
-			if (base64_decode(Tools::getValue('del') == $this->formId)) {
-				
+
+		    if (Tools::getValue('del') == $this->formId) {
 				$res = Db::getInstance()->delete('egoi_forms', 'form_id='.(int)$this->formId);
 				if ($res) {
 					$this->assign('success_message', $this->displaySuccess($this->l('Form deleted')));
