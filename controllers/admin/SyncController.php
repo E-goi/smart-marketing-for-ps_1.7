@@ -232,7 +232,6 @@ class SyncController extends SmartMarketingBaseController
 				$field_exist = isset($exists[0]) ? $exists[0] : false;
 
 				if (!$field_exist){
-
 					// insert new mapped field
 					Db::getInstance()->insert('egoi_map_fields', array(
 						'ps' => $ps,
@@ -251,7 +250,6 @@ class SyncController extends SmartMarketingBaseController
 
 	         		echo $this->context->smarty->display($this->_path.'/views/templates/admin/fields.tpl');
 		        }
-
 				exit;
 
 			}else if($id) {
