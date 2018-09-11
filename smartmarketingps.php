@@ -680,8 +680,8 @@ class SmartMarketingPs extends Module
    	public function hookDisplayTop($params)
    	{
    		// check if the customer did any Order
-		if(isset($_SESSION['order']) && ($_SESSION['order'])) {
-			unset($_SESSION['order']);
+		if(isset($this->context->cookie->order) && ($this->context->cookie->order)) {
+			$this->context->cookie->__unset('order');
 		}else{
 
 			// assign t&e vars
@@ -862,8 +862,9 @@ class SmartMarketingPs extends Module
 		          		'activate' => 1
 			      	)
 			  	);
-				
-				$_SESSION['order'] = 1;
+
+                $this->context->cookie->__set('order', 1);
+                $this->context->cookie->write();
 				$this->removeCart();
 			}
 		}
@@ -997,11 +998,7 @@ class SmartMarketingPs extends Module
 	 */
 	private function getCustomerId() 
 	{
-		if(!session_id()) {
-			session_start();
-		}
-
-		return (int)$this->context->cookie->id_customer ?: session_id();
+		return (int)$this->context->cookie->id_customer;
 	}
 
 	/**
