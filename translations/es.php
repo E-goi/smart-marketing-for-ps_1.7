@@ -14,11 +14,12 @@ $_MODULE['<{smartmarketingps}prestashop>smartmarketingps_229630365cfc31edb1df933
 $_MODULE['<{smartmarketingps}prestashop>accountcontroller_bea8d9e6a0d57c4a264756b4f9822ed9'] = 'Mi Cuenta';
 $_MODULE['<{smartmarketingps}prestashop>accountcontroller_1a14ba31c663277458d667253a855c6e'] = 'Ir a E-goi';
 $_MODULE['<{smartmarketingps}prestashop>accountcontroller_79c0665a32ebc8f1c83876a0aa018891'] = '$( \'#save-form\' ).click();';
+$_MODULE['<{smartmarketingps}prestashop>accountcontroller_30816a65cf880c128ee2c0ab8860ef89'] = 'Error al crear esta lista';
+$_MODULE['<{smartmarketingps}prestashop>accountcontroller_17b5a54602752bc4807f1d0aa6bd1e94'] = 'Lista \"';
+$_MODULE['<{smartmarketingps}prestashop>accountcontroller_49d39ee4f87d24f17e161021f2df8811'] = '\" creado con éxito';
 $_MODULE['<{smartmarketingps}prestashop>formscontroller_60e891de2fbf8b6a5a17ad4ddf61f929'] = 'Formularios E-goi';
 $_MODULE['<{smartmarketingps}prestashop>formscontroller_4abf00b2d141d640a689a148587aa875'] = 'Guardar formulario';
 $_MODULE['<{smartmarketingps}prestashop>formscontroller_79c0665a32ebc8f1c83876a0aa018891'] = '$( \'#save-form\' ).click();';
-$_MODULE['<{smartmarketingps}prestashop>formscontroller_5f758cfd467147d58e07c31d983e4771'] = 'Vista previa del formulario';
-$_MODULE['<{smartmarketingps}prestashop>formscontroller_e1d18a58560c1a1442f4ffa3d3d030ea'] = '$( \'#preview-form\' ).click();';
 $_MODULE['<{smartmarketingps}prestashop>formscontroller_677e4f4ae93b2ccb75dfd6d39e4c3ef3'] = 'Agregar nuevo formulario';
 $_MODULE['<{smartmarketingps}prestashop>formscontroller_83a2d50d3c217d071932614d391c8ea5'] = '$( \'#add-form\' ).trigger(\"click\");';
 $_MODULE['<{smartmarketingps}prestashop>formscontroller_e14be48400032f6646089a5d8603fd1a'] = 'Configuraciones de formulario actualizadas';

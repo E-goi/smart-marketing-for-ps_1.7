@@ -39,7 +39,6 @@ class AccountController extends SmartMarketingBaseController
 	public function setMedia() 
 	{
 		parent::setMedia();
-		$this->addJS($this->_path. '/views/assets/js/account.js');
     }
 	
 	 /**
@@ -126,7 +125,7 @@ class AccountController extends SmartMarketingBaseController
             }
 			if($result) {
                 $this->assign('success_msg', $this->displaySuccess(
-                    $this->l('List "'.$name.'" successfully created')));
+                    $this->l('List "') . $name . $this->l('" successfully created')));
 				return null;
 			}
 		}
