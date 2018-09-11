@@ -7,11 +7,11 @@
 *}
 
 {if isset($error_msg) and ($error_msg)}
-	{$error_msg}{* No escape necessary for this code*}
+	{$error_msg}
 {/if}
 
 {if isset($success_msg) and ($success_msg)}
-	{$success_msg}{* No escape necessary for this code*}
+	{$success_msg}
 {/if}
 
 {if isset($smart_api_key_error) and ($smart_api_key_error) and (!$config)}
