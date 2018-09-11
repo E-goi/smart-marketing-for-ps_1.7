@@ -1,11 +1,16 @@
 <?php
+/**
+ * Smart Marketing
+ *
+ *  @author    E-goi
+ *  @copyright 2018 E-goi
+ *  @license   LICENSE.txt
+ *  @package SmartMarketingPs
+ */
 
 if (!defined('_PS_VERSION_'))
   	exit;
 
-/**
- * Package SmartMarketing
- */
 class SmartMarketingPs extends Module
 {
 	
@@ -26,6 +31,20 @@ class SmartMarketingPs extends Module
 	 */
 	protected $custom_override = '/../../override/classes/WebserviceSpecificManagementEgoi.php';
 
+    /**
+     * Dev Index file Cache
+     *
+     * @var string
+     */
+	protected $dev_cache;
+
+    /**
+     * Production Index file Cache
+     *
+     * @var string
+     */
+	protected $prod_cache;
+
 	/**
 	* Module Constructor
 	*/
@@ -38,6 +57,9 @@ class SmartMarketingPs extends Module
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
 	    $this->bootstrap = true;
+
+        $this->dev_cache = dirname(__FILE__).'/../../app/cache/dev/class_index.php';
+        $this->prod_cache = dirname(__FILE__).'/../../app/cache/prod/class_index.php';
 
 	    parent::__construct();
 
@@ -54,7 +76,7 @@ class SmartMarketingPs extends Module
 	      	$this->warning = $this->l('No name provided');
 	    }
 
-		if(isset($_POST['smart_api_key']) && ($_POST['smart_api_key'])){
+		if(!empty(Tools::getValue('smart_api_key'))){
 			$this->addClientId($_POST);
 		}
 	    $this->validateApiKey();
@@ -75,7 +97,7 @@ class SmartMarketingPs extends Module
 	 */
 	public function autoloadApi() 
 	{
-        $classFile = __DIR__ . '/lib/SmartApi.php';
+        $classFile = dirname(__FILE__) . '/lib/SmartApi.php';
         if(is_file($classFile)){
             include_once $classFile;
         }
@@ -118,7 +140,7 @@ class SmartMarketingPs extends Module
 	{
 		$return = true;
 		$sql = array();
-		include __DIR__ . '/install/sql.php';
+		include dirname(__FILE__) . '/install/sql.php';
 		
 		foreach ($sql as $s){
 		    $return &= Db::getInstance()->execute($s);
@@ -236,7 +258,7 @@ class SmartMarketingPs extends Module
     protected function uninstallDb() 
 	{
 		// drop all tables from the plugin
-		include __DIR__ . '/install/sql.php';
+		include dirname(__FILE__) . '/install/sql.php';
     	foreach ($sql as $name => $v){
        		Db::getInstance()->execute('DROP TABLE IF EXISTS '.$name);
    		}
@@ -393,8 +415,8 @@ class SmartMarketingPs extends Module
 	public function displayForm() 
 	{
 		//add headers
-		$this->context->controller->addJS($this->_path. 'views/assets/js/config.js');
-		$this->context->controller->addCSS($this->_path. 'views/assets/css/main.css');
+		$this->context->controller->addJS($this->_path. 'views/js/config.js');
+		$this->context->controller->addCSS($this->_path. 'views/css/main.css');
 		
 		// assign vars
         $this->assign($this->success_msg, 'success_msg');
@@ -411,9 +433,9 @@ class SmartMarketingPs extends Module
 	 */
 	public function validateApiKey()
 	{
-		if(isset($_POST["api_key"]) && ($_POST["api_key"])) {
+		if(!empty(Tools::getValue("api_key"))) {
 
-	        $api = new SmartApi($_POST["api_key"]);
+	        $api = new SmartApi(Tools::getValue("api_key"));
 	        $clientData = $api->getClientData();
 
 	        if(isset($clientData['CLIENTE_ID']) && ($clientData['CLIENTE_ID'])) {
@@ -899,9 +921,18 @@ class SmartMarketingPs extends Module
      */
     private function installSmartOverrides()
     {
-    	exec('cp '.dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php '.dirname(__FILE__).'/../../override/classes/webservice/');
-		@exec('rm -f '.dirname(__FILE__).'/../../app/cache/dev/class_index.php');
-		@exec('rm -f '.dirname(__FILE__).'/../../app/cache/prod/class_index.php');
+        copy(
+            dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php',
+            dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php'
+        );
+
+        // if main file not exists
+        $file = dirname(__FILE__).'/../../override/classes/webservice/WebserviceRequest.php';
+        if (!file_exists($file)) {
+            copy(dirname(__FILE__).'/override/classes/webservice/WebserviceRequest.php', $file);
+        }
+
+        $this->cleanCache();
     }
 
     /**
@@ -911,9 +942,28 @@ class SmartMarketingPs extends Module
      */
     private function uninstallSmartOverrides()
     {
-    	exec('rm -f '.dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
-    	@exec('rm -f '.dirname(__FILE__).'/../../app/cache/dev/class_index.php');
-    	@exec('rm -f '.dirname(__FILE__).'/../../app/cache/prod/class_index.php');
+        unlink(dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
+        $this->cleanCache();
+    }
+
+    /**
+     * Clean Index class from cache for Dev && Production
+     *
+     * @return void
+     */
+    private function cleanCache()
+    {
+        if (file_exists($this->dev_cache)) {
+            unlink($this->dev_cache);
+        }else{
+            @unlink(dirname(__FILE__).'/../../var/cache/dev/class_index.php');
+        }
+
+        if (file_exists($this->prod_cache)) {
+            unlink($this->prod_cache);
+        }else{
+            @unlink(dirname(__FILE__).'/../../var/cache/prod/class_index.php');
+        }
     }
 
 	/**
@@ -989,8 +1039,8 @@ class SmartMarketingPs extends Module
 		  	);
 
 			if($res['popup']) {
-                $this->context->controller->addJS($this->_path. 'views/assets/js/modal.js');
-                $this->context->controller->addCSS($this->_path. 'views/assets/css/modal.css');
+                $this->context->controller->addJS($this->_path. 'views/js/modal.js');
+                $this->context->controller->addCSS($this->_path. 'views/css/modal.css');
 
                 $this->assign($res['popup'], 'popup');
 				if ($res['once']) {
