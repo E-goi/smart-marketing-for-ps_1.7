@@ -23,10 +23,10 @@ if(!empty($products)){
         $product_id = $product['id_product'];
         $product_name = htmlentities($product['name']);
         $product_cat = '-';
-        $product_price = floatval($product['price_wt']);
+        $product_price = (float)$product['price_wt'];
         $product_quantity = $product['quantity'];
 
-        $sum_price += floatval(round(($product_price * $product_quantity), 2));
+        $sum_price += (float)round(($product_price * $product_quantity), 2);
 
         $te .= "_egoiaq.push(['addEcommerceItem',
         \"$product_id\",
@@ -57,7 +57,7 @@ if(!empty($products)){
 }
 
 if(isset($order)){
-    $order_total = floatval(round($sum_price, 2));
+    $order_total = (float)round($sum_price, 2);
 
     $te .= "_egoiaq.push(['trackEcommerceOrder',
     \"$order_id\",
