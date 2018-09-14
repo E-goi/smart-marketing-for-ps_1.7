@@ -50,6 +50,7 @@ class SmartMarketingPs extends Module
 	*/
 	public function __construct()
 	{
+		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
 	    $this->version = '1.0.0';
@@ -57,6 +58,9 @@ class SmartMarketingPs extends Module
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
 	    $this->bootstrap = true;
+
+	    // module key
+	    $this->module_key = '2f50fb7b4988d0a880ac658653d637ad';
 
         $this->dev_cache = dirname(__FILE__).'/../../app/cache/dev/class_index.php';
         $this->prod_cache = dirname(__FILE__).'/../../app/cache/prod/class_index.php';
@@ -87,7 +91,6 @@ class SmartMarketingPs extends Module
 
         // check newsletter submissions anywhere
 		$this->checkNewsletterSubmissions();
-        //$this->context->controller->addCSS(_PS_ADMIN_DIR_.'/themes/new-theme/public/theme.css', 'all', 1);
 	}
 
 	/**
