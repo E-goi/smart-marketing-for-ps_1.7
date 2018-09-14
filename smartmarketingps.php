@@ -68,7 +68,7 @@ class SmartMarketingPs extends Module
 	    parent::__construct();
 
 	    // Name & Description
-	    $this->displayName = $this->l('Smart Marketing for Prestashop');
+	    $this->displayName = $this->l('Smart Marketing');
 	    $this->description = $this->l('Easily sync your Prestashop contacts with E-goi.');
 
 	   	// on uninstall
@@ -80,7 +80,7 @@ class SmartMarketingPs extends Module
 	      	$this->warning = $this->l('No name provided');
 	    }
 
-		if(!empty(Tools::getValue('smart_api_key'))){
+		if(!empty(Tools::getValue('smart_api_key'))) {
 			$this->addClientId($_POST);
 		}
 	    $this->validateApiKey();

@@ -2,10 +2,10 @@
     <module>
         <name>smartmarketingps</name>
         <displayName><![CDATA[Smart Marketing]]></displayName>
-        <version><![CDATA[1.0]]></version>
+        <version><![CDATA[1.0.0]]></version>
         <description><![CDATA[Easily sync your Prestashop contacts with E-goi.]]></description>
         <author><![CDATA[E-goi]]></author>
-        <tab><![CDATA[front_office_features]]></tab>
+        <tab><![CDATA[advertising_marketing]]></tab>
         <confirmUninstall>Are you sure you want to uninstall?</confirmUninstall>
         <is_configurable>1</is_configurable>
         <need_instance>0</need_instance>
