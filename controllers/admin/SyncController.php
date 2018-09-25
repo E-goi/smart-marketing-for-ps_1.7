@@ -38,12 +38,13 @@ class SyncController extends SmartMarketingBaseController
 
 	/**
 	 * Inject Dependencies
-	 * 
+	 *
+     * @param $isNewTheme
 	 * @return mixed
 	 */
-	public function setMedia()
+	public function setMedia($isNewTheme = false)
 	{
-		parent::setMedia();
+		parent::setMedia($isNewTheme);
 		$this->addJS($this->_path. '/views/js/sync.js');
 	}
 

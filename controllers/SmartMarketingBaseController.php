@@ -57,14 +57,15 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 
 	/**
      * Inject Dependencies
-     * 
+     *
+     * @param $isNewTheme
      * @return void
      */
-	public function setMedia() 
+	public function setMedia($isNewTheme = false)
 	{
 		$this->addJquery();
 		$this->addCSS($this->_path. '/views/css/main.css');
-		return parent::setMedia();
+		return parent::setMedia($isNewTheme);
     }
 
 	/**

@@ -33,12 +33,13 @@ class AccountController extends SmartMarketingBaseController
 
 	/**
      * Inject Dependencies
-     * 
+     *
+     * @param $isNewTheme
      * @return void
      */
-	public function setMedia() 
+	public function setMedia($isNewTheme = false)
 	{
-		parent::setMedia();
+		parent::setMedia($isNewTheme);
     }
 	
 	 /**

@@ -234,7 +234,7 @@ class WebserviceSpecificManagementEgoi extends WebserviceSpecificManagementSearc
      */
     private function getGroups($category_id)
     {
-        $sql = 'SELECT id_group FROM '._DB_PREFIX_.'category_group WHERE id_category = '.$category_id;
+        $sql = 'SELECT id_group FROM '._DB_PREFIX_.'category_group WHERE id_category = '.(int)$category_id;
         return Db::getInstance()->executeS($sql);
     }
 
