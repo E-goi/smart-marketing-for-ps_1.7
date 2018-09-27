@@ -518,7 +518,7 @@ class SmartMarketingPs extends Module
         $res = $this->getClientData();
 		if($res['sync']) {
             // check if is a role defined
-            if (!$this->getRole((int)$params['object']->id, $res['role'])) {
+            if (!$this->getRole($params['object']->id, $res['role'])) {
                 return false;
             }
 
@@ -560,7 +560,7 @@ class SmartMarketingPs extends Module
 				$customer = new Customer((int)$id);
 				if (!empty($customer)) {
 				    // check if is a role defined
-                    if (!$this->getRole((int)$customer->id, $res['role'])) {
+                    if (!$this->getRole($customer->id, $res['role'])) {
 				        return false;
                     }
 
@@ -663,7 +663,7 @@ class SmartMarketingPs extends Module
     {
         if ($customer_role) {
             $role = Db::getInstance()
-                ->getValue("SELECT COUNT(*) FROM "._DB_PREFIX_."customer_group WHERE id_customer='".$customer_id."' and id_group='$customer_role'");
+                ->getValue("SELECT COUNT(*) FROM "._DB_PREFIX_."customer_group WHERE id_customer='".(int)$customer_id."' and id_group='".(int)$customer_role."'");
             if (!$role) {
                 return false;
             }
@@ -973,7 +973,7 @@ class SmartMarketingPs extends Module
 	private function getCartId($customerId) 
 	{
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)
-					->getValue("SELECT id_cart FROM "._DB_PREFIX_."egoi_customers WHERE customer='".$customerId."'");
+					->getValue("SELECT id_cart FROM "._DB_PREFIX_."egoi_customers WHERE customer='".(int)$customerId."'");
 	}
 
 	/**
@@ -985,7 +985,7 @@ class SmartMarketingPs extends Module
 	private function getOrderDetails($orderId)
 	{
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)
-					->getRow("SELECT * FROM "._DB_PREFIX_."orders WHERE id_cart='$orderId' OR id_order='$orderId'");
+					->getRow("SELECT * FROM "._DB_PREFIX_."orders WHERE id_cart='".(int)$orderId."' OR id_order='".(int)$orderId."'");
 	}
 
 	/**
@@ -1100,19 +1100,6 @@ class SmartMarketingPs extends Module
      */
 	private function checkNewsletterSubmissions()
     {
-        /*
-        if (Tools::getValue('conf') == '4') {
-            if ($id = (int)Tools::getValue('id')) {
-                var_dump($id);
-                exit;
-
-                $subscriber = Db::getInstance(_PS_USE_SQL_SLAVE_)
-                    ->getValue("SELECT email FROM {_DB_PREFIX_}emailsubscription WHERE id='$id'");
-                var_dump($subscriber);
-                exit;
-            }
-        }*/
-
         if (Tools::isSubmit('submitNewsletter')) {
             if ($email = Tools::getValue('email')) {
 
