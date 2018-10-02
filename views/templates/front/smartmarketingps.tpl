@@ -31,11 +31,7 @@
 	{else}
 
 		<div id="smart_form" {if isset($header) and ($header)} style="width:50%;margin-left:25%;text-align:center;margin-top:10%;" {/if}>
-			{if isset($form_type) and ($form_type eq 'iframe')}
-				{$content nofilter}{* No escape necessary for this code *}
-			{else}
-				{$content nofilter}{* No escape necessary for this code *}
-			{/if}
+			{$content nofilter}{* No escape necessary for this code *}
 		</div>
 	{/if}
 
