@@ -35,15 +35,9 @@
 			font-size: 20px;
 		}
 
-		{if isset($type) and ($type eq 'iframe')}
-			#panel_egbody{
-				height: 550px;
-			}
-		{else}
-			#panel_egbody{
-				height: 720px;
-			}
-		{/if}
+		#panel_egbody{
+			height: 720px;
+		}
 
 		.bootstrap hr{
 			margin-top: 10px;
