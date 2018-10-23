@@ -15,7 +15,7 @@ $te = "<script type='text/javascript'>
 		_egoiaq.push(['setSubscriber', \"$customer\"]);
 		_egoiaq.push(['setTrackerUrl', u+'collect']);\n";
 		
-		$sum_price = '';
+		$sum_price = 0;
 
 if(!empty($products)){
     foreach($products as $key => $product){
