@@ -141,6 +141,7 @@ $_MODULE['<{smartmarketingps}prestashop>sync_43f8ad6b9575cc41e3823379b1f24908'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_7105a8c7eaaed1981b0dda5f44cedae8'] = 'Bloque de módulo de Newsletter';
 $_MODULE['<{smartmarketingps}prestashop>sync_ce76a5e8d6126dca6d4eb9231b5bee58'] = 'Doble Opt-in';
 $_MODULE['<{smartmarketingps}prestashop>sync_4940e96ce89f2252b9803365124f77e4'] = 'Seleccione \"sí\" si desea habilitar el doble opt-in cuando sus suscriptores se registren en este';
+$_MODULE['<{smartmarketingps}prestashop>sync_528054000ab6b394d616f24e2c8bda89'] = 'Seleccione \"sí\" si desea habilitar la sincronización de suscriptores del boletín con este';
 $_MODULE['<{smartmarketingps}prestashop>sync_22884db148f0ffb0d830ba431102b0b5'] = 'módulo';
 $_MODULE['<{smartmarketingps}prestashop>sync_23aae2f77e88eb477aa99ba4c508f822'] = 'Campos de PrestaShop';
 $_MODULE['<{smartmarketingps}prestashop>sync_30924fddab24565087299f817bcd6a71'] = 'Seleccionar campo';

@@ -152,3 +152,6 @@ $_MODULE['<{smartmarketingps}prestashop>sync_5455146337d77d4c1271350f7da83c4a'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_185b7133db22230701a857c059360cc2'] = 'Assign';
 $_MODULE['<{smartmarketingps}prestashop>sync_234b6206205c09f587001fddeac2e314'] = 'Mapped Fields';
 $_MODULE['<{smartmarketingps}prestashop>sync_2c99d9e9d949e4feb67525256a7ea77d'] = 'The selected fields are already mapped!';
+
+$_MODULE['<{smartmarketingps}prestashop>sync_850b16544cb58ba475fcf8791889081f'] = 'Double Optin Registrations';
+$_MODULE['<{smartmarketingps}prestashop>sync_528054000ab6b394d616f24e2c8bda89'] = 'Select \"yes\" if you want to enable newsletter subscribers synchronization from this';

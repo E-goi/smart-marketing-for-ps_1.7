@@ -139,6 +139,8 @@ $_MODULE['<{smartmarketingps}prestashop>sync_7c0b43201656f84c4ed2487a4548ff43'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_823e2334007d702211213b0d078362d4'] = 'Mapear campos personalizados';
 $_MODULE['<{smartmarketingps}prestashop>sync_43f8ad6b9575cc41e3823379b1f24908'] = 'Sincronize campos personalizados do PrestaShop com a lista E-goi';
 $_MODULE['<{smartmarketingps}prestashop>sync_7105a8c7eaaed1981b0dda5f44cedae8'] = 'Módulo Subscrição da newsletter';
+$_MODULE['<{smartmarketingps}prestashop>sync_b2480b0b733052a313df6baa62ee3e16'] = 'Sincronizar Assinantes de Newsletter';
+$_MODULE['<{smartmarketingps}prestashop>sync_528054000ab6b394d616f24e2c8bda89'] = 'Selecione \"sim\" se quiser activar a sincronização de assinantes de newsletters deste ';
 $_MODULE['<{smartmarketingps}prestashop>sync_ce76a5e8d6126dca6d4eb9231b5bee58'] = 'Email de confirmação após a subscrição';
 $_MODULE['<{smartmarketingps}prestashop>sync_4940e96ce89f2252b9803365124f77e4'] = 'Selecione \"sim\" se você quiser activar o envio de email de confirmação após a subscrição';
 $_MODULE['<{smartmarketingps}prestashop>sync_22884db148f0ffb0d830ba431102b0b5'] = 'módulo';
