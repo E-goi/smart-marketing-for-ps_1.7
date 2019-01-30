@@ -35,9 +35,15 @@
 			font-size: 20px;
 		}
 
-		#panel_egbody{
-			height: 720px;
-		}
+		{if isset($type) and ($type eq 'iframe')}
+			#panel_egbody{
+				height: 550px;
+			}
+		{else}
+			#panel_egbody{
+				height: 720px;
+			}
+		{/if}
 
 		.bootstrap hr{
 			margin-top: 10px;
@@ -76,6 +82,7 @@
 						<select name="type" class="form_type" onchange="this.form.submit();">
 							<option value="popup" {if isset($type) and ($type eq 'popup')} selected {/if}>{l s='E-goi Form Popup' mod='smartmarketingps'}</option>
 							<option value="html" {if isset($type) and ($type eq 'html')} selected {/if}>{l s='E-goi Form HTML' mod='smartmarketingps'}</option>
+							<option value="iframe" {if isset($type) and ($type eq 'iframe')} selected {/if}>{l s='E-goi Form IFRAME' mod='smartmarketingps'}</option>
 						</select>
 					</div>
 				</form>
@@ -109,7 +116,73 @@
 						</tr>
 					</table>
 
-					{if $type eq 'popup' or $type eq 'html'}
+					{if $type eq 'iframe'}
+
+						<table class="table">
+							<tr>
+								{if !$lists}
+									{l s='No lists found, are you connected to E-goi and/or have created lists?' mod='smartmarketingps'}
+								{else}
+									<td>
+										<b>{l s='Select your List' mod='smartmarketingps'}</b>
+									</td>
+									<td>
+										<select name="list_id" id="list_id" required>
+											<option value="" disabled selected>
+                                                {l s='Select List ...' mod='smartmarketingps'}
+											</option>
+											{foreach $lists as $list}
+												{if isset($list_id) and ($list_id eq $list.listnum)}
+													<option value="{$list.listnum|escape:'htmlall':'UTF-8'}" selected="selected">{$list.title|escape:'htmlall':'UTF-8'}</option>
+												{else}
+													<option value="{$list.listnum|escape:'htmlall':'UTF-8'}">{$list.title|escape:'htmlall':'UTF-8'}</option>
+												{/if}
+											{/foreach}
+										</select>
+										<div class="sync_list" style="display: none;"></div>
+										<i class="material-icons" id="sync_success" style="display: none;">beenhere</i>
+									</td>
+                                {/if}
+							</tr>
+							<tr>
+								<td>
+									<b>{l s='Select your Form' mod='smartmarketingps'}</b>
+								</td>
+								<td>
+									<select name="form" id="formid_egoi" required>
+										<option value="" disabled selected>
+											{l s='Select first your list ...' mod='smartmarketingps'}
+										</option>
+										{if isset($myforms) and ($myforms)}
+											{foreach $myforms as $form_egoi}
+												{if $form_data eq $form_egoi.url}
+													<option value="{$form_egoi.url|escape:'htmlall':'UTF-8'}" selected="selected">
+														{$form_egoi.title|escape:'htmlall':'UTF-8'}
+													</option>
+												{else}
+													<option value="{$form_egoi.url|escape:'htmlall':'UTF-8'}">{$form_egoi.title|escape:'htmlall':'UTF-8'}</option>
+												{/if}
+											{/foreach}
+										{/if}
+									</select>
+									<div id="show_preview" {if isset($list_id) and ($list_id)} {else} style="display: none; {/if}">
+										<a data-toggle="modal" class="btn" data-target="#preview">{l s='Preview' mod='smartmarketingps'}</a>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<b>{l s='Box Dimensions' mod='smartmarketingps'}</b>
+									<p class="egoi-help">{l s='Values in px' mod='smartmarketingps'}</p>
+								</td>
+								<td>
+									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="{l s='Width' mod='smartmarketingps'}" maxlength="5" name="style_width" value="{$style_width|escape:'htmlall':'UTF-8'}">
+									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="{l s='Height' mod='smartmarketingps'}" maxlength="5" name="style_height" value="{$style_height|escape:'htmlall':'UTF-8'}">
+								</td>
+							</tr>
+						</table>
+
+					{elseif $type eq 'popup' or $type eq 'html'}
 
 						{* $editor *}
 						<div class="form-group">
@@ -216,6 +289,24 @@
 				<input type="hidden" name="form_id" value="{$form}">
 				<input type="submit" name="save-form" id="save-form" value="1" style="display: none;">
 			</form>
+
+		{if $type eq 'iframe'}
+			{* Modal Preview *}
+			<div class="modal fade" id="preview" role="dialog">
+			    <div class="modal-dialog" style="width:730px;height:400px;">
+			     	<div class="modal-content">
+				        <div class="modal-body">
+							<div id="egoi_form_inter">
+								<iframe id="prev_iframe" src="" width="700" height="600" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>
+							</div>
+				        </div>
+				        <div class="modal-footer">
+				          <button type="button" class="btn btn-default" id="close_fields" data-dismiss="modal">{l s='Close' mod='smartmarketingps'}</button>
+				        </div>
+			      	</div>
+			    </div>
+			</div>
+		{/if}
 
 	{else}
 
