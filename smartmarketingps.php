@@ -1104,15 +1104,20 @@ class SmartMarketingPs extends Module
             if ($email = Tools::getValue('email')) {
 
                 $client = $this->getClientData();
-                if ($client['sync']) {
+                if ($client['sync'] && $client['newsletter_sync']) {
 
                     if (Validate::isEmail($email)) {
-                        return (new SmartApi)
+
+                    	$api = new SmartApi;
+                    	$tag_id = $api->processNewTag("NewsletterSubscriptions");
+
+                        return $api
                             ->addSubscriber(
                                 array(
                                     'listID' => $client['list_id'],
                                     'email' => $email,
-                                    'status' => $client['optin'] ? 0 : 1
+                                    'status' => $client['optin'] ? 0 : 1,
+                                    'tags' => array($tag_id)
                                 )
                             );
                     }

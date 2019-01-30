@@ -90,6 +90,7 @@ class SyncController extends SmartMarketingBaseController
 				$track = $rq['track'];
 				$role = $rq['role'];
                 $optin = $rq['optin'];
+                $newsletter_sync = $rq['newsletter_sync'];
 			}
 
 			if(isset($list_id) && ($list_id)) {
@@ -100,6 +101,7 @@ class SyncController extends SmartMarketingBaseController
 				$this->assign('track', $track);
 				$this->assign('role_id', $role);
 				$this->assign('optin', $optin);
+				$this->assign('newsletter_sync', $newsletter_sync);
 
 				//map fields
 				$egoi_fields = array(
@@ -146,7 +148,8 @@ class SyncController extends SmartMarketingBaseController
 			$sync = Tools::getValue('enable');
 			$role = Tools::getValue('role');
 
-            $optin = Tools::getValue('newsletter_optin', 0);
+            $nsync = Tools::getValue('newsletter_sync', 0);
+            $noptin = Tools::getValue('newsletter_optin', 0);
 			$track = Tools::getValue('track', 1);
 
 			// compare client ID -> API with DB
@@ -156,13 +159,22 @@ class SyncController extends SmartMarketingBaseController
 			$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
 						->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id='.(int)$client);
 
+			// temporary - alter table with new column
+			if ($nsync) {
+				if (is_null($res['newsletter_sync'])) {
+					$query = "ALTER TABLE "._DB_PREFIX_."egoi ADD COLUMN newsletter_sync INT(11) NOT NULL DEFAULT '0' AFTER `optin`";
+					Db::getInstance()->execute($query);
+				}
+			}
+
 			$values = array(
 				'list_id' => (int)$list, 
 				'client_id' => (int)$client,
 				'sync' => (int)$sync,
 				'track' => (int)$track,
 				'role' => pSQL($role),
-				'optin' => (int)$optin,
+				'newsletter_sync' => (int)$nsync,
+				'optin' => (int)$noptin,
 				'estado' => 1,
                 'total' => 0
 			);
@@ -330,56 +342,93 @@ class SyncController extends SmartMarketingBaseController
 	 */
 	protected function sincronizeList()
 	{
+		// on a specific POST request
         if(!empty(Tools::getValue("token_list"))) {
 
             $res = Db::getInstance(_PS_USE_SQL_SLAVE_)
-                        ->getRow('SELECT list_id, client_id, sync, role FROM '._DB_PREFIX_.'egoi WHERE client_id != "" and sync="1" order by egoi_id DESC');
+                        ->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id != "" and sync="1" order by egoi_id DESC');
             $sync = $res['sync'];
             $client_id = $res['client_id'];
             $list_id = $res['list_id'];
             $role = $res['role'];
+            $newsletter_sync = $res['newsletter_sync'];
+            $newsletter_optin = $res['optin'];
 
+            // main sync is activated
             if($sync) {
+            	
+            	// get main customers
+                $customers = Db::getInstance(_PS_USE_SQL_SLAVE_)
+                					->executeS('SELECT * FROM '._DB_PREFIX_.'customer WHERE active="1"');
 
-                $sql = 'SELECT id, email, firstname, lastname, birthday, newsletter, optin FROM '._DB_PREFIX_.'customer WHERE active="1"';
-                $customers = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-
-                $parent_subs = array();
                 $subscribers = array();
+                $nsubscribers = array();
 
+                // get newsletter subscriptions if newsletter sync is activated
+                if ($newsletter_sync) {
+                	$nsubs = Db::getInstance(_PS_USE_SQL_SLAVE_)
+                					->executeS('SELECT * FROM '._DB_PREFIX_.'emailsubscription WHERE active="1"');
+	                if (!empty($nsubs)) {
+
+	                	// assign new tag ID for this import
+	                	$newsletters_tag = $this->api->processNewTag("NewsletterSubscriptions");
+
+	                	// get all newsletter subscriptions
+	                	foreach($nsubs as $keyn => $sub) {
+
+	                		$nsubscribers[$keyn]['email'] = $sub['email'];
+	                    	// check if option is double optin
+	                    	if ($newsletter_optin) {
+	                    		$nsubscribers[$keyn]['status'] = 0;
+	                    	}else{
+	                    		$nsubscribers[$keyn]['status'] = 1;
+	                    	}
+		                }
+
+		                // import all newsletter subscriptions
+		                $this->api->addSubscriberBulk($list_id, $nsubscribers, $newsletters_tag);
+	                }
+	            }
+
+	            // import main customers
                 if (!empty($customers)) {
-                    foreach($customers as $customer) {
 
-                        if (!$this->getRole((int)$customer['id'], $role)) {
+                	// assign new tag ID for the customers import 
+	                $customer_tag = $this->api->processNewTag("Customer");
+
+	                // get all customers
+                    foreach($customers as $keyc => $customer) {
+
+                    	$id = isset($customer['id']) ? $customer['id'] : $customer['id_customer'];
+                        if (!$this->getRole((int)$id, $role)) {
                             return false;
                         }
 
-                        $subscribers['email'] = $customer['email'];
+                        $subscribers[$keyc]['email'] = $customer['email'];
                         foreach ($customer as $key => $value) {
                             $row_new_value = $this->getFieldMap(0, $key);
 
                             if($row_new_value){
-                                $subscribers[$row_new_value] = $value;
+                                $subscribers[$keyc][$row_new_value] = $value;
                             }
                         }
 
                         // check if this fields are not mapped
-                        if (count($subscribers) == 1) {
-                            $subscribers['first_name'] = $customer['firstname'];
-                            $subscribers['last_name'] = $customer['lastname'];
-                            $subscribers['birth_date'] = $customer['birthday'];
+                        if (count($subscribers[$keyc]) == 1) {
+                            $subscribers[$keyc]['first_name'] = $customer['firstname'] ?: null;
+                            $subscribers[$keyc]['last_name'] = $customer['lastname'] ?: null;
+                            $subscribers[$keyc]['birth_date'] = $customer['birthday'] ?: null;
+                            $subscribers[$keyc]['status'] = 1;
                         }
-
-                        $parent_subs[] = $subscribers;
                     }
 
-                    // add subscribers to E-goi
-                    $this->api->addSubscriberBulk($list_id, $parent_subs);
+                    // import subscribers to E-goi
+                    $this->api->addSubscriberBulk($list_id, $subscribers, $customer_tag);
 
                     // update in DB
                     echo Db::getInstance()->update('egoi',
                         array(
-                            'total' => (int)count($customers) + count($parent_subs)
+                            'total' => (int)count($customers) + count($subscribers) + count($nsubscribers)
                         ), "client_id = $client_id");
                     exit;
                 }

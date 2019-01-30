@@ -75,6 +75,16 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#newsletter_sync0').on('click', function() {
+		$('#optin0').prop('disabled', false);
+		$('#optin1').prop('disabled', false);
+	});
+
+	$('#newsletter_sync1').on('click', function() {
+		$('#optin0').prop('disabled', true);
+		$('#optin1').prop('disabled', true);
+	});
+
 	$('#save_map_fields').on('click', function() {
 		
 		var $ps = $('#ps_fields');

@@ -355,4 +355,30 @@ class SmartApi
         return $result['TAG_LIST'];
     }
 
+    /**
+     * Get tag ID then if not exists create it 
+     * 
+     * @param string $tag_name
+     * @return int|string
+     */
+    public function processNewTag($tag_name)
+    {
+        $tags = $this->getTags();
+
+        $tag_id = 0;
+        if (!empty($tags)) {
+            foreach ($tags as $tag) {
+                if (strtolower($tag['NAME']) == strtolower($tag_name)) {
+                    $tag_id = $tag['ID'];
+                }
+            }
+        }
+
+        if (!$tag_id) {
+            $tag = $this->addTag($tag_name);
+            $tag_id = $tag['ID'];
+        }
+        return $tag_id;
+    }
+
 }

@@ -130,20 +130,60 @@
 					<th class="egoi-td" scope="row">
 						<label class="control-label">
 							<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Newsletter module block' mod='smartmarketingps'}">
-								{l s='Newsletter Optin' mod='smartmarketingps'}
+								{l s='Sync Newsletter Subscribers' mod='smartmarketingps'}
 							</span>
 						</label>
 					</th>
 					<td class="nowrap input-group">
 						<span class="switch prestashop-switch fixed-width-lg">
-							<input type="radio" name="newsletter_optin" id="optin0" value="1" {if isset($optin) and ($optin eq '1')} checked {/if}>
+							<input type="radio" name="newsletter_sync" 
+								id="newsletter_sync0" 
+								value="1" 
+								{if isset($newsletter_sync) and ($newsletter_sync eq '1')} checked {/if}>
+							<label for="newsletter_sync0">{l s='Yes' mod='smartmarketingps'}</label>
+
+							<input type="radio" name="newsletter_sync" 
+								id="newsletter_sync1" 
+								value="0" 
+								{if $newsletter_sync eq '0' or $newsletter_sync eq ''} checked {/if}>
+							<label for="newsletter_sync1">{l s='No' mod='smartmarketingps'}</label>
+							<a class="slide-button btn"></a>
+						</span>
+						<p class="help">{l s='Select "yes" if you want to enable newsletter subscribers synchronization from this ' mod='smartmarketingps'}
+							<a target="_blank" href="index.php?controller=AdminModules&configure=ps_emailsubscription&token={$token|escape:'htmlall'}">
+								{l s='module' mod='smartmarketingps'}
+							</a>
+						</p>
+					</td>
+				</tr>
+
+				<tr>
+					<th class="egoi-td" scope="row">
+						<label class="control-label">
+							<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Newsletter module block' mod='smartmarketingps'}">
+								{l s='Double Optin Registrations' mod='smartmarketingps'}
+							</span>
+						</label>
+					</th>
+					<td class="nowrap input-group">
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="newsletter_optin" 
+								id="optin0" 
+								value="1" 
+								{if isset($optin) and ($optin eq '1')} checked {/if} 
+								{if $newsletter_sync eq '0' or ($newsletter_sync eq '')} disabled {/if}>
 							<label for="optin0">{l s='Yes' mod='smartmarketingps'}</label>
-							<input type="radio" name="newsletter_optin" id="optin1" value="0" {if $optin eq '0' or $optin eq ''} checked {/if}>
+
+							<input type="radio" name="newsletter_optin" 
+								id="optin1" 
+								value="0" 
+								{if $optin eq '0' or $optin eq ''} checked {/if} 
+								{if $newsletter_sync eq '0' or ($newsletter_sync eq '')} disabled {/if}>
 							<label for="optin1">{l s='No' mod='smartmarketingps'}</label>
 							<a class="slide-button btn"></a>
 						</span>
 						<p class="help">{l s='Select "yes" if you want to enable double optin when your subscribers register in this' mod='smartmarketingps'}
-							<a target="_blank" href="index.php?controller=AdminModules&configure=ps_emailsubscription&token=f744a50172d26d9638122d2536f716a6">
+							<a target="_blank" href="index.php?controller=AdminModules&configure=ps_emailsubscription&token={$token|escape:'htmlall'}">
 								{l s='module' mod='smartmarketingps'}
 							</a>
 						</p>
