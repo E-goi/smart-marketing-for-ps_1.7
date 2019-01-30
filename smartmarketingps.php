@@ -1042,7 +1042,11 @@ class SmartMarketingPs extends Module
 				}
 			}
 
-			$content = html_entity_decode($res['form_content']);
+			if($res['form_type'] == 'iframe') {
+				$content = '<iframe src="http://'.$res['url'].'" width="'.$res['style_width'].'" height="'.$res['style_height'].'" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>';
+			}else{
+				$content = html_entity_decode($res['form_content']);
+			}
 
 			if ($res['enable']) {
 				$this->assign($content, 'content');

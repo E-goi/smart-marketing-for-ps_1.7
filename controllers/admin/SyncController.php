@@ -213,7 +213,7 @@ class SyncController extends SmartMarketingBaseController
     {
         if ($role) {
             $exists = Db::getInstance()
-                ->getValue("SELECT COUNT(*) FROM "._DB_PREFIX_."customer_group WHERE id_customer='".(int)$id."' and id_group='".(int)$role."'");
+                ->getValue("SELECT COUNT(*) FROM "._DB_PREFIX_."customer_group WHERE id_customer='".$id."' and id_group='$role'");
             if (!$exists) {
                 return false;
             }
