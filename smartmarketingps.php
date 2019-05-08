@@ -13,7 +13,31 @@ if (!defined('_PS_VERSION_'))
 
 class SmartMarketingPs extends Module
 {
-	
+
+    const PLUGIN_KEY = 'b2d226e839b116c38f53204205c8410c';
+
+    const SMS_NOTIFICATIONS_SENDER_CONFIGURATION = 'sms_notifications_sender';
+    const SMS_NOTIFICATIONS_ADMINISTRATOR_CONFIGURATION = 'sms_notifications_administrator';
+    const SMS_NOTIFICATIONS_ADMINISTRATOR_PREFIX_CONFIGURATION = 'sms_notifications_administrator_prefix';
+    const SMS_NOTIFICATIONS_DELIVERY_ADDRESS_CONFIGURATION = 'sms_notifications_delivery_address';
+    const SMS_NOTIFICATIONS_INVOICE_ADDRESS_CONFIGURATION = 'sms_notifications_invoice_address';
+
+    const SMS_MESSAGES_DEFAULT_LANG_CONFIGURATION = 'sms_messages_default_lang';
+    const SMS_REMINDERS_DEFAULT_LANG_CONFIGURATION = 'sms_reminders_default_lang';
+
+    const CUSTOM_INFO_DELIMITER = '%';
+    const CUSTOM_INFO_ORDER_REFERENCE = self::CUSTOM_INFO_DELIMITER . 'order_reference' . self::CUSTOM_INFO_DELIMITER;
+    const CUSTOM_INFO_ORDER_STATUS = self::CUSTOM_INFO_DELIMITER . 'order_status' . self::CUSTOM_INFO_DELIMITER;
+    const CUSTOM_INFO_TOTAL_COST = self::CUSTOM_INFO_DELIMITER . 'total_cost' . self::CUSTOM_INFO_DELIMITER;
+    const CUSTOM_INFO_CURRENCY = self::CUSTOM_INFO_DELIMITER . 'currency' . self::CUSTOM_INFO_DELIMITER;
+    const CUSTOM_INFO_ENTITY = self::CUSTOM_INFO_DELIMITER . 'entity' . self::CUSTOM_INFO_DELIMITER;
+    const CUSTOM_INFO_MB_REFERENCE = self::CUSTOM_INFO_DELIMITER . 'mb_reference' . self::CUSTOM_INFO_DELIMITER;
+    const CUSTOM_INFO_SHOP_NAME = self::CUSTOM_INFO_DELIMITER . 'shop_name' . self::CUSTOM_INFO_DELIMITER;
+    const CUSTOM_INFO_BILLING_NAME = self::CUSTOM_INFO_DELIMITER . 'billing_name' . self::CUSTOM_INFO_DELIMITER;
+
+    const LIMIT_HOUR_MIN = 10;
+    const LIMIT_HOUR_MAX = 22;
+
 	/**
 	 * @var mixed
 	 */
@@ -45,6 +69,13 @@ class SmartMarketingPs extends Module
      */
 	protected $prod_cache;
 
+    /**
+     * Transactional API
+     *
+     * @var $transactionalApi
+     */
+	protected $transactionalApi;
+
 	/**
 	* Module Constructor
 	*/
@@ -53,7 +84,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.0.0';
+	    $this->version = '1.1.0';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -75,6 +106,8 @@ class SmartMarketingPs extends Module
 	    $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
         spl_autoload_register(array($this, 'autoloadApi'));
+
+        $this->transactionalApi = new TransactionalApi();
 
 	    if (!Configuration::get('SMART_MARKETING')) {
 	      	$this->warning = $this->l('No name provided');
@@ -100,10 +133,8 @@ class SmartMarketingPs extends Module
 	 */
 	public function autoloadApi() 
 	{
-        $classFile = dirname(__FILE__) . '/lib/SmartApi.php';
-        if(is_file($classFile)){
-            include_once $classFile;
-        }
+        include_once dirname(__FILE__) . '/lib/SmartApi.php';
+        include_once dirname(__FILE__) . '/lib/TransactionalApi.php';
     }
 
 	/**
@@ -118,10 +149,11 @@ class SmartMarketingPs extends Module
 	  		    array(
 	  		        'cart',
 	  		        'actionCartSave',
+	  		        'actionDispatcher',
 	  		        'actionObjectCustomerAddAfter',
                     'actionObjectCustomerUpdateAfter',
 	  		        'actionObjectCustomerDeleteAfter',
-                    'actionValidateOrder',
+	  		        'actionOrderStatusPostUpdate',
 	  		        'displayHome',
 	  		        'displayTop',
 	  		        'displayFooter'
@@ -161,7 +193,8 @@ class SmartMarketingPs extends Module
 		$subtabs = array(
 			'Account' => $this->l('Account'),
 			'Sync' => $this->l('Sync Contacts'),
-			'Forms' => $this->l('Forms')
+			'Forms' => $this->l('Forms'),
+            'SmsNotifications' => $this->l('SMS Notifications')
 		);
 
 		foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ') as $val) {
@@ -268,10 +301,13 @@ class SmartMarketingPs extends Module
 
    		// remove menus
    		Db::getInstance()->delete('tab', "module = '$this->name'");
-   		Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='Forms'");
+   		Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='Forms' or name='SMS Notifications'");
 
    		// remove API Key in cache
    		Configuration::deleteByName('smart_api_key');
+
+        Configuration::deleteByName(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+        Configuration::deleteByName(self::SMS_NOTIFICATIONS_ADMINISTRATOR_CONFIGURATION);
 		
 		// remove webservice
 		$this->uninstallWebService();
@@ -483,6 +519,357 @@ class SmartMarketingPs extends Module
 	{
 		return $this->deleteCustomer($params);
 	}
+
+    /**
+     * Hook for triggering reminders
+     *
+     * @param $params
+     */
+    public function hookActionDispatcher($params)
+    {
+        $this->triggerReminders();
+    }
+
+    /**
+     * Hook for updating order status
+     *
+     * @param array $params
+     *
+     * @return bool
+     */
+	public function hookActionOrderStatusPostUpdate($params)
+    {
+        return $this->sendSmsNotification($params);
+    }
+
+    /**
+     * Triggers reminders
+     */
+    private function triggerReminders()
+    {
+        //Server time. Perhaps retrieve it from store?
+        $time = time();
+        $hour = $time / 3600 % 24;
+
+        if ($hour > self::LIMIT_HOUR_MIN && $hour < self::LIMIT_HOUR_MAX) {
+            $reminders = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_sms_notif_order_reminder");
+            foreach ($reminders as $reminder) {
+                if ($time >= $reminder['send_date']) {
+                    $this->sendReminder($reminder['mobile'], $reminder['message'], $reminder['order_id']);
+                }
+            }
+        }
+    }
+
+    /**
+     * Sends a reminder and removes its entry from database
+     *
+     * @param $mobile
+     * @param $message
+     * @param $orderId
+     */
+    private function sendReminder($mobile, $message, $orderId)
+    {
+        $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+        $this->transactionalApi->sendSms($mobile, $senderHash, $message);
+        $this->deleteReminder($orderId);
+    }
+
+    /**
+     * Deletes a reminder
+     *
+     * @param $orderId
+     */
+    private function deleteReminder($orderId)
+    {
+        $orderId = pSQL($orderId);
+        Db::getInstance()->delete('egoi_sms_notif_order_reminder', "order_id=$orderId");
+    }
+
+    /**
+     * Sends sms notification
+     *
+     * @param  $params
+     * @return bool
+     */
+    private function sendSmsNotification($params)
+    {
+        if (!Configuration::hasKey(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION)) {
+            return false;
+        }
+
+        $order = new Order($params['id_order']);
+        $newOrderStatus = $params['newOrderStatus'];
+        $smsNotif = Db::getInstance()->getRow("SELECT * FROM "._DB_PREFIX_."egoi_sms_notif_order_status WHERE order_status_id=".pSQL($newOrderStatus->id));
+        $send = $smsNotif['send_client'] == 1;
+        $this->sendClient($newOrderStatus, $order, $send);
+
+        $admin = Configuration::get(self::SMS_NOTIFICATIONS_ADMINISTRATOR_CONFIGURATION);
+        if (!empty($admin) && $smsNotif['send_admin'] == 1) {
+            return $this->sendAdmin($params['newOrderStatus'], $order, $admin);
+        }
+
+        return true;
+    }
+
+    /**
+     * Sends client message
+     *
+     * @param $newOrderStatus
+     * @param $order
+     * @param $send
+     *
+     * @return bool
+     */
+    private function sendClient($newOrderStatus, $order, $send)
+    {
+        $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+
+        $messages = $this->getNotifMessages($newOrderStatus->id, $order->id_lang);
+        $message = $this->parseMessage($messages['client_message'], $newOrderStatus, $order);
+        if ($send && empty($message)) {
+            return false;
+        }
+
+        $addresses = array();
+        if (!empty(Configuration::get(self::SMS_NOTIFICATIONS_DELIVERY_ADDRESS_CONFIGURATION))) {
+            array_push($addresses, new Address($order->id_address_delivery));
+        }
+        if (!empty(Configuration::get(self::SMS_NOTIFICATIONS_INVOICE_ADDRESS_CONFIGURATION))) {
+            array_push($addresses, new Address($order->id_address_invoice));
+        }
+
+        $sent = array();
+        foreach ($addresses as $address) {
+            $mobile = $this->getPhoneFromOrder($address);
+            if (!$mobile) {
+                return false;
+            }
+
+            $country = new Country($address->id_country);
+            $mobile = $country->call_prefix . '-' . $mobile;
+            if (isset($sent[$mobile])) {
+                continue;
+            }
+
+            $sent[$mobile] = 1;
+            if ($send) {
+                $this->transactionalApi->sendSms($mobile, $senderHash, $message);
+            }
+
+            $this->reminder($order, $newOrderStatus, $mobile);
+        }
+
+        return true;
+    }
+
+    /**
+     * Sends admin message
+     *
+     * @param $newOrderStatus
+     * @param $order
+     * @param $admin
+     *
+     * @return bool
+     */
+    private function sendAdmin($newOrderStatus, $order, $admin)
+    {
+        $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+
+        $messages = empty($messages) ? $this->getNotifMessages($newOrderStatus->id, $order->id_lang) : $messages;
+        $message = $this->parseMessage($messages['admin_message'], $newOrderStatus, $order);
+        if (empty($message)) {
+            return false;
+        }
+
+        $mobile = Configuration::get(self::SMS_NOTIFICATIONS_ADMINISTRATOR_PREFIX_CONFIGURATION) . '-' . $admin;
+        $this->transactionalApi->sendSms($mobile, $senderHash, $message);
+
+        return true;
+    }
+
+    /**
+     * Get SMS notification messages
+     *
+     * @param $orderStatusId
+     * @param $langId
+     *
+     * @return mixed
+     */
+    private function getNotifMessages($orderStatusId, $langId)
+    {
+        return Db::getInstance()->getRow("SELECT client_message,admin_message FROM "._DB_PREFIX_.
+            "egoi_sms_notif_messages WHERE order_status_id=" .pSQL($orderStatusId). " AND lang_id=".pSQL($langId)
+        );
+    }
+
+    /**
+     * Parses custom information and returns the real message
+     *
+     * @param $message
+     * @param $orderStatus
+     * @param $order
+     *
+     * @return mixed
+     */
+    private function parseMessage($message, $orderStatus, $order)
+    {
+        $currency = new Currency($order->id_currency);
+        $mb = $this->getMbData($order);
+        $customer = new Customer($order->id_customer);
+
+        return str_replace(
+            [
+                self::CUSTOM_INFO_ORDER_REFERENCE,
+                self::CUSTOM_INFO_ORDER_STATUS,
+                self::CUSTOM_INFO_TOTAL_COST,
+                self::CUSTOM_INFO_CURRENCY,
+                self::CUSTOM_INFO_ENTITY,
+                self::CUSTOM_INFO_MB_REFERENCE,
+                self::CUSTOM_INFO_SHOP_NAME,
+                self::CUSTOM_INFO_BILLING_NAME
+            ],
+            [
+                $order->reference,
+                $orderStatus->name,
+                $mb['total_cost'],
+                $currency->sign,
+                $mb['entity'],
+                $mb['reference'],
+                Configuration::get('PS_SHOP_NAME'),
+                $customer->firstname . ' ' . $customer->lastname
+            ],
+            $message
+        );
+    }
+
+    /**
+     * Get keys for payment reminders
+     *
+     * @return array
+     */
+    public static function getPaymentReminderKeys()
+    {
+        return array(
+            //reminder for ifThenPay. Check OrderState instance on state "Aguardar pagamento multibanco"
+            'multibanco' => array('template' => 'multibanco')
+        );
+    }
+
+    /**
+     * Handles reminders
+     *
+     * @param $order
+     * @param $orderState
+     * @param $mobile
+     */
+    private function reminder($order, $orderState, $mobile)
+    {
+        $reminders = self::getPaymentReminderKeys();
+        if (isset($reminders[$orderState->module_name]) &&
+            $reminders[$orderState->module_name]['template'] === $orderState->template) {
+            $message = $this->getReminderMessage($orderState->id, $order->id_lang)['message'];
+            if (empty($message)) {
+                return;
+            }
+
+            $message = $this->parseMessage($message, $orderState, $order);
+            if (!empty($message)) {
+                Db::getInstance()->insert(
+                    'egoi_sms_notif_order_reminder',
+                    array(
+                        'order_id' => pSQL($order->id),
+                        'mobile' => pSQL($mobile),
+                        'send_date' => time() + 300,
+                        'message' => pSQL($message)
+                    )
+                );
+            }
+        } else {
+            $this->deleteReminder($order->id);
+        }
+    }
+
+    /**
+     * Get SMS reminder message
+     *
+     * @param $orderStatusId
+     * @param $langId
+     *
+     * @return mixed
+     */
+    private function getReminderMessage($orderStatusId, $langId)
+    {
+        return Db::getInstance()->getRow("SELECT message FROM "._DB_PREFIX_.
+            "egoi_sms_notif_reminder_messages WHERE order_status_id=".pSQL($orderStatusId)
+            ." AND lang_id=".pSQL($langId)
+            ." AND active=1"
+        );
+    }
+
+    /**
+     * Gets phone or cellphone from order
+     *
+     * @param $address
+     *
+     * @return bool
+     */
+    private function getPhoneFromOrder($address)
+    {
+        if (!empty($address->phone_mobile)) {
+            return $address->phone_mobile;
+        } elseif (!empty($address->phone)) {
+            return $address->phone;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get mb data
+     *
+     * @param $order
+     *
+     * @return array
+     */
+    private function getMbData($order)
+    {
+        switch ($order->module) {
+            case 'multibanco':
+                $data = $this->getIfThenPayData($order);
+                break;
+            case 'eupago_multibanco':
+                $module = Module::getInstanceByName('eupago_multibanco');
+                $ref = $module->GenerateReference($order);
+                break;
+            default:
+                $data = array('entity' => '', 'reference' => '', 'total_cost' => '');
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get IfThenPay data
+     *
+     * @param $order
+     *
+     * @return array
+     */
+    private function getIfThenPayData($order)
+    {
+        $module = Module::getInstanceByName('multibanco');
+        $details = $module->getMBDetails();
+        $total = $order->getOrdersTotalPaid();
+        $ref = $module->GenerateMbRef($details[0], $details[1], $order->id, $total);
+
+        $data = array();
+        $data['entity'] = $details[0];
+        $data['reference'] = $ref;
+        $data['total_cost'] = Tools::displayPrice($total, new Currency($order->id_currency), false);
+
+        return $data;
+    }
 
 	/**
 	 * Add customer

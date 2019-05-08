@@ -14,11 +14,6 @@ class SmartApi
     /**
      * @var string
      */
-    protected $plugin_key = 'b2d226e839b116c38f53204205c8410c';
-
-    /**
-     * @var string
-     */
     protected $api_url = 'https://api.e-goi.com/v2/soap.php?wsdl';
 
     /**
@@ -50,7 +45,7 @@ class SmartApi
     {
         return array(
             'apikey' => $this->apiKey,
-            'plugin_key' => $this->plugin_key,
+            'plugin_key' => SmartMarketingPs::PLUGIN_KEY,
             'status' => 1
         );
     }
