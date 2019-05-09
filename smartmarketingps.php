@@ -21,6 +21,7 @@ class SmartMarketingPs extends Module
     const SMS_NOTIFICATIONS_ADMINISTRATOR_PREFIX_CONFIGURATION = 'sms_notifications_administrator_prefix';
     const SMS_NOTIFICATIONS_DELIVERY_ADDRESS_CONFIGURATION = 'sms_notifications_delivery_address';
     const SMS_NOTIFICATIONS_INVOICE_ADDRESS_CONFIGURATION = 'sms_notifications_invoice_address';
+    const SMS_REMINDER_DEFAULT_TIME_CONFIG = 'sms_reminder_default_time_config';
 
     const SMS_MESSAGES_DEFAULT_LANG_CONFIGURATION = 'sms_messages_default_lang';
     const SMS_REMINDERS_DEFAULT_LANG_CONFIGURATION = 'sms_reminders_default_lang';
@@ -133,8 +134,10 @@ class SmartMarketingPs extends Module
 	 */
 	public function autoloadApi() 
 	{
+        include_once dirname(__FILE__) . '/lib/EgoiRestApi.php';
         include_once dirname(__FILE__) . '/lib/SmartApi.php';
         include_once dirname(__FILE__) . '/lib/TransactionalApi.php';
+        include_once dirname(__FILE__) . '/lib/ApiV3.php';
     }
 
 	/**
@@ -437,9 +440,11 @@ class SmartMarketingPs extends Module
 	    	
 	    	if (!$api_key)
                 $this->error_msg = $this->displayError($this->l('Indicate correct API key.'));
-	        
+
 	        if (!sizeof($this->_errors)) {
                 Configuration::updateValue('smart_api_key', ($api_key));
+                $this->transactionalApi = new TransactionalApi();
+                $this->transactionalApi->enableClient();
                 $this->success_msg = $this->displayConfirmation($this->l('API Key saved and updated'));
             }
 	    }
@@ -715,7 +720,7 @@ class SmartMarketingPs extends Module
     private function parseMessage($message, $orderStatus, $order)
     {
         $currency = new Currency($order->id_currency);
-        $mb = $this->getMbData($order);
+        $mb = $this->getMbData($order, $orderStatus);
         $customer = new Customer($order->id_customer);
 
         return str_replace(
@@ -780,7 +785,7 @@ class SmartMarketingPs extends Module
                     array(
                         'order_id' => pSQL($order->id),
                         'mobile' => pSQL($mobile),
-                        'send_date' => time() + 300,
+                        'send_date' => time() + Configuration::get(self::SMS_REMINDER_DEFAULT_TIME_CONFIG) * 3600,
                         'message' => pSQL($message)
                     )
                 );
@@ -829,21 +834,25 @@ class SmartMarketingPs extends Module
      * Get mb data
      *
      * @param $order
+     * @param $orderState
      *
      * @return array
      */
-    private function getMbData($order)
+    private function getMbData($order, $orderState)
     {
-        switch ($order->module) {
+        $data = array('entity' => '', 'reference' => '', 'total_cost' => '');
+        $reminders = self::getPaymentReminderKeys();
+        switch ($orderState->module_name) {
             case 'multibanco':
-                $data = $this->getIfThenPayData($order);
+                if ($reminders[$orderState->module_name]['template'] === $orderState->template) {
+                    $data = $this->getIfThenPayData($order);
+                }
                 break;
             case 'eupago_multibanco':
                 $module = Module::getInstanceByName('eupago_multibanco');
                 $ref = $module->GenerateReference($order);
                 break;
             default:
-                $data = array('entity' => '', 'reference' => '', 'total_cost' => '');
         }
 
         return $data;

@@ -15,6 +15,7 @@
                 class="baseline">{l s='SMS Messages' mod='smartmarketingps'}</span>
     </div>
     <form class="row" method="post">
+        {include file='./partials/balance.tpl'}
         {include file='./partials/language_selection.tpl'}
         {include file='./partials/custom_information.tpl'}
 

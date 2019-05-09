@@ -81,8 +81,8 @@ $sql[_DB_PREFIX_.'egoi_sms_notif_order_status'] = 'CREATE TABLE IF NOT EXISTS `'
 $sql[_DB_PREFIX_.'egoi_sms_notif_messages'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi_sms_notif_messages` (
 			  `order_status_id` int(11) NOT NULL,
 			  `lang_id` int(11) NOT NULL,
-			  `client_message` varchar(512),
-			  `admin_message` varchar(512),
+			  `client_message` varchar(2048),
+			  `admin_message` varchar(2048),
 			  PRIMARY KEY (`order_status_id`,`lang_id`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
 
@@ -91,7 +91,7 @@ $sql[_DB_PREFIX_.'egoi_sms_notif_order_reminder'] = 'CREATE TABLE IF NOT EXISTS 
 			  `order_id` int(11) NOT NULL UNIQUE,
 			  `send_date` varchar(512),
 			  `mobile` varchar(32) NOT NULL,
-			  `message` varchar(512),
+			  `message` varchar(2048),
 			  PRIMARY KEY (`id`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
 

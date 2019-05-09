@@ -14,9 +14,14 @@ class SmsNotificationsController extends SmartMarketingBaseController
 {
 
     /**
-     * @var object $transactionalApi
+     * @var TransactionalApi $transactionalApi
      */
     protected $transactionalApi;
+
+    /**
+     * @var ApiV3 $apiv3
+     */
+    protected $apiv3;
 
     /**
      * SmsNotificationsController constructor.
@@ -25,7 +30,7 @@ class SmsNotificationsController extends SmartMarketingBaseController
     {
         parent::__construct();
 
-        $this->activateTransactionalApi();
+        $this->activateApis();
 
         $this->bootstrap = true;
         $this->cfg = 0;
@@ -41,13 +46,14 @@ class SmsNotificationsController extends SmartMarketingBaseController
     }
 
     /**
-     * Activate E-goi Transactional API
+     * Activate E-goi APIs
      *
      * @return void
      */
-    private function activateTransactionalApi()
+    private function activateApis()
     {
         $this->transactionalApi = new TransactionalApi();
+        $this->apiv3 = new ApiV3();
     }
 
     /**
@@ -90,6 +96,11 @@ class SmsNotificationsController extends SmartMarketingBaseController
         parent::initContent();
 
         if ($this->isValid()) {
+            $account = $this->apiv3->getMyAccount();
+            $balance = $account['balance_info']['balance'];
+            $currency = $account['balance_info']['currency'];
+            $this->assign('balance', "$balance $currency");
+
             if (isset($_GET['messages'])) {
                 $this->getMessages();
                 $this->assign('menu_tab', 1);
@@ -263,13 +274,23 @@ class SmsNotificationsController extends SmartMarketingBaseController
     private function getReminders()
     {
         if(!empty($_POST)){
+            $this->selectReminderTimes();
             $this->selectReminders();
             $this->assign('success_msg', $this->displaySuccess($this->l('Payment Reminders Saved')));
         }
 
         $this->languagesMessages(SmartMarketingPs::SMS_REMINDERS_DEFAULT_LANG_CONFIGURATION);
+        $this->reminderTimes();
         $this->customInfoMessages();
         $this->paymentOrderStatesReminders();
+    }
+
+    /**
+     * Selects the reminder time
+     */
+    private function selectReminderTimes()
+    {
+        Configuration::updateValue(SmartMarketingPs::SMS_REMINDER_DEFAULT_TIME_CONFIG, $_POST['egoi-sms-reminder-time']);
     }
 
     /**
@@ -295,6 +316,27 @@ class SmsNotificationsController extends SmartMarketingBaseController
         }
 
         Configuration::updateValue(SmartMarketingPs::SMS_REMINDERS_DEFAULT_LANG_CONFIGURATION, $_POST['egoi-sms-messages-languages']);
+    }
+
+    /**
+     * Get reminder times
+     */
+    private function reminderTimes()
+    {
+        //time in hours
+        $times = array(12, 24, 36, 48, 72);
+        $timeNames = array();
+        foreach ($times as $time) {
+            array_push($timeNames, $time . $this->l(' hours'));
+        }
+
+        if (!Configuration::hasKey(SmartMarketingPs::SMS_REMINDER_DEFAULT_TIME_CONFIG)) {
+            Configuration::updateValue(SmartMarketingPs::SMS_REMINDER_DEFAULT_TIME_CONFIG, $times[0]);
+        }
+
+        $this->assign('defaultReminderTime', Configuration::get(SmartMarketingPs::SMS_REMINDER_DEFAULT_TIME_CONFIG));
+        $this->assign('reminderTimes', $times);
+        $this->assign('reminderTimeNames', $timeNames);
     }
 
     /**

@@ -17,6 +17,7 @@
 
     {if $senderIds}
         <form method="post">
+            {include file='./partials/balance.tpl'}
             <div class="row sms-notifications-margin-top">
                 <label class="col-xs-3 p5"
                        for="egoi-transactional-sms-sender">{l s='E-goi SMS Sender' mod='smartmarketingps'}</label>
@@ -48,9 +49,9 @@
                 <div class="col-xs-9">
                     <select id="egoi-transactional-sms-destination" class="form-control"
                             name="egoi-transactional-sms-destination">
-                        <option value="double-address" {if $deliveryAddress && $invoiceAddress}{/if}>{l s='Delivery and Invoice Address' mod='smartmarketingps'}</option>
-                        <option value="delivery-address" {if $deliveryAddress}{/if}>{l s='Only Delivery Address' mod='smartmarketingps'}</option>
-                        <option value="invoice-address" {if $invoiceAddress}{/if}>{l s='Only Invoice Address' mod='smartmarketingps'}</option>
+                        <option value="double-address" {if $deliveryAddress && $invoiceAddress}selected{/if}>{l s='Delivery and Invoice Address' mod='smartmarketingps'}</option>
+                        <option value="delivery-address" {if $deliveryAddress && !$invoiceAddress}selected{/if}>{l s='Only Delivery Address' mod='smartmarketingps'}</option>
+                        <option value="invoice-address" {if !$deliveryAddress && $invoiceAddress}selected{/if}>{l s='Only Invoice Address' mod='smartmarketingps'}</option>
                     </select>
                     <p class="p5">{l s='Select addresses that will receive SMS notifications' mod='smartmarketingps'}</p>
                 </div>

@@ -3,15 +3,10 @@
 /**
  * @package lib/TransactionalApi
  */
-class TransactionalApi
+class TransactionalApi extends EgoiRestApi
 {
 
     const MAX_MESSAGES = 10;
-
-    /**
-     * @var string $apiKey
-     */
-    private $apiKey;
 
     /**
      * @var string API_URL
@@ -19,17 +14,11 @@ class TransactionalApi
     const API_URL = 'https://www51.e-goi.com/api/public';
 
     /**
-     * SmartApi constructor.
-     *
-     * @param bool $apikey
+     * Enables client transactional
      */
-    public function __construct($apikey = false)
+    public function enableClient()
     {
-        if ($apikey) {
-            $this->apiKey = $apikey;
-        } else {
-            $this->apiKey = $this->apiKey ?: Configuration::get('smart_api_key');
-        }
+        $this->call('POST', '/client');
     }
 
     /**
@@ -83,7 +72,7 @@ class TransactionalApi
      *
      * @return mixed
      */
-    private function call($method, $url, $data = array())
+    protected function call($method, $url, $data = array())
     {
         $curl = curl_init();
         $url = self::API_URL . $url;
@@ -93,17 +82,11 @@ class TransactionalApi
         switch ($method) {
             case 'POST':
                 curl_setopt($curl, CURLOPT_POST, 1);
-
-                if (!empty($data)) {
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-                }
-
+                curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
                 array_push($headers, 'Content-Type: application/json');
                 break;
             default:
-                if (!empty($data)) {
-                    $url = sprintf("%s?%s", $url, http_build_query($data));
-                }
+                $url = sprintf("%s?%s", $url, http_build_query($data));
         }
 
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
