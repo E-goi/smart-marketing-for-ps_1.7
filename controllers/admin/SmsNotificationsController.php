@@ -347,12 +347,10 @@ class SmsNotificationsController extends SmartMarketingBaseController
         $lang = Configuration::get(SmartMarketingPs::SMS_REMINDERS_DEFAULT_LANG_CONFIGURATION);
         $orderState = new OrderState($lang);
         $orderStates = array_reverse($orderState->getOrderStates($lang));
-        $reminders = SmartMarketingPs::getPaymentReminderKeys();
 
         $paymentOrderState = null;
         foreach ($orderStates as $orderState) {
-            if (isset($reminders[$orderState['module_name']]) &&
-                $reminders[$orderState['module_name']]['template'] === $orderState['template']) {
+            if (SmartMarketingPs::getPaymentModule($orderState)) {
                 $paymentOrderState = $orderState;
                 break;
             }

@@ -36,6 +36,10 @@ class SmartMarketingPs extends Module
     const CUSTOM_INFO_SHOP_NAME = self::CUSTOM_INFO_DELIMITER . 'shop_name' . self::CUSTOM_INFO_DELIMITER;
     const CUSTOM_INFO_BILLING_NAME = self::CUSTOM_INFO_DELIMITER . 'billing_name' . self::CUSTOM_INFO_DELIMITER;
 
+    const PAYMENT_MODULE_IFTHENPAY = 'multibanco';
+    const PAYMENT_MODULE_EUPAGO = 'eupago_multibanco';
+    const PAYMENT_STATUS_WAITING_MB_PAYMENT = 'waiting_mb_payment';
+
     const LIMIT_HOUR_MIN = 10;
     const LIMIT_HOUR_MAX = 22;
 
@@ -183,7 +187,186 @@ class SmartMarketingPs extends Module
 		foreach ($sql as $s){
 		    $return &= Db::getInstance()->execute($s);
 		}
+
+		if ($return) {
+		    $this->mapOrderStateTemplates();
+        }
+
 		return $return;
+    }
+
+    /**
+     * Maps order state templates
+     */
+    private function mapOrderStateTemplates()
+    {
+        $orderState = new OrderState($this->context->language->id);
+        $orderStates = $orderState->getOrderStates($this->context->language->id);
+        $langs = Language::getLanguages(true, $this->context->shop->id);
+
+        $orderStateTemplates = $this->getOrderStateTemplates();
+        foreach ($orderStates as $orderState) {
+            $paymentMod = self::getPaymentModule($orderState);
+            if ($paymentMod) {
+                $orderState['template'] = self::PAYMENT_STATUS_WAITING_MB_PAYMENT;
+            }
+            if (isset($orderStateTemplates[$orderState['template']])) {
+                $this->mapOrderStateTemplateLangs($langs, $orderStateTemplates[$orderState['template']], $orderState);
+            }
+        }
+    }
+
+    /**
+     * Maps languages for an order state template
+     *
+     * @param $langs
+     * @param $template
+     * @param $orderState
+     */
+    private function mapOrderStateTemplateLangs($langs, $template, $orderState)
+    {
+        foreach ($langs as $lang) {
+            if (isset($template[$lang['iso_code']])) {
+                $clientMessage = $template[$lang['iso_code']]['client'];
+                $adminMessage = $template[$lang['iso_code']]['admin'];
+            } else {
+                $clientMessage = $template['en']['client'];
+                $adminMessage = $template['en']['admin'];
+            }
+
+            Db::getInstance()->insert(
+                'egoi_sms_notif_messages',
+                array(
+                    'order_status_id' => $orderState['id_order_state'],
+                    'lang_id' => $lang['id_lang'],
+                    'client_message' => $clientMessage,
+                    'admin_message' => $adminMessage
+                )
+            );
+        }
+    }
+
+    /**
+     * Get templates for each order state
+     *
+     * @return array
+     */
+    private function getOrderStateTemplates()
+    {
+        return array(
+            'cheque' => array(
+                'en' => array(
+                    'client' => '',
+                    'admin' => ''
+                ),
+                'pt' => array(
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se aguardar de pagamento. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
+                    'admin' => 'Uma nova encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                ),
+                'es' => array(
+                    'client' => '',
+                    'admin' => ''
+                )
+            ),
+            'bankwire' => array(
+                'en' => array(
+                    'client' => '',
+                    'admin' => ''
+                ),
+                'pt' => array(
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se aguardar de pagamento. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
+                    'admin' => 'Uma nova encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                ),
+                'es' => array(
+                    'client' => '',
+                    'admin' => ''
+                )
+            ),
+            'order_canceled' => array(
+                'en' => array(
+                    'client' => '',
+                    'admin' => ''
+                ),
+                'pt' => array(
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se cancelada. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
+                    'admin' => 'A encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                ),
+                'es' => array(
+                    'client' => '',
+                    'admin' => ''
+                )
+            ),
+            'payment' => array(
+                'en' => array(
+                    'client' => '',
+                    'admin' => ''
+                ),
+                'pt' => array(
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se com o pagamento confirmado. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
+                    'admin' => 'A encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                ),
+                'es' => array(
+                    'client' => '',
+                    'admin' => ''
+                )
+            ),
+            'preparation' => array(
+                'en' => array(
+                    'client' => '',
+                    'admin' => ''
+                ),
+                'pt' => array(
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se em preparação. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
+                    'admin' => ''
+                ),
+                'es' => array(
+                    'client' => '',
+                    'admin' => ''
+                )
+            ),
+            'refund' => array(
+                'en' => array(
+                    'client' => '',
+                    'admin' => ''
+                ),
+                'pt' => array(
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se em reembolso. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
+                    'admin' => 'A encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                ),
+                'es' => array(
+                    'client' => '',
+                    'admin' => ''
+                )
+            ),
+            'outofstock' => array(
+                'en' => array(
+                    'client' => '',
+                    'admin' => ''
+                ),
+                'pt' => array(
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se sem stock. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
+                    'admin' => 'A encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_SHOP_NAME
+                ),
+                'es' => array(
+                    'client' => '',
+                    'admin' => ''
+                )
+            ),
+            self::PAYMENT_STATUS_WAITING_MB_PAYMENT => array(
+                'en' => array(
+                    'client' => '',
+                    'admin' => ''
+                ),
+                'pt' => array(
+                    'client' => 'Olá ' . self::CUSTOM_INFO_BILLING_NAME . ', a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' está aguardar pagamento MB use Ent. ' . self::CUSTOM_INFO_ENTITY . ' Ref. ' . self::CUSTOM_INFO_MB_REFERENCE . ' Valor ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' Obrigado',
+                    'admin' => 'Uma nova encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                ),
+                'es' => array(
+                    'client' => '',
+                    'admin' => ''
+                )
+            )
+        );
     }
 
     /**
@@ -749,16 +932,58 @@ class SmartMarketingPs extends Module
     }
 
     /**
-     * Get keys for payment reminders
+     * Returns the payment module key from order
      *
-     * @return array
+     * @param $orderState
+     *
+     * @return bool|string
      */
-    public static function getPaymentReminderKeys()
+    public static function getPaymentModule($orderState)
     {
-        return array(
-            //reminder for ifThenPay. Check OrderState instance on state "Aguardar pagamento multibanco"
-            'multibanco' => array('template' => 'multibanco')
-        );
+        if (self::isPaymentIfthenPay($orderState)) {
+            return self::PAYMENT_MODULE_IFTHENPAY;
+        }
+
+        if (self::isPaymentEuPago($orderState)) {
+            return self::PAYMENT_MODULE_EUPAGO;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if payment is from ifThenPay module
+     *
+     * @param $orderState
+     *
+     * @return bool
+     */
+    private static function isPaymentIfthenPay($orderState)
+    {
+        $orderState = (array)$orderState;
+        if ($orderState['template'] == 'multibanco') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if payment is from euPago module
+     *
+     * @param $orderState
+     *
+     * @return bool
+     */
+    private static function isPaymentEuPago($orderState)
+    {
+        $search = 'euPago';
+        $orderState = (array)$orderState;
+        if (substr($orderState['name'], 0, strlen($search)) === $search && $orderState['template'] == '') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -770,9 +995,7 @@ class SmartMarketingPs extends Module
      */
     private function reminder($order, $orderState, $mobile)
     {
-        $reminders = self::getPaymentReminderKeys();
-        if (isset($reminders[$orderState->module_name]) &&
-            $reminders[$orderState->module_name]['template'] === $orderState->template) {
+        if (self::getPaymentModule($orderState)) {
             $message = $this->getReminderMessage($orderState->id, $order->id_lang)['message'];
             if (empty($message)) {
                 return;
@@ -840,17 +1063,14 @@ class SmartMarketingPs extends Module
      */
     private function getMbData($order, $orderState)
     {
-        $data = array('entity' => '', 'reference' => '', 'total_cost' => '');
-        $reminders = self::getPaymentReminderKeys();
-        switch ($orderState->module_name) {
+        $data = array('entity' => '', 'reference' => '', 'total_cost' => $order->total_paid);
+        $paymentModule = self::getPaymentModule($orderState);
+        switch ($paymentModule) {
             case 'multibanco':
-                if ($reminders[$orderState->module_name]['template'] === $orderState->template) {
-                    $data = $this->getIfThenPayData($order);
-                }
+                $data = $this->getIfThenPayData($order);
                 break;
             case 'eupago_multibanco':
-                $module = Module::getInstanceByName('eupago_multibanco');
-                $ref = $module->GenerateReference($order);
+                $data = $this->getEuPagoData($order);
                 break;
             default:
         }
@@ -872,10 +1092,49 @@ class SmartMarketingPs extends Module
         $total = $order->getOrdersTotalPaid();
         $ref = $module->GenerateMbRef($details[0], $details[1], $order->id, $total);
 
+        return $this->buildMbArray($details[0], $ref, $total, $order->id_currency);
+    }
+
+    /**
+     * Get EuPago data
+     *
+     * @param $order
+     *
+     * @return array
+     */
+    private function getEuPagoData($order)
+    {
+        $module = Module::getInstanceByName('eupago_multibanco');
+        $result = $module->GenerateReference($order);
+
+        $entity = '';
+        $ref = '';
+        $total = $order->total_paid;
+        if ($result->estado == 0) {
+            $entity = $result->entidade;
+            $ref = $result->referencia;
+            $total = $result->valor;
+        }
+
+        return $this->buildMbArray($entity, $ref, $total, $order->id_currency);
+    }
+
+    /**
+     * Returns MB data
+     *
+     * @param $entity
+     * @param $ref
+     * @param $total
+     * @param $currency
+     *
+     * @return array
+     */
+    private function buildMbArray($entity, $ref, $total, $currency)
+    {
         $data = array();
-        $data['entity'] = $details[0];
+        $data['entity'] = $entity;
         $data['reference'] = $ref;
-        $data['total_cost'] = Tools::displayPrice($total, new Currency($order->id_currency), false);
+        $data['total_cost'] = Tools::displayPrice($total, new Currency($currency), false);
 
         return $data;
     }
