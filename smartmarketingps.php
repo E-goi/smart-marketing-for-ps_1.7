@@ -209,6 +209,7 @@ class SmartMarketingPs extends Module
             $paymentMod = self::getPaymentModule($orderState);
             if ($paymentMod) {
                 $orderState['template'] = self::PAYMENT_STATUS_WAITING_MB_PAYMENT;
+                $this->mapReminderLangs($langs, $orderState);
             }
             if (isset($orderStateTemplates[$orderState['template']])) {
                 $this->mapOrderStateTemplateLangs($langs, $orderStateTemplates[$orderState['template']], $orderState);
@@ -244,6 +245,51 @@ class SmartMarketingPs extends Module
                 )
             );
         }
+    }
+
+    /**
+     * Maps languages for reminder
+     *
+     * @param $langs
+     * @param $orderState
+     */
+    private function mapReminderLangs($langs, $orderState)
+    {
+        $reminderTemplates = $this->getReminderTemplates();
+        foreach ($langs as $lang) {
+            if (isset($reminderTemplates[$lang['iso_code']])) {
+                $message = $reminderTemplates[$lang['iso_code']];
+            } else {
+                $message = $reminderTemplates['en'];
+            }
+
+            Db::getInstance()->insert(
+                'egoi_sms_notif_reminder_messages',
+                array(
+                    'order_status_id' => $orderState['id_order_state'],
+                    'lang_id' => $lang['id_lang'],
+                    'message' => $message,
+                    'active' => 0
+                )
+            );
+        }
+    }
+
+    /**
+     * Get reminder templates
+     *
+     * @return array
+     */
+    private function getReminderTemplates()
+    {
+        return array(
+            'en' => '',
+            'pt' => 'Olá ' . self::CUSTOM_INFO_BILLING_NAME . ', a sua encomenda em '
+                . self::CUSTOM_INFO_SHOP_NAME . ' está aguardar pagamento MB use Ent. '
+                . self::CUSTOM_INFO_ENTITY . ' Ref. ' . self::CUSTOM_INFO_MB_REFERENCE . ' Valor '
+                . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '. Obrigado',
+            'es' => ''
+        );
     }
 
     /**
@@ -430,7 +476,7 @@ class SmartMarketingPs extends Module
 				array(
 					'id_parent' => $main_id,
 					'position' => $index,
-	    			'module' => 'smartmarketingps',
+	    			'module' => 'E-goi Smart Marketing',
 	    			'class_name' => $key,
 	    			'active' => 1
 	    		)

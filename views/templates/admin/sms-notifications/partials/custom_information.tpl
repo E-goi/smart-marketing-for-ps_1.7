@@ -8,7 +8,7 @@
 
 <div class="sms-notifications-margin-top">
     <label>{l s='Customization Codes' mod='smartmarketingps'}</label>
-    <p>{l s="You can use these codes to customize your messages (e.g. {$order_reference} will be parsed into the real reference of the order)" mod='smartmarketingps'}</p>
+    <p>{l s="You can use these codes to customize your messages" mod='smartmarketingps'}</p>
 
     <div class="col-xs-6">
         <div class="sms-notifications-custom-info">

@@ -327,7 +327,7 @@ class SmsNotificationsController extends SmartMarketingBaseController
         $times = array(12, 24, 36, 48, 72);
         $timeNames = array();
         foreach ($times as $time) {
-            array_push($timeNames, $time . $this->l(' hours'));
+            array_push($timeNames, $time . ' ' . $this->l('hours'));
         }
 
         if (!Configuration::hasKey(SmartMarketingPs::SMS_REMINDER_DEFAULT_TIME_CONFIG)) {
