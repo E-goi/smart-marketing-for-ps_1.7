@@ -283,12 +283,18 @@ class SmartMarketingPs extends Module
     private function getReminderTemplates()
     {
         return array(
-            'en' => '',
-            'pt' => 'Olá ' . self::CUSTOM_INFO_BILLING_NAME . ', a sua encomenda em '
-                . self::CUSTOM_INFO_SHOP_NAME . ' está aguardar pagamento MB use Ent. '
-                . self::CUSTOM_INFO_ENTITY . ' Ref. ' . self::CUSTOM_INFO_MB_REFERENCE . ' Valor '
-                . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '. Obrigado',
-            'es' => ''
+            'en' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! MB payment details for your order at '
+                . self::CUSTOM_INFO_SHOP_NAME . '. Ent.: '
+                . self::CUSTOM_INFO_ENTITY . ' Ref.: ' . self::CUSTOM_INFO_MB_REFERENCE . ' Amount: '
+                . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' Thanks!',
+            'pt' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . '! Aguardamos o pagamento por MB do pedido que fez na '
+                . self::CUSTOM_INFO_SHOP_NAME . '. Ent.: '
+                . self::CUSTOM_INFO_ENTITY . ' Ref.: ' . self::CUSTOM_INFO_MB_REFERENCE . ' Valor: '
+                . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' Obrigado!',
+            'es' => 'Hola ' . self::CUSTOM_INFO_BILLING_NAME . ', Datos para el pago vía MB de tu pedido en '
+                . self::CUSTOM_INFO_SHOP_NAME . '. Ent.: '
+                . self::CUSTOM_INFO_ENTITY . ' Ref.: ' . self::CUSTOM_INFO_MB_REFERENCE . ' Importe: '
+                . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' ¡Gracias!'
         );
     }
 
@@ -302,114 +308,114 @@ class SmartMarketingPs extends Module
         return array(
             'cheque' => array(
                 'en' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We\'re waiting for the payment of your order at ' . self::CUSTOM_INFO_SHOP_NAME . '. Amount to pay: ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '.',
+                    'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
-                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se aguardar de pagamento. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
-                    'admin' => 'Uma nova encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . '! Obrigado pelo seu pedido na ' . self::CUSTOM_INFO_SHOP_NAME . '. O valor é de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '. Aguardamos o pagamento.',
+                    'admin' => 'O novo pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está no estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 ),
                 'es' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hola ' . self::CUSTOM_INFO_BILLING_NAME . ', Gracias por tu pedido en ' . self::CUSTOM_INFO_SHOP_NAME . '. El importe es de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '. Estamos esperando tu pago.',
+                    'admin' => 'El nuevo pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está en el estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 )
             ),
             'bankwire' => array(
                 'en' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We\'re waiting for the payment of your order at ' . self::CUSTOM_INFO_SHOP_NAME . '. Amount to pay: ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '.',
+                    'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
-                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se aguardar de pagamento. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
-                    'admin' => 'Uma nova encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . '! Obrigado pelo seu pedido na ' . self::CUSTOM_INFO_SHOP_NAME . '. O valor é de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '. Aguardamos o pagamento.',
+                    'admin' => 'O novo pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está no estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 ),
                 'es' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hola ' . self::CUSTOM_INFO_BILLING_NAME . ', Gracias por tu pedido en ' . self::CUSTOM_INFO_SHOP_NAME . '. El importe es de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '. Estamos esperando tu pago.',
+                    'admin' => 'El nuevo pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está en el estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 )
             ),
             'order_canceled' => array(
                 'en' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! Your order at ' . self::CUSTOM_INFO_SHOP_NAME . ' has been cancelled.',
+                    'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
-                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se cancelada. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
-                    'admin' => 'A encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . '! O pedido que fez na nossa loja ' . self::CUSTOM_INFO_SHOP_NAME . ' foi cancelado.',
+                    'admin' => 'O novo pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está no estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 ),
                 'es' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hola ' . self::CUSTOM_INFO_BILLING_NAME . ', Tu pedido en nuestra tienda ' . self::CUSTOM_INFO_SHOP_NAME . ' ha sido cancelado.',
+                    'admin' => 'El nuevo pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está en el estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 )
             ),
             'payment' => array(
                 'en' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! The payment for your order at ' . self::CUSTOM_INFO_SHOP_NAME . ' has been confirmed. We\'re now processing your order. Thanks!',
+                    'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
-                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se com o pagamento confirmado. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
-                    'admin' => 'A encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . '! O pagamento do pedido que fez na ' . self::CUSTOM_INFO_SHOP_NAME . ' está confirmado. O pedido já está em processamento. Obrigado!',
+                    'admin' => 'O novo pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está no estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 ),
                 'es' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hola ' . self::CUSTOM_INFO_BILLING_NAME . ', El pago de tu pedido en ' . self::CUSTOM_INFO_SHOP_NAME . ' fue confirmado. Estamos procesando el pedido. ¡Gracias!',
+                    'admin' => 'El nuevo pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está en el estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 )
             ),
             'preparation' => array(
                 'en' => array(
-                    'client' => '',
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We\'re preparing your order at ' . self::CUSTOM_INFO_SHOP_NAME . ' for shipment. Thanks!',
                     'admin' => ''
                 ),
                 'pt' => array(
-                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se em preparação. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . '! O pedido que fez na ' . self::CUSTOM_INFO_SHOP_NAME . ' está em preparação. Obrigado!',
                     'admin' => ''
                 ),
                 'es' => array(
-                    'client' => '',
+                    'client' => 'Hola ' . self::CUSTOM_INFO_BILLING_NAME . ', Estamos preparando el envío de tu pedido en ' . self::CUSTOM_INFO_SHOP_NAME . '. ¡Gracias!',
                     'admin' => ''
                 )
             ),
             'refund' => array(
                 'en' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We\'ve just refunded your order at ' . self::CUSTOM_INFO_SHOP_NAME . '.',
+                    'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
-                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se em reembolso. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
-                    'admin' => 'A encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . '! Fizemos o reembolso do valor do seu pedido na nossa loja ' . self::CUSTOM_INFO_SHOP_NAME . '.',
+                    'admin' => 'O pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está no estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 ),
                 'es' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hola ' . self::CUSTOM_INFO_BILLING_NAME . ', Hemos finalizado la devolución del importe de tu pedido en ' . self::CUSTOM_INFO_SHOP_NAME . '.',
+                    'admin' => 'El pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está en el estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 )
             ),
             'outofstock' => array(
                 'en' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! Unfortunately the item you chose at ' . self::CUSTOM_INFO_SHOP_NAME . ' is out of stock. We\'ll contact you soon about it.',
+                    'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
-                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . ' a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' encontra-se sem stock. Obrigado ' . self::CUSTOM_INFO_SHOP_NAME,
-                    'admin' => 'A encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_SHOP_NAME
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . '! Infelizmente o produto que escolheu na ' . self::CUSTOM_INFO_SHOP_NAME . ' está esgotado. Aguarde o nosso contato.',
+                    'admin' => 'O pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está no estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 ),
                 'es' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hola ' . self::CUSTOM_INFO_BILLING_NAME . ', Lamentablemente el producto que elegiste en ' . self::CUSTOM_INFO_SHOP_NAME . ' está agotado. Te contactaremos pronto.',
+                    'admin' => 'El pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está en el estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 )
             ),
             self::PAYMENT_STATUS_WAITING_MB_PAYMENT => array(
                 'en' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! MB payment details for your order at ' . self::CUSTOM_INFO_SHOP_NAME . '. Ent.: ' . self::CUSTOM_INFO_ENTITY . ' Ref.: ' . self::CUSTOM_INFO_MB_REFERENCE . ' Amount: ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' Thanks!',
+                    'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in %order_status% status.'
                 ),
                 'pt' => array(
-                    'client' => 'Olá ' . self::CUSTOM_INFO_BILLING_NAME . ', a sua encomenda em ' . self::CUSTOM_INFO_SHOP_NAME . ' está aguardar pagamento MB use Ent. ' . self::CUSTOM_INFO_ENTITY . ' Ref. ' . self::CUSTOM_INFO_MB_REFERENCE . ' Valor ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' Obrigado',
-                    'admin' => 'Uma nova encomenda ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está ' . self::CUSTOM_INFO_ORDER_STATUS
+                    'client' => 'Olá, ' . self::CUSTOM_INFO_BILLING_NAME . '! Aguardamos o pagamento por MB do pedido que fez na ' . self::CUSTOM_INFO_SHOP_NAME . '. Ent.: ' . self::CUSTOM_INFO_ENTITY . ' Ref.: ' . self::CUSTOM_INFO_MB_REFERENCE . ' Valor: ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' Obrigado!',
+                    'admin' => 'O novo pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está no estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 ),
                 'es' => array(
-                    'client' => '',
-                    'admin' => ''
+                    'client' => 'Hola ' . self::CUSTOM_INFO_BILLING_NAME . ', Datos para el pago vía MB de tu pedido en ' . self::CUSTOM_INFO_SHOP_NAME . '. Ent.: ' . self::CUSTOM_INFO_ENTITY . ' Ref.: ' . self::CUSTOM_INFO_MB_REFERENCE . ' Importe: ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' ¡Gracias!',
+                    'admin' => 'El nuevo pedido ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' de ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' está en el estado ' . self::CUSTOM_INFO_ORDER_STATUS . '.'
                 )
             )
         );
