@@ -482,7 +482,7 @@ class SmartMarketingPs extends Module
 				array(
 					'id_parent' => $main_id,
 					'position' => $index,
-	    			'module' => 'E-goi Smart Marketing',
+	    			'module' => 'smartmarketingps',
 	    			'class_name' => $key,
 	    			'active' => 1
 	    		)
