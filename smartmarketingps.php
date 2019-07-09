@@ -308,7 +308,7 @@ class SmartMarketingPs extends Module
         return array(
             'cheque' => array(
                 'en' => array(
-                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We\'re waiting for the payment of your order at ' . self::CUSTOM_INFO_SHOP_NAME . '. Amount to pay: ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '.',
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We are waiting for the payment of your order at ' . self::CUSTOM_INFO_SHOP_NAME . '. Amount to pay: ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '.',
                     'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
@@ -322,7 +322,7 @@ class SmartMarketingPs extends Module
             ),
             'bankwire' => array(
                 'en' => array(
-                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We\'re waiting for the payment of your order at ' . self::CUSTOM_INFO_SHOP_NAME . '. Amount to pay: ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '.',
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We are waiting for the payment of your order at ' . self::CUSTOM_INFO_SHOP_NAME . '. Amount to pay: ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . '.',
                     'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
@@ -350,7 +350,7 @@ class SmartMarketingPs extends Module
             ),
             'payment' => array(
                 'en' => array(
-                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! The payment for your order at ' . self::CUSTOM_INFO_SHOP_NAME . ' has been confirmed. We\'re now processing your order. Thanks!',
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! The payment for your order at ' . self::CUSTOM_INFO_SHOP_NAME . ' has been confirmed. We are now processing your order. Thanks!',
                     'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
@@ -364,7 +364,7 @@ class SmartMarketingPs extends Module
             ),
             'preparation' => array(
                 'en' => array(
-                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We\'re preparing your order at ' . self::CUSTOM_INFO_SHOP_NAME . ' for shipment. Thanks!',
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We are preparing your order at ' . self::CUSTOM_INFO_SHOP_NAME . ' for shipment. Thanks!',
                     'admin' => ''
                 ),
                 'pt' => array(
@@ -378,7 +378,7 @@ class SmartMarketingPs extends Module
             ),
             'refund' => array(
                 'en' => array(
-                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We\'ve just refunded your order at ' . self::CUSTOM_INFO_SHOP_NAME . '.',
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! We have just refunded your order at ' . self::CUSTOM_INFO_SHOP_NAME . '.',
                     'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
@@ -392,7 +392,7 @@ class SmartMarketingPs extends Module
             ),
             'outofstock' => array(
                 'en' => array(
-                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! Unfortunately the item you chose at ' . self::CUSTOM_INFO_SHOP_NAME . ' is out of stock. We\'ll contact you soon about it.',
+                    'client' => 'Hi, ' . self::CUSTOM_INFO_BILLING_NAME . '! Unfortunately the item you chose at ' . self::CUSTOM_INFO_SHOP_NAME . ' is out of stock. We will contact you soon about it.',
                     'admin' => 'New order ' . self::CUSTOM_INFO_ORDER_REFERENCE . ' amounting ' . self::CUSTOM_INFO_TOTAL_COST . self::CUSTOM_INFO_CURRENCY . ' is in ' . self::CUSTOM_INFO_ORDER_STATUS . ' status.'
                 ),
                 'pt' => array(
@@ -435,7 +435,7 @@ class SmartMarketingPs extends Module
             'SmsNotifications' => $this->l('SMS Notifications')
 		);
 
-		foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ') as $val) {
+		foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ', 'SMSNOTIFICATIONS_READ') as $val) {
 			$result = Db::getInstance()->getValue("SELECT slug FROM "._DB_PREFIX_."authorization_role WHERE slug = 'ROLE_MOD_TAB_".$val."'");
 			
 			if (isset($result) && ($result)) {
@@ -1556,7 +1556,7 @@ class SmartMarketingPs extends Module
 				$order_tax = number_format($order['total_shipping'], 1);
 				$order_shipping = number_format($order['total_wrapping'], 1);
 				$order_discount = $order['total_discounts'];
-				$products = $cart->getProducts();
+				//$products = $cart->getProducts();
 
 				include 'includes/te.php';
 
