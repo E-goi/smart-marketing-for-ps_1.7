@@ -439,7 +439,7 @@ class SmartMarketingPs extends Module
 			$result = Db::getInstance()->getValue("SELECT slug FROM "._DB_PREFIX_."authorization_role WHERE slug = 'ROLE_MOD_TAB_".$val."'");
 			
 			if (isset($result) && ($result)) {
-				break;
+				continue;
 			}
 
 			Db::getInstance()->insert('authorization_role', 

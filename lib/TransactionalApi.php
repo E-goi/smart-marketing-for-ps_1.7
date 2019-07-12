@@ -29,14 +29,15 @@ class TransactionalApi extends EgoiRestApi
     public function getSmsSenders()
     {
         $senders = json_decode($this->call('POST', '/sms/senders'), true);
+        $newSenders = [];
 
-        foreach ($senders as $key => &$sender) {
-            if ($sender['deleted'] === true) {
-                array_splice($senders, $key, $key);
+        foreach ($senders as $sender) {
+            if ($sender['deleted'] === false) {
+                $newSenders[] = $sender;
             }
         }
 
-        return $senders;
+        return $newSenders;
     }
 
     /**
