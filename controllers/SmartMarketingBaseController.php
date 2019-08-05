@@ -55,6 +55,14 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
         $this->assign('redirect', $this->redirectToConfig());
 	}
 
+    /**
+     * Sanitizes input
+     */
+    protected function sanitize()
+    {
+        $_POST = array_map('strip_tags', $_POST);
+    }
+
 	/**
      * Inject Dependencies
      *

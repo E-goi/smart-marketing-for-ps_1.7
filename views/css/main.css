@@ -127,3 +127,57 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+#egoi-transactional-sms-administrator-prefix {
+   width: 30% !important;
+   display: inline-block;
+}
+
+#egoi-transactional-sms-administrator {
+   width: 69.6% !important;
+   display: inline-block;
+}
+
+.sms-notifications-nav {
+   background-color: transparent;
+   margin-bottom: 15px;
+   text-transform: uppercase;
+}
+
+.sms-notifications-nav-link {
+      color: inherit !important;
+}
+
+.sms-notifications-nav-item:hover {
+   background-color: #f4f8fb;
+}
+
+.sms-notifications-nav-item-selected {
+   background-color: #ffffff;
+   font-weight: 600;
+}
+
+.sms-notifications-margin-top {
+   margin-top: 20px;
+}
+
+.sms-notifications-custom-info {
+   margin-top: 10px;
+}
+
+.sms-notifications-custom-info-btn {
+   width: 35%;
+}
+
+.sms-notifications-custom-info-label {
+   padding: 10px;
+   margin-left: 75px;
+}
+
+.p5 {
+    padding: 5px;
+ }
+
+.p10 {
+   padding: 10px;
+}
