@@ -35,6 +35,9 @@ class SmartMarketingPs extends Module
     const CUSTOM_INFO_MB_REFERENCE = self::CUSTOM_INFO_DELIMITER . 'mb_reference' . self::CUSTOM_INFO_DELIMITER;
     const CUSTOM_INFO_SHOP_NAME = self::CUSTOM_INFO_DELIMITER . 'shop_name' . self::CUSTOM_INFO_DELIMITER;
     const CUSTOM_INFO_BILLING_NAME = self::CUSTOM_INFO_DELIMITER . 'billing_name' . self::CUSTOM_INFO_DELIMITER;
+    const CUSTOM_INFO_CARRIER = self::CUSTOM_INFO_DELIMITER . 'carrier' . self::CUSTOM_INFO_DELIMITER;
+    const CUSTOM_INFO_TRACKING_URL = self::CUSTOM_INFO_DELIMITER . 'tracking_url' . self::CUSTOM_INFO_DELIMITER;
+    const CUSTOM_INFO_TRACKING_NUMBER = self::CUSTOM_INFO_DELIMITER . 'tracking_number' . self::CUSTOM_INFO_DELIMITER;
 
     const PAYMENT_MODULE_IFTHENPAY = 'multibanco';
     const PAYMENT_MODULE_EUPAGO = 'eupago_multibanco';
@@ -89,7 +92,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.1.0';
+	    $this->version = '1.2.0';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -957,6 +960,7 @@ class SmartMarketingPs extends Module
         $currency = new Currency($order->id_currency);
         $mb = $this->getMbData($order, $orderStatus);
         $customer = new Customer($order->id_customer);
+        $carrier = new Carrier($order->id_carrier);
 
         return str_replace(
             [
@@ -967,7 +971,10 @@ class SmartMarketingPs extends Module
                 self::CUSTOM_INFO_ENTITY,
                 self::CUSTOM_INFO_MB_REFERENCE,
                 self::CUSTOM_INFO_SHOP_NAME,
-                self::CUSTOM_INFO_BILLING_NAME
+                self::CUSTOM_INFO_BILLING_NAME,
+                self::CUSTOM_INFO_CARRIER,
+                self::CUSTOM_INFO_TRACKING_URL,
+                self::CUSTOM_INFO_TRACKING_NUMBER
             ],
             [
                 $order->reference,
@@ -977,7 +984,10 @@ class SmartMarketingPs extends Module
                 $mb['entity'],
                 $mb['reference'],
                 Configuration::get('PS_SHOP_NAME'),
-                $customer->firstname . ' ' . $customer->lastname
+                $customer->firstname . ' ' . $customer->lastname,
+                $carrier->name,
+                str_replace('@', $order->shipping_number, $carrier->url),
+                $order->shipping_number
             ],
             $message
         );

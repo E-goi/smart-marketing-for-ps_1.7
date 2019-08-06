@@ -201,7 +201,7 @@ $_MODULE['<{smartmarketingps}prestashop>custom_information_386c339d37e737a436499
 $_MODULE['<{smartmarketingps}prestashop>custom_information_1a434befae3f49ae09347ded52032f6f'] = 'Entidade';
 $_MODULE['<{smartmarketingps}prestashop>custom_information_2797f6c1df8655a129b522bd49572e53'] = 'Referência Multibanco';
 $_MODULE['<{smartmarketingps}prestashop>custom_information_9127fe218b2cac7f0c8aecd7016a891d'] = 'Nome da loja';
-$_MODULE['<{smartmarketingps}prestashop>custom_information_0b3f142ce3c618038190ef9abdc589a4'] = 'Nome associado ao endereço de faturação';
+$_MODULE['<{smartmarketingps}prestashop>custom_information_0b3f142ce3c618038190ef9abdc589a4'] = 'Nome no endereço de faturação';
 $_MODULE['<{smartmarketingps}prestashop>language_selection_4994a8ffeba4ac3140beb89e8d41f174'] = 'Idioma';
 $_MODULE['<{smartmarketingps}prestashop>language_selection_dfbcfc41aeacad10a7a893c01983e5aa'] = 'Idioma do conteúdo da mensagem SMS.';
 $_MODULE['<{smartmarketingps}prestashop>balance_8610be9376aa2240dbd0d765cb2ccfe0'] = 'Saldo no E-goi';
