@@ -172,6 +172,9 @@ class SmsNotificationsController extends SmartMarketingBaseController
         $this->assign('mb_reference', SmartMarketingPs::CUSTOM_INFO_MB_REFERENCE);
         $this->assign('shop_name', SmartMarketingPs::CUSTOM_INFO_SHOP_NAME);
         $this->assign('billing_name', SmartMarketingPs::CUSTOM_INFO_BILLING_NAME);
+        $this->assign('carrier', SmartMarketingPs::CUSTOM_INFO_CARRIER);
+        $this->assign('tracking_url', SmartMarketingPs::CUSTOM_INFO_TRACKING_URL);
+        $this->assign('tracking_number', SmartMarketingPs::CUSTOM_INFO_TRACKING_NUMBER);
     }
 
     /**
