@@ -9,6 +9,7 @@
  */
 
 include_once dirname(__FILE__).'/../SmartMarketingBaseController.php';
+include_once dirname(__FILE__).'/../../smartmarketingps.php';
 
 class SyncController extends SmartMarketingBaseController 
 {
@@ -34,6 +35,7 @@ class SyncController extends SmartMarketingBaseController
 		$this->mapFieldsEgoi();
 		$this->syncronizeEgoi();
 		$this->sincronizeList();
+        $this->countCostumersByShop();
 	}
 
 	/**
@@ -62,6 +64,15 @@ class SyncController extends SmartMarketingBaseController
 		    'desc' => $this->l('Save Settings'),
 		    'js' => $this->l('$( \'#action_add\' ).click();')
 		);
+    }
+
+    public function countCostumersByShop(){
+        if(empty(Tools::getValue("size"))) {
+            return false;
+        }
+
+        echo json_encode(SmartMarketingPs::sizeList());
+        exit;
     }
 
 	/**
@@ -316,22 +327,10 @@ class SyncController extends SmartMarketingBaseController
 	}
 
     /**
-     * @param bool $name
-     * @param bool $field
-     * @return string
-     */
-	protected function getFieldMap($name = false, $field = false)
-    {
-        require_once dirname(__FILE__) . '/../../smartmarketingps.php';
-        return (new SmartMarketingPs)->getFieldMap($name, $field);
-    }
-
-    /**
      * @return array
      */
 	protected function getMappedFields()
     {
-        require_once dirname(__FILE__) . '/../../smartmarketingps.php';
         return (new SmartMarketingPs)->getMappedFields();
     }
 
@@ -343,97 +342,68 @@ class SyncController extends SmartMarketingBaseController
 	protected function sincronizeList()
 	{
 		// on a specific POST request
-        if(!empty(Tools::getValue("token_list"))) {
-
-            $res = Db::getInstance(_PS_USE_SQL_SLAVE_)
-                        ->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id != "" and sync="1" order by egoi_id DESC');
-            $sync = $res['sync'];
-            $client_id = $res['client_id'];
-            $list_id = $res['list_id'];
-            $role = $res['role'];
-            $newsletter_sync = $res['newsletter_sync'];
-            $newsletter_optin = $res['optin'];
-
-            // main sync is activated
-            if($sync) {
-            	
-            	// get main customers
-                $customers = Db::getInstance(_PS_USE_SQL_SLAVE_)
-                					->executeS('SELECT * FROM '._DB_PREFIX_.'customer WHERE active="1"');
-
-                $subscribers = array();
-                $nsubscribers = array();
-
-                // get newsletter subscriptions if newsletter sync is activated
-                if ($newsletter_sync) {
-                	$nsubs = Db::getInstance(_PS_USE_SQL_SLAVE_)
-                					->executeS('SELECT * FROM '._DB_PREFIX_.'emailsubscription WHERE active="1"');
-	                if (!empty($nsubs)) {
-
-	                	// assign new tag ID for this import
-	                	$newsletters_tag = $this->api->processNewTag("NewsletterSubscriptions");
-
-	                	// get all newsletter subscriptions
-	                	foreach($nsubs as $keyn => $sub) {
-
-	                		$nsubscribers[$keyn]['email'] = $sub['email'];
-	                    	// check if option is double optin
-	                    	if ($newsletter_optin) {
-	                    		$nsubscribers[$keyn]['status'] = 0;
-	                    	}else{
-	                    		$nsubscribers[$keyn]['status'] = 1;
-	                    	}
-		                }
-
-		                // import all newsletter subscriptions
-		                $this->api->addSubscriberBulk($list_id, $nsubscribers, $newsletters_tag);
-	                }
-	            }
-
-	            // import main customers
-                if (!empty($customers)) {
-
-                	// assign new tag ID for the customers import 
-	                $customer_tag = $this->api->processNewTag("Customer");
-
-	                // get all customers
-                    foreach($customers as $keyc => $customer) {
-
-                    	$id = isset($customer['id']) ? $customer['id'] : $customer['id_customer'];
-                        if (!$this->getRole((int)$id, $role)) {
-                            return false;
-                        }
-
-                        $subscribers[$keyc]['email'] = $customer['email'];
-                        foreach ($customer as $key => $value) {
-                            $row_new_value = $this->getFieldMap(0, $key);
-
-                            if($row_new_value){
-                                $subscribers[$keyc][$row_new_value] = $value;
-                            }
-                        }
-
-                        // check if this fields are not mapped
-                        if (count($subscribers[$keyc]) == 1) {
-                            $subscribers[$keyc]['first_name'] = $customer['firstname'] ?: null;
-                            $subscribers[$keyc]['last_name'] = $customer['lastname'] ?: null;
-                            $subscribers[$keyc]['birth_date'] = $customer['birthday'] ?: null;
-                            $subscribers[$keyc]['status'] = 1;
-                        }
-                    }
-
-                    // import subscribers to E-goi
-                    $this->api->addSubscriberBulk($list_id, $subscribers, $customer_tag);
-
-                    // update in DB
-                    echo Db::getInstance()->update('egoi',
-                        array(
-                            'total' => (int)count($customers) + count($subscribers) + count($nsubscribers)
-                        ), "client_id = $client_id");
-                    exit;
-                }
-            }
+        if(empty(Tools::getValue("token_list"))) {
+            return false;
         }
+
+        $res = SmartMarketingPs::getClientData();
+
+        $sync               = $res['sync'];
+        $client_id          = $res['client_id'];
+        $list_id            = $res['list_id'];
+        $newsletter_sync    = $res['newsletter_sync'];
+
+
+        // main sync is activated
+        if(!$sync) {exit;}
+
+        $subs = Tools::getValue("subs");
+        $store_id = Tools::getValue("store_id");
+        $store_name = SmartMarketingPs::getShopsName($store_id);
+        $store_filter = 'AND id_shop="'.$store_id.'" ';
+        // get main customers
+        $ts = [];
+        if(!empty($store_id) && !empty($store_name)){
+            array_push($ts, $store_name);
+        }
+
+        $add='';
+        if(!empty($newsletter_sync) && $newsletter_sync == '1'){
+            $add = 'AND newsletter="1" ';
+            array_push($ts, 'newsletter');
+        }
+
+        $tags = SmartMarketingPs::makeTagMap($ts);
+
+        $buff = 1000;
+        $count = intval($subs);
+
+
+        $sqlc = 'SELECT email, firstname, lastname, birthday, newsletter, optin, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" '.$add.$store_filter.'LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
+        $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
+
+        if(empty($getcs)){
+            echo json_encode(['error' => 'No users!']);
+            exit;
+        }
+
+        $array = array();
+
+        foreach($getcs as $row){
+            $array[] = SmartMarketingPs::mapSubscriber($row);
+        }
+
+        $this->api->addSubscriberBulk($list_id, $array, $tags);
+
+
+        Db::getInstance()->update('egoi',
+            array(
+                'total' => $this->api->getAllSubscribers()
+            ), "client_id = $client_id");
+
+        $count++;
+        echo json_encode(['imported' => $count]);
+        exit;
 	}
 	
 }

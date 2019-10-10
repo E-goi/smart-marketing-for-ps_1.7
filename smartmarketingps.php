@@ -92,7 +92,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.2.0';
+	    $this->version = '1.2.2';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -749,7 +749,7 @@ class SmartMarketingPs extends Module
 	 */
 	public function hookActionObjectCustomerUpdateAfter($params)
 	{
-		return $this->updateCustomer($params);
+		return $this->addCustomer($params);
 	}
 
 	/**
@@ -1225,41 +1225,110 @@ class SmartMarketingPs extends Module
 			// default fields to be passed to E-goi in case the fields are not mapped
 			$fields = array_merge($fields, 
 				array(
-					'first_name' => $params['object']->firstname,
-					'last_name' => $params['object']->lastname,
-					'birth_date' => $params['object']->birthday
+					'first_name'    => $params['object']->firstname,
+					'last_name'     => $params['object']->lastname,
+					'birth_date'    => $params['object']->birthday
 				)
 			);
 		}
 
         $res = $this->getClientData();
-		if($res['sync']) {
-            // check if is a role defined
-            if (!$this->getRole($params['object']->id, $res['role'])) {
-                return false;
-            }
 
-			$fields['listID'] = $res['list_id'];
-			$fields['validate_email'] = '0';
+        // check if is a role defined
+        if (
+            (
+                !$res['sync']
+                || ((bool) $res['newsletter_sync'] && !(bool)$params['object']->newsletter)
+            )
+            ||
+            (
+                !$this->getRole($params['object']->id, $res['role'])
+            )
+        ) {
+            return false;
+        }
 
-            if($params['object']->newsletter == '0') {
-                return false;
-            }
+        $fields['listID'] = $res['list_id'];
+        $fields['validate_email'] = '0';
+        $ts = [];
 
-			$add = $api->addSubscriber($fields);
-			if(isset($add['ERROR']) && ($add['ERROR'])) {
-				return false;
-			}
+        if(!empty($params['object']->id_shop)) {
+            $ts[] = self::getShopsName($params['object']->id_shop);
+        }
+        if(!empty($params['object']->newsletter) && $params['object']->newsletter == '1') {
+            $ts[] = 'newsletter';
+        }
 
-            $client_data = $api->getClientData();
-            $client = (int)$client_data['CLIENTE_ID'];
+        $fields['tags'] = self::makeTagMap($ts);
 
-			return Db::getInstance()->update('egoi', 
-				array(
-					'total' => (int)$res['total']
-				), "client_id = $client");
-		}
+        $add = $api->addSubscriber($fields);
+        if(isset($add['ERROR']) && ($add['ERROR'])) {
+            return false;
+        }
+
+        $client_data = $api->getClientData();
+        $client = (int)$client_data['CLIENTE_ID'];
+
+        return Db::getInstance()->update('egoi',
+            array(
+                'total' => (int)$res['total']
+            ), "client_id = $client");
 	}
+
+    public static function getShopsName($id){
+        try{
+            $sql = 'SELECT * FROM '._DB_PREFIX_.'shop where id_shop = '.$id;
+            $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+            return empty($rq[0]['name'])?false:$rq[0]['name'];
+        }catch (Exception $e){
+            return false;
+        }
+    }
+
+    /*
+     * Count size of list by store
+     * */
+    public static function sizeList(){
+        $options = self::getClientData();
+        $add = '';
+        if(!empty($options['newsletter_sync'])){
+            $add = 'AND newsletter="1"';
+        }
+        $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" '.$add.' group by id_shop';//AND newsletter="1"
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+    }
+
+	/*
+	 * gets tag number from name (creates if they dont exist)
+	 * */
+    public static function makeTagMap($ts = []){
+        $api = new SmartApi();
+
+
+        $resp = $api->getTags();
+
+        foreach ($resp as $tag){
+            for($i = 0;$i<count($ts);$i++){
+                if(strcasecmp($tag['NAME'], $ts[$i]) == 0)
+                    $ts[$ts[$i]] = $tag['ID'];
+            }
+        }
+        for($i = 0;$i<count($ts);$i++){
+            if(empty($ts[$ts[$i]])){
+                $resp = $api->addTag($ts[$i]);
+                isset($resp['ID']) ? $ts[$ts[$i]] = $resp['ID'] : null;
+            }
+        }
+
+        $tags = [];
+
+        foreach ($ts as $key => $tagID){
+            if(!empty($tagID))
+                array_push($tags, $tagID);
+        }
+        return $tags;
+    }
 
 	/**
 	 * Update customer
@@ -1602,7 +1671,7 @@ class SmartMarketingPs extends Module
      * @param $field
      * @return string
      */
-    public function getFieldMap($name = false, $field = false)
+    public static function getFieldMap($name = false, $field = false)
     {
         if ($field) {
             $sql = "SELECT * FROM " . _DB_PREFIX_ . "egoi_map_fields WHERE ps='" . pSQL($field) . "'";
@@ -1613,6 +1682,31 @@ class SmartMarketingPs extends Module
         return $rq['egoi'];
     }
 
+    /*
+     * Map subscriber to egoi map
+     * */
+    public static function mapSubscriber($row){
+        $subscriber=[//default map
+            'first_name'    => $row['firstname'],
+            'email'         => $row['email'],
+            'last_name'     => $row['lastname'],
+            'birth_date'    => $row['birthdate'],
+            'status'        => 1,
+        ];
+        foreach ($row as $field => $value){
+            $field = self::getFieldMap(0, $field);
+
+            if(empty($field)){
+                continue;
+            }
+
+            $subscriber[$field] = $value;
+        }
+
+        return $subscriber;
+
+    }
+
 	/**
 	 * Get Client Data from DB
 	 *
@@ -1620,7 +1714,7 @@ class SmartMarketingPs extends Module
      * @param $val
 	 * @return array|null
 	 */
-	private function getClientData($field = false, $val = false)
+	public static function getClientData($field = false, $val = false)
 	{
 		$instance = Db::getInstance(_PS_USE_SQL_SLAVE_);
 		if ($field && $val) {

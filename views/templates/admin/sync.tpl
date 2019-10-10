@@ -109,11 +109,21 @@
 				<tr valign="top">
 					<th class="egoi-td" scope="row">{l s='Sync existing customers' mod='smartmarketingps'}</th>
 					<td>
-						<button type="button" class="btn btn-info" id="sync_old_subs">
-							{l s='Sync Customers' mod='smartmarketingps'}
-						</button>
-						<div class="sync_customers" style="display: none;"></div>
-						<i class="material-icons" id="sync_success" style="display: none;">beenhere</i>
+						<div style="display: flex;flex-direction: row;align-items: center;justify-content: flex-start">
+							<button type="button" class="btn btn-info" id="sync_old_subs">
+								{l s='Sync Customers' mod='smartmarketingps'}
+							</button>
+							<div class="sync_customers" style="display: none;"></div>
+							<i class="material-icons" id="sync_success" style="display: none;">beenhere</i>
+							<span id="spanprogress" style="width: 200px; height: 20px;">
+								<div id="progressbarSync" class="progress" style="display: none;margin: 0;">
+									<div id="progressbarValues" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 0px;width:0%">
+									</div>
+								</div>
+							</span>
+						</div>
+
+
 						<p class="help">{l s='Sync already existing PrestaShop customers to E-goi List' mod='smartmarketingps'}</p>
 					</td>
 				</tr>
@@ -130,7 +140,7 @@
 					<th class="egoi-td" scope="row">
 						<label class="control-label">
 							<span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Newsletter module block' mod='smartmarketingps'}">
-								{l s='Sync Newsletter Subscribers' mod='smartmarketingps'}
+								{l s='Sync ONLY Newsletter Subscribers' mod='smartmarketingps'}
 							</span>
 						</label>
 					</th>
@@ -149,7 +159,7 @@
 							<label for="newsletter_sync1">{l s='No' mod='smartmarketingps'}</label>
 							<a class="slide-button btn"></a>
 						</span>
-						<p class="help">{l s='Select "yes" if you want to enable newsletter subscribers synchronization from this ' mod='smartmarketingps'}
+						<p class="help">{l s='Select "yes" if you want to enable ONLY newsletter subscribers synchronization from this ' mod='smartmarketingps'}
 							<a target="_blank" href="index.php?controller=AdminModules&configure=ps_emailsubscription&token={$token|escape:'htmlall'}">
 								{l s='module' mod='smartmarketingps'}
 							</a>
@@ -170,15 +180,13 @@
 							<input type="radio" name="newsletter_optin" 
 								id="optin0" 
 								value="1" 
-								{if isset($optin) and ($optin eq '1')} checked {/if} 
-								{if $newsletter_sync eq '0' or ($newsletter_sync eq '')} disabled {/if}>
+								{if isset($optin) and ($optin eq '1')} checked {/if} >
 							<label for="optin0">{l s='Yes' mod='smartmarketingps'}</label>
 
 							<input type="radio" name="newsletter_optin" 
 								id="optin1" 
 								value="0" 
-								{if $optin eq '0' or $optin eq ''} checked {/if} 
-								{if $newsletter_sync eq '0' or ($newsletter_sync eq '')} disabled {/if}>
+								{if $optin eq '0' or $optin eq ''} checked {/if} >
 							<label for="optin1">{l s='No' mod='smartmarketingps'}</label>
 							<a class="slide-button btn"></a>
 						</span>
