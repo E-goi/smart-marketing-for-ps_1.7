@@ -98,8 +98,7 @@
 
 .sync_customers, .sync_api_key, .sync_list {
    border: 2px solid #f3f3f3;
-   position: absolute;
-   margin-left: 20px;
+   margin: 0 10px;
    display: inline-block;
    border-radius: 50%;
    border-top: 2px solid #3498db;
@@ -110,11 +109,11 @@
 }
 
 #sync_success{
-   position: absolute;
-   margin-left: 20px;
-   width: 30px;
-   height: 30px;
    color: green;
+}
+
+#progressbarSync{
+   width: 100%;
 }
 
 /* Safari */

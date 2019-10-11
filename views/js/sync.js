@@ -12,6 +12,10 @@ jQuery.fn.show = function() {
 
 $(document).ready(function() {
 
+    var totalPages = 0;
+    var currentPage = 0;
+    var pagesStores = [];
+    var btn_sync = $("#sync_old_subs");
 	var listID = $('#egoi_lists').val();
 	var sub_egoi = $("#sub_in_egoi").text();
 	var sub_ps = $("#sub_in_ps").text();
@@ -31,32 +35,96 @@ $(document).ready(function() {
     	}
     });
 
-	$("#sync_old_subs").on('click', function() {
+    function interaction(store,num){
+
+        var subs = num;//numero do count
+        var token_list = '1';
+
+        $.ajax({
+            type: 'POST',
+            data:({
+                token_list: token_list,
+                subs: subs,
+                newsletter: + $('#newsletter_only').is(':checked'),
+                store_id: store
+            }),
+            success:function(data, status) {
+                var json = JSON.parse(data);
+                currentPage++;
+
+                $('#progressbarValues').attr("aria-valuenow",currentPage);
+                $('#progressbarValues').width(Math.ceil(currentPage * 100 / totalPages) + "%");
+                $('#progressbarValues').text( currentPage + "/" + totalPages);
+
+                if(+json['imported'] >= getPagesByStore(store)){
+                    var next = getNextStore(store);
+                    if(next == false){
+                        $('.loading').prop('id', 'valid');
+
+                        setTimeout(function() {
+                            $('#progressbarSync').hide();
+                            $('#progressbarValues').width("0%");
+                        }, 1000);
+
+                        btn_sync.prop('disabled', false);
+                        $('.sync_customers').hide();
+                        $('#sync_success').show();
+
+                        totalPages = 0;
+                        currentPage = 0;
+                        pagesStores = [];
+                    }else{
+                        interaction(next, 0);
+                    }
+
+                } else{
+                    interaction(store,json['imported']);
+                }
+
+            },
+            error:function(status){
+                btn_sync.prop('disabled', false);
+                $('.sync_customers').hide();
+                $('#sync_success').hide();
+                $('#progressbarSync').hide();
+                totalPages = 0;
+                currentPage = 0;
+                pagesStores = [];
+            }
+        });
+
+
+        return 0;
+    }
+
+    btn_sync.on('click', function() {
 
 		$('.sync_customers').show();
         $('#sync_success').hide();
-		var btn_sync = $(this);
 		btn_sync.prop('disabled', true);
 
-		$.ajax({
-		    type: 'POST',
-		    data:({
-		        token_list: '1',
-		        subs: 'OK'
-		    }),
-		    success:function(data, status) {
-		    	if (data) {
-		    		btn_sync.prop('disabled', false);
-		    		$('.sync_customers').hide();
-		    		$('#sync_success').show();
-		    	}
-		    },
-		    error:function(status){
-		    	btn_sync.prop('disabled', false);
-		    	$('.sync_customers').hide();
+        $.ajax({
+            type: 'POST',
+            data:({
+                size: 1,
+            }),
+            success:function(data, status) {
+                var json = JSON.parse(data);
+                json = pagesStores = calcPages(json);
+
+                $('#progressbarSync').show();
+                $('#progressbarValues').attr("aria-valuemax", totalPages);
+                $('#progressbarValues').width("0%");
+                $('#progressbarValues').text("0/" + totalPages);
+                interaction(json[0].id_shop,0);
+
+            },
+            error:function(status){
+                btn_sync.prop('disabled', false);
+                $('.sync_customers').hide();
                 $('#sync_success').hide();
-		    }
-		});
+            }
+        });
 	});
 
 	$('#ps_fields').on('change', function() {
@@ -73,16 +141,6 @@ $(document).ready(function() {
 		}else{
 			$('#save_map_fields').prop('disabled', true);
 		}
-	});
-
-	$('#newsletter_sync0').on('click', function() {
-		$('#optin0').prop('disabled', false);
-		$('#optin1').prop('disabled', false);
-	});
-
-	$('#newsletter_sync1').on('click', function() {
-		$('#optin0').prop('disabled', true);
-		$('#optin1').prop('disabled', true);
 	});
 
 	$('#save_map_fields').on('click', function() {
@@ -151,4 +209,34 @@ $(document).ready(function() {
 		});
 
 	});
+
+    function calcPages(arr){
+        var tot = 0;
+        for (var i = 0;i<arr.length;i++){
+            arr[i]['total'] = Math.ceil(arr[i]['total']/1000);
+            tot += arr[i]['total'];
+        }
+        totalPages = tot;
+        return arr
+    }
+
+    function getPagesByStore(store){
+        for (var i = 0;i<pagesStores.length;i++){
+            if(pagesStores[i]['id_shop'] == store){
+                return pagesStores[i]['total'];
+            }
+        }
+    }
+
+    function getNextStore(store){
+        for (var i = 0;i<pagesStores.length;i++){
+            if(pagesStores[i]['id_shop'] == store){
+                i++;
+                if(pagesStores.length == i){
+                    return false;
+                }
+                return pagesStores[i]['id_shop'];
+            }
+        }
+    }
 });

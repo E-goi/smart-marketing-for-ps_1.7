@@ -46,8 +46,14 @@ class SmartApi
         return array(
             'apikey' => $this->apiKey,
             'plugin_key' => SmartMarketingPs::PLUGIN_KEY,
-            'status' => 1
+            'status' => $this->getDoubleOptin()
         );
+    }
+
+    private function getDoubleOptin(){
+        $a = Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->getValue("SELECT optin FROM "._DB_PREFIX_."egoi");
+        return empty($a)?1:0;
     }
 
     /**
@@ -235,8 +241,10 @@ class SmartApi
             'listID'       => $id_list,
             'compareField' => 'email',
             'operation'    => 2,
+            'notification'  => 0,
             'subscribers'  => $subscribers,
-            'tags'         => array($tag),
+            'tags'         => $tag,
+
         );
 
         return $this->client->addSubscriberBulk(
