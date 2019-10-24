@@ -1,182 +1,213 @@
-#error{
-   position: absolute;
-   margin-left: 20px;
-   color: red;
+#error {
+    position: absolute;
+    margin-left: 20px;
+    color: red;
 }
 
-.bootstrap.panel{
-   margin-top: 13%;
-   margin-bottom: -10%;
+.bootstrap.panel {
+    margin-top: 13%;
+    margin-bottom: -10%;
 }
 
-.msg{
-   padding: 10px;
+.msg {
+    padding: 10px;
 }
 
-.sett, .reg{
-   padding: 22px;
+.sett, .reg {
+    padding: 22px;
 }
 
-.register{
-   float:right;
-   margin-top: -10px;
-   width: 75%;
+.register {
+    float: right;
+    margin-top: -10px;
+    width: 75%;
 }
 
-.form, .list, .hide_form, .enable, .styles{
-   float:right;
-   margin-top: -10px;
-   padding-bottom: 20px;
-   width: 75%;
+.form, .list, .hide_form, .enable, .styles {
+    float: right;
+    margin-top: -10px;
+    padding-bottom: 20px;
+    width: 75%;
 }
 
-.list-group-item{
-   cursor:pointer;
+.list-group-item {
+    cursor: pointer;
 }
 
-.egoi.panel-heading{
-   height: 40px !important;
+.egoi.panel-heading {
+    height: 40px !important;
 }
 
-.baseline{
-   vertical-align: -webkit-baseline-middle;
-   vertical-align: -moz-baseline-middle;
-   vertical-align: -ms-baseline-middle;
-   font-size: 1rem;
+.baseline {
+    vertical-align: -webkit-baseline-middle;
+    vertical-align: -moz-baseline-middle;
+    vertical-align: -ms-baseline-middle;
+    font-size: 1rem;
 }
 
-#account, #lists, #subs, #forms{
-   vertical-align: -webkit-baseline-middle;
-   vertical-align: -moz-baseline-middle;
-   padding: 10px;
-   font-size: 1.2rem !important;
+#account, #lists, #subs, #forms {
+    vertical-align: -webkit-baseline-middle;
+    vertical-align: -moz-baseline-middle;
+    padding: 10px;
+    font-size: 1.2rem !important;
 }
 
-#egoi-table tbody>tr>td{
-   line-height: 26px !important;
+#egoi-table tbody > tr > td {
+    line-height: 26px !important;
 }
 
-.egoi-td{
-   padding: 0px !important;
-   line-height: 3 !important;
-   border: none !important;
+.egoi-td {
+    padding: 0px !important;
+    line-height: 3 !important;
+    border: none !important;
 }
 
-#egoi-subs-table tbody>tr>td{
-   border: none !important;
+#egoi-subs-table tbody > tr > td {
+    border: none !important;
 }
 
-.egoi-b{
-   font-size: 14px;
-   vertical-align: -webkit-baseline-middle;
-   vertical-align: -moz-baseline-middle;
+.egoi-b {
+    font-size: 14px;
+    vertical-align: -webkit-baseline-middle;
+    vertical-align: -moz-baseline-middle;
 }
 
-.egoi-help{
-   font-style: italic;
+.egoi-help {
+    font-style: italic;
 }
 
-#egoi-map-icon{
-   font-size: 1em !important;
+#egoi-map-icon {
+    font-size: 1em !important;
 }
 
-.egoi-map-header{
-   background-color: #25b9d7;
+.egoi-map-header {
+    background-color: #25b9d7;
 }
 
-.egoi-title{
-   color: #fff !important;
+.egoi-title {
+    color: #fff !important;
 }
 
-.icon-external-link{
-   font-size: 30px;
+.icon-external-link {
+    font-size: 30px;
 }
 
-.icon-desktop{
-   font-size: 30px;
+.icon-desktop {
+    font-size: 30px;
 }
 
 .sync_customers, .sync_api_key, .sync_list {
-   border: 2px solid #f3f3f3;
-   margin: 0 10px;
-   display: inline-block;
-   border-radius: 50%;
-   border-top: 2px solid #3498db;
-   width: 30px;
-   height: 30px;
-   -webkit-animation: spin 2s linear infinite; /* Safari */
-   animation: spin 2s linear infinite;
+    border: 2px solid #f3f3f3;
+    margin: 0 10px;
+    display: inline-block;
+    border-radius: 50%;
+    border-top: 2px solid #3498db;
+    width: 30px;
+    height: 30px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
 }
 
-#sync_success{
-   color: green;
+#sync_success {
+    color: green;
 }
 
-#progressbarSync{
-   width: 100%;
+#progressbarSync {
+    width: 100%;
 }
 
 /* Safari */
 @-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 #egoi-transactional-sms-administrator-prefix {
-   width: 30% !important;
-   display: inline-block;
+    width: 30% !important;
+    display: inline-block;
 }
 
 #egoi-transactional-sms-administrator {
-   width: 69.6% !important;
-   display: inline-block;
+    width: 69.6% !important;
+    display: inline-block;
+}
+
+.egoi-enabled {
+    color: #78d07d;
+}
+
+.egoi-disabled {
+    color: #c05c67;
+}
+
+.egoi-catalog-name-listing {
+    max-width: 100vh;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sms-notifications-nav {
-   background-color: transparent;
-   margin-bottom: 15px;
-   text-transform: uppercase;
+    background-color: transparent;
+    margin-bottom: 15px;
+    text-transform: uppercase;
 }
 
 .sms-notifications-nav-link {
-      color: inherit !important;
+    color: inherit !important;
 }
 
 .sms-notifications-nav-item:hover {
-   background-color: #f4f8fb;
+    background-color: #f4f8fb;
 }
 
 .sms-notifications-nav-item-selected {
-   background-color: #ffffff;
-   font-weight: 600;
-}
-
-.sms-notifications-margin-top {
-   margin-top: 20px;
+    background-color: #ffffff;
+    font-weight: 600;
 }
 
 .sms-notifications-custom-info {
-   margin-top: 10px;
+    margin-top: 10px;
 }
 
 .sms-notifications-custom-info-btn {
-   width: 35%;
+    width: 35%;
 }
 
 .sms-notifications-custom-info-label {
-   padding: 10px;
-   margin-left: 75px;
+    padding: 10px;
+    margin-left: 75px;
 }
 
 .p5 {
     padding: 5px;
- }
+}
 
 .p10 {
-   padding: 10px;
+    padding: 10px;
+}
+
+.mt20 {
+    margin-top: 20px;
+}
+
+.align-right {
+    text-align: right;
+}
+
+.uppercase {
+    text-transform: uppercase;
 }

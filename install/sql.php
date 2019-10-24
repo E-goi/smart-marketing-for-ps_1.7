@@ -102,3 +102,9 @@ $sql[_DB_PREFIX_.'egoi_sms_notif_reminder_messages'] = 'CREATE TABLE IF NOT EXIS
 			  `active` int(1) NOT NULL DEFAULT \'0\',
 			  PRIMARY KEY (`order_status_id`,`lang_id`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
+
+$sql[_DB_PREFIX_.'egoi_active_catalogs'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi_active_catalogs` (
+              `catalog_id` int(11) NOT NULL UNIQUE,
+			  `active` int(1) NOT NULL DEFAULT \'0\',
+			  PRIMARY KEY (`catalog_id`)
+			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';

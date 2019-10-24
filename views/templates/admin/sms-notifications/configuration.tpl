@@ -18,7 +18,7 @@
     {if $senderIds}
         <form method="post">
             {include file='./partials/balance.tpl'}
-            <div class="row sms-notifications-margin-top">
+            <div class="row mt20">
                 <label class="col-xs-3 p5"
                        for="egoi-transactional-sms-sender">{l s='E-goi SMS Sender' mod='smartmarketingps'}</label>
                 <div class="col-xs-9">
@@ -29,7 +29,7 @@
                     <p class="col-xs-12 p5">{l s='Select the sender to be used by SMS notifications' mod='smartmarketingps'}</p>
                 </div>
             </div>
-            <div class="row sms-notifications-margin-top">
+            <div class="row mt20">
                 <label class="col-xs-3 p5"
                        for="egoi-transactional-sms-administrator">{l s='Account Administrator' mod='smartmarketingps'}</label>
                 <div class="col-xs-9">
@@ -43,7 +43,7 @@
                     <p class="col-xs-12 p5">{l s='Insert account administrator that will receive SMS notifications' mod='smartmarketingps'}</p>
                 </div>
             </div>
-            <div class="row sms-notifications-margin-top">
+            <div class="row mt20">
                 <label class="col-xs-3 p5"
                        for="egoi-transactional-sms-destination">{l s='Destinations to Send SMS Notifications' mod='smartmarketingps'}</label>
                 <div class="col-xs-9">
@@ -56,7 +56,7 @@
                     <p class="p5">{l s='Select addresses that will receive SMS notifications' mod='smartmarketingps'}</p>
                 </div>
             </div>
-            <table class="table col-xs-12 sms-notifications-margin-top">
+            <table class="table col-xs-12 mt20">
                 <tr valign="top">
                     <th scope="row" class="egoi-td">{l s='Order Status' mod='smartmarketingps'}</th>
                     <th scope="row" class="egoi-td">{l s='Client' mod='smartmarketingps'}</th>
@@ -78,9 +78,10 @@
                     </tr>
                 {/foreach}
             </table>
+            <input type="hidden" name="token" value="{$token|escape:'htmlall':'UTF-8'}">
             <input type="submit" id="save-config" name="save-config"
                    value="{l s='Save Configuration' mod='smartmarketingps'}"
-                   class="btn btn-primary sms-notifications-margin-top">
+                   class="btn btn-primary mt20">
         </form>
     {else}
         {l s='Error retrieving senders from E-goi' mod='smartmarketingps'}

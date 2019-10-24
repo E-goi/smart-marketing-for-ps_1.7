@@ -6,7 +6,7 @@
 *  @license LICENSE.txt
 *}
 
-<div class="row sms-notifications-margin-top">
+<div class="row mt20">
     <label class="col-xs-3 p5" for="egoi-account-balance">{l s='Account Balance' mod='smartmarketingps'}</label>
     <div class="col-xs-9" id="egoi-account-balance">{$balance}</div>
 </div>
