@@ -55,7 +55,17 @@ class ProductsController extends SmartMarketingBaseController
                 $this->createCatalog();
             } elseif (!empty($_GET['deleteCatalog'])) {
                 $this->deleteCatalog($_GET['deleteCatalog']);
+            } elseif (!empty($_GET['toggleSync']) && isset($_GET['value'])) {
+                $this->toggleSync($_GET['toggleSync']);
+            } elseif (!empty($_GET['syncCatalog']) && !empty($_GET['language']) && !empty($_GET['currency'])) {
+                $this->syncCatalog($_GET['syncCatalog'], $_GET['language'], $_GET['currency']);
+            } elseif (!empty($_GET['syncAllCatalogs'])) {
+                $this->syncProducts(true);
             } else {
+                if (!empty($_GET['ignoreCategories'])) {
+                    Configuration::updateValue('egoi_import_categories', false);
+                }
+
                 $this->syncProducts();
             }
         }
@@ -70,7 +80,7 @@ class ProductsController extends SmartMarketingBaseController
             }
 
             $data = array(
-                'title' => $_POST['egoi-catalog-name'],
+                'title' => 'Prestashop_' . $_POST['egoi-catalog-name'],
                 'language' => $_POST['egoi-catalog-language'],
                 'currency' => $_POST['egoi-catalog-currency']
             );
@@ -81,13 +91,17 @@ class ProductsController extends SmartMarketingBaseController
                     'egoi_active_catalogs',
                     array(
                         'catalog_id' => $result['catalog_id'],
-                        'active' => $catalogSync
+                        'active' => $catalogSync,
+                        'language' => $result['language'],
+                        'currency' => $result['currency']
                     )
                 );
 
-                $link = $this->context->link->getAdminLink('Products');
-                Context::getContext()->cookie->notificacion = 'catalog_created';
-                Tools::redirectAdmin($link);
+                if (!empty($catalogSync)) {
+                    $this->syncCatalog($result['catalog_id'], $result['language'], $result['currency']);
+                }
+
+                $this->redirectProducts('catalog_created');
             } else {
                 $this->errors[] = $this->l('Error creating catalog');
             }
@@ -116,58 +130,123 @@ class ProductsController extends SmartMarketingBaseController
 
     private function deleteCatalog($id)
     {
-        if (is_int($_GET['deleteCatalog'])) {
-            $link = $this->context->link->getAdminLink('Products');
-            Context::getContext()->cookie->notificacion = 'invalid_catalog';
-            Tools::redirectAdmin($link);
-            return;
-        }
+        $this->checkCatalogValid($id);
 
         $result = $this->apiv3->deleteCatalog($id);
         if ($result === 204) {
-            Db::getInstance()->delete('egoi_active_catalogs', 'catalog_id = '.(int)$id);
-            Context::getContext()->cookie->notificacion = 'catalog_delete_success';
+            Db::getInstance()->delete('egoi_active_catalogs', 'catalog_id = ' . (int)$id);
+            $this->redirectProducts('catalog_delete_success');
         } else {
-            Context::getContext()->cookie->notificacion = 'catalog_delete_error';
+            $this->redirectProducts('catalog_delete_error');
         }
-
-        $link = $this->context->link->getAdminLink('Products');
-        Tools::redirectAdmin($link);
     }
 
-    private function syncProducts()
+    private function syncCatalog($id, $lang, $curr, $skip = false)
+    {
+        $this->checkCatalogValid($id);
+
+        $data = array();
+
+        $languages = Language::getLanguages(true, $this->context->shop->id);
+        $langId = 0;
+        foreach ($languages as $language) {
+            if ($language['iso_code'] === strtolower($lang)) {
+                $langId = $language['id_lang'];
+            }
+        }
+        if ($langId === 0) {
+            $this->redirectProducts('lang_not_active');
+        }
+
+        $currencies = Currency::getCurrencies(true);
+        $currencyId = 0;
+        foreach ($currencies as $currency) {
+            if ($currency->iso_code === $curr) {
+                $currencyId = $currency->id;
+            }
+        }
+        if ($currencyId === 0) {
+            $this->redirectProducts('currency_not_active');
+        }
+
+        $products = Product::getProducts($langId, 0, 0, 'id_product', 'DESC', false, true);
+        foreach ($products as $product) {
+            $data['products'][] = SmartMarketingPs::mapProduct($product, $langId, $currencyId);
+        }
+
+        $result = $this->apiv3->importProducts($id, $data);
+
+        if ($skip) return;
+
+        if (isset($result['result']) && $result['result'] === 'success') {
+            $this->redirectProducts('import_success');
+        }
+
+        $this->redirectProducts('import_failed');
+    }
+
+    private function toggleSync($id)
+    {
+        $this->checkCatalogValid($id, $_GET['value'] != 0 && $_GET['value'] != 1);
+
+        $newValue = (int)!$_GET['value'];
+        Db::getInstance()->update(
+            'egoi_active_catalogs',
+            array(
+                'active' => $newValue
+            ),
+            'catalog_id = ' . (int)$id
+        );
+
+        if ($newValue === 1) {
+            $this->redirectProducts('catalog_toggle_sync_true');
+        }
+
+        $this->redirectProducts('catalog_toggle_sync_false');
+    }
+
+    private function syncProducts($syncAll = false)
     {
         $this->checkNotifications();
 
         $catalogs = $this->apiv3->getCatalogs();
+        $showCatalogs = array();
         if (!is_int($catalogs)) {
             $catalogs = $catalogs['items'];
             $catalogEnabled = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs ORDER BY catalog_id DESC");
-            $catalogCount = count($catalogEnabled);
+            $catalogCount = count($catalogs);
 
             for ($i = 0; $i < $catalogCount; $i++) {
-                $catalogs[$i]['active'] = 0;
-                if ($catalogs[$i]['catalog_id'] == $catalogEnabled[$i]['catalog_id']) {
-                    if (isset($catalogEnabled[$i])) {
-                        $catalogs[$i]['active'] = $catalogEnabled[$i]['active'];
-                    } else {
-                        Db::getInstance()->insert(
-                            'egoi_active_catalogs',
-                            array(
-                                'catalog_id' => $catalogs[$i]['catalog_id'],
-                                'active' => 0
-                            )
-                        );
-                        $catalogs[$i]['active'] = 0;
+                $key = $this->searchForId($catalogs[$i]['catalog_id'], $catalogEnabled);
+                if ($key !== false) {
+                    $catalogs[$i]['active'] = $catalogEnabled[$key]['active'];
+                    $showCatalogs[] = $catalogs[$i];
+                    if ($syncAll) {
+                        $this->syncCatalog($catalogs[$i]['catalog_id'], $catalogs[$i]['language'], $catalogs[$i]['currency'], true);
                     }
                 }
+            }
+
+            if ($syncAll) {
+                Configuration::updateValue('egoi_import_categories', false);
             }
         } else {
             $this->errors[] = $this->l('Error loading catalogs');
         }
 
-        $this->assign('catalogs', $catalogs);
+        if (Configuration::get('egoi_import_categories')) {
+            $this->assign('importCategories', true);
+        }
+
+        $this->assign('catalogs', $showCatalogs);
         $this->assign('content', $this->fetch('sync-products.tpl'));
+    }
+
+    private function checkCatalogValid($id, $condition = false)
+    {
+        if (!is_numeric($id) || $condition) {
+            $this->redirectProducts('invalid_catalog');
+        }
     }
 
     private function checkNotifications()
@@ -185,9 +264,45 @@ class ProductsController extends SmartMarketingBaseController
             case 'catalog_delete_success':
                 $this->assign('success_msg', $this->displaySuccess($this->l('Catalog deleted')));
                 break;
+            case 'catalog_toggle_sync_true':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Automatic sync enabled for the selected catalog')));
+                break;
+            case 'catalog_toggle_sync_false':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Automatic sync disabled for the selected catalog')));
+                break;
+            case 'lang_not_active':
+                $this->errors[] = $this->l('The language of the selected catalog is not active in your store');
+                break;
+            case 'currency_not_active':
+                $this->errors[] = $this->l('The currency of the selected catalog is not active in your store');
+                break;
+            case 'import_success':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Products were successfully imported to E-goi')));
+                break;
+            case 'import_failed':
+                $this->errors[] = $this->l('Error! Some products were not imported to E-goi');
+                break;
             default:
         }
 
         Context::getContext()->cookie->notificacion = '';
+    }
+
+    private function redirectProducts($message)
+    {
+        $link = $this->context->link->getAdminLink('Products');
+        Context::getContext()->cookie->notificacion = $message;
+        Tools::redirectAdmin($link);
+    }
+
+    private function searchForId($id, $array)
+    {
+        foreach ($array as $key => $val) {
+            if ($val['catalog_id'] == $id) {
+                return $key;
+            }
+        }
+
+        return false;
     }
 }

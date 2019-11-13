@@ -58,7 +58,7 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Custom Override file
-	 * 
+	 *
 	 * @var string
 	 */
 	protected $custom_override = '/../../override/classes/WebserviceSpecificManagementEgoi.php';
@@ -84,6 +84,13 @@ class SmartMarketingPs extends Module
      */
 	protected $transactionalApi;
 
+    /**
+     * API v3
+     *
+     * @var $transactionalApi
+     */
+    protected $apiv3;
+
 	/**
 	* Module Constructor
 	*/
@@ -92,7 +99,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.2.0';
+	    $this->version = '1.3.0';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -116,6 +123,7 @@ class SmartMarketingPs extends Module
         spl_autoload_register(array($this, 'autoloadApi'));
 
         $this->transactionalApi = new TransactionalApi();
+        $this->apiv3 = new ApiV3();
 
 	    if (!Configuration::get('SMART_MARKETING')) {
 	      	$this->warning = $this->l('No name provided');
@@ -164,6 +172,10 @@ class SmartMarketingPs extends Module
                     'actionObjectCustomerUpdateAfter',
 	  		        'actionObjectCustomerDeleteAfter',
 	  		        'actionOrderStatusPostUpdate',
+	  		        'actionObjectCategoryUpdateAfter',
+	  		        'actionObjectCategoryDeleteAfter',
+	  		        'actionObjectProductUpdateAfter',
+                    'actionObjectProductDeleteAfter',
 	  		        'displayHome',
 	  		        'displayTop',
 	  		        'displayFooter'
@@ -785,6 +797,180 @@ class SmartMarketingPs extends Module
     {
         return $this->sendSmsNotification($params);
     }
+
+    /**
+     * Hook for category update
+     *
+     * @param $params
+     */
+    public function hookActionObjectCategoryUpdateAfter($params)
+    {
+        $this->updateCategories();
+    }
+
+    /**
+     * Hook for category removal
+     *
+     * @param $params
+     */
+    public function hookActionObjectCategoryDeleteAfter($params)
+    {
+        $this->updateCategories();
+    }
+
+    private function updateCategories()
+    {
+        $catalogsEnabled = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs ORDER BY catalog_id DESC");
+        if(!empty($catalogsEnabled)) {
+            Configuration::updateValue('egoi_import_categories', true);
+        }
+    }
+
+    /**
+     * Hook for product update
+     *
+     * @param array $params
+     */
+    public function hookActionObjectProductUpdateAfter($params)
+    {
+        $product = $params['object'];
+        if ($product->active) {
+            $languages = Language::getLanguages(true, Context::getContext()->shop->id);
+            $currencies = Currency::getCurrencies(true);
+            $catalogsEnabled = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs ORDER BY catalog_id DESC");
+            foreach ($catalogsEnabled as $catalog) {
+                if (!$this->checkLangCurrency($languages, $langId, $currencies, $currencyId, $catalog) || !$catalog['active']) {
+                    continue;
+                }
+
+                $data = static::mapProduct($product, $langId, $currencyId);
+                $result = $this->apiv3->createProduct($catalog['catalog_id'], $data);
+
+                if (!empty($result['errors']['product_already_exists'])) {
+                    $id = $data['product_identifier'];
+                    unset($data['product_identifier']);
+                    $this->apiv3->updateProduct($catalog['catalog_id'], $id, $data);
+                }
+            }
+        }
+    }
+
+    /**
+     * Hook for product add
+     *
+     * @param array $params
+     */
+    public function hookActionObjectProductDeleteAfter($params)
+    {
+        $product = $params['object'];
+        if ($product->active) {
+            $languages = Language::getLanguages(true, Context::getContext()->shop->id);
+            $currencies = Currency::getCurrencies(true);
+            $catalogsEnabled = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs ORDER BY catalog_id DESC");
+            foreach ($catalogsEnabled as $catalog) {
+                if (!$this->checkLangCurrency($languages, $langId, $currencies, $currencyId, $catalog) || !$catalog['active']) {
+                    continue;
+                }
+
+                $this->apiv3->deleteProduct($catalog['catalog_id'], $product->id);
+            }
+        }
+    }
+
+    private function checkLangCurrency($languages, &$langId, $currencies, &$currencyId, $catalog)
+    {
+        $langId = 0;
+        foreach ($languages as $language) {
+            if ($language['iso_code'] === strtolower($catalog['language'])) {
+                $langId = $language['id_lang'];
+            }
+        }
+        if ($langId === 0) {
+            return false;
+        }
+
+        $currencyId = 0;
+        foreach ($currencies as $currency) {
+            if ($currency->iso_code === $catalog['currency']) {
+                $currencyId = $currency->id;
+            }
+        }
+        if ($currencyId === 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function mapProduct($product, $lang, $currency)
+    {
+        if (is_array($product)) {
+            $product = new Product($product['id_product'], true, $lang);
+        } else {
+            $product = new Product($product->id, true, $lang);
+        }
+
+        $link = new Link();
+
+        $desc = filter_var($product->description_short, FILTER_SANITIZE_STRING);
+
+        $price = round(Tools::convertPrice($product->base_price, $currency), 2);
+        $salePrice = Tools::convertPrice($product->price, $currency);
+
+        $url = $link->getProductLink($product, null, null, null, $lang, null) . '&SubmitCurrency=1&id_currency=' . $currency;
+
+        $img = $product->getCover($product->id);
+        $ssl = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
+        $imageUrl = $ssl . $link->getImageLink(isset($product->link_rewrite) ? $product->link_rewrite : $product->name, (int)$img['id_image'], 'home_default');
+        if (strpos($imageUrl, 'home_default') !== false) {
+            $imageUrl = 'https://goidini.e-goi.com/media/images/noimage.jpg';
+        }
+
+        $categories = static::buildBreadcrumbs($product->getCategories(), $lang);
+
+        $relatedProducts = array();
+
+        $acessories = Product::getAccessoriesLight($lang, $product->id);
+        foreach ($acessories as $item) {
+            $relatedProducts[] = $item['id_product'];
+        }
+
+        return array(
+            'product_identifier' => $product->id,
+            'name' => $product->name,
+            'description' => $desc,
+            'sku' => $product->reference,
+            'upc' => $product->upc,
+            'ean' => $product->ean13,
+            'link' => $url,
+            'image_link' => $imageUrl,
+            'price' => $price,
+            'sale_price' => $salePrice,
+            'brand' => $product->manufacturer_name,
+            'categories' => $categories,
+            'related_products' => $relatedProducts
+        );
+    }
+
+    private static function buildBreadcrumbs($categories, $lang)
+    {
+        $categoryCount = count($categories);
+        $result = array();
+        for ($i = 0; $i < $categoryCount; $i++) {
+            $category = new Category($categories[$i], $lang);
+            $breadcrumb = $category->name;
+
+            while ($category->id_parent !== '1' && $category->id_parent !== '0') {
+                $category = new Category($category->id_parent, $lang);
+                $breadcrumb = $category->name . '>' . $breadcrumb;
+            }
+
+            $result[] = $breadcrumb;
+        }
+
+        return $result;
+    }
+
 
     /**
      * Triggers reminders
@@ -1627,12 +1813,12 @@ class SmartMarketingPs extends Module
 		if ($field && $val) {
 			$instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' and $field='$val' order by egoi_id DESC");
 		}
-		return $instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' order by egoi_id DESC");	
+		return $instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' order by egoi_id DESC");
 	}
 
 	/**
      * Process Overrides
-     * 
+     *
      * @return void
      */
     private function installSmartOverrides()
@@ -1653,7 +1839,7 @@ class SmartMarketingPs extends Module
 
     /**
      * Remove overrides
-     * 
+     *
      * @return void
      */
     private function uninstallSmartOverrides()
@@ -1684,21 +1870,21 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Get Cart ID from Customer Id
-	 * 
+	 *
 	 * @param  $customerId
 	 * @return mixed
 	 */
-	private function getCartId($customerId) 
+	private function getCartId($customerId)
 	{
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)
 					->getValue("SELECT id_cart FROM "._DB_PREFIX_."egoi_customers WHERE customer='".(int)$customerId."'");
 	}
 
 	/**
-	 * Get Order details from ID 
-	 * 
+	 * Get Order details from ID
+	 *
 	 * @param int $orderId
-	 * @return mixed     
+	 * @return mixed
 	 */
 	private function getOrderDetails($orderId)
 	{
@@ -1708,20 +1894,20 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Get current customer ID from cookie or from session
-	 * 
+	 *
 	 * @return int|null
 	 */
-	private function getCustomerId() 
+	private function getCustomerId()
 	{
 		return (int)$this->context->cookie->id_customer;
 	}
 
 	/**
 	 * Remove customer cart from DB
-	 * 
+	 *
 	 * @return bool
 	 */
-	private function removeCart() 
+	private function removeCart()
 	{
 		$idc = $this->getCustomerId();
 		return Db::getInstance()->delete('egoi_customers', "customer='$idc'");
@@ -1729,7 +1915,7 @@ class SmartMarketingPs extends Module
 
    	/**
    	 * Process Block Options
-   	 * 
+   	 *
    	 * @param  $blockName
    	 * @return bool
    	 */
@@ -1780,7 +1966,7 @@ class SmartMarketingPs extends Module
    	 * @param $key
    	 * @return void
    	 */
-   	private function assign($values, $key = false) 
+   	private function assign($values, $key = false)
    	{
     	if(!empty($values) && is_array($values)){
 	        foreach ($values as $key => $value) {
@@ -1796,16 +1982,16 @@ class SmartMarketingPs extends Module
 
     /**
      * Add new Client ID
-     * 
+     *
      * @param array $post
      * @return bool
      */
-    private function addClientId($post) 
+    private function addClientId($post)
     {
     	// clean table
 		Db::getInstance()->execute('TRUNCATE TABLE '._DB_PREFIX_.'egoi');
 		// then insert new data
-		Db::getInstance()->insert('egoi', 
+		Db::getInstance()->insert('egoi',
 			array(
 				'client_id' => (int)$post['egoi_client_id']
 			)

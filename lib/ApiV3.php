@@ -9,7 +9,7 @@ class ApiV3 extends EgoiRestApi
     /**
      * @var string API_URL
      */
-    const API_URL = 'https://dev-api.egoiapp.com';
+    const API_URL = 'https://api.egoiapp.com';
 
     /**
      * Returns user account information
@@ -56,6 +56,60 @@ class ApiV3 extends EgoiRestApi
     }
 
     /**
+     * Imports products to a catalog
+     *
+     * @param $id
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function importProducts($id, $data)
+    {
+        return $this->call('POST', '/catalogs/' . $id . '/products/actions/import', $data);
+    }
+
+    /**
+     * Creates a product
+     *
+     * @param $catalogId
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function createProduct($catalogId, $data)
+    {
+        return $this->call('POST', '/catalogs/' . $catalogId . '/products', $data);
+    }
+
+    /**
+     * Updates a product
+     *
+     * @param $catalogId
+     * @param $id
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function updateProduct($catalogId, $id, $data)
+    {
+        return $this->call('PATCH', '/catalogs/' . $catalogId . '/products/' . $id, $data);
+    }
+
+    /**
+     * Deletes a product
+     *
+     * @param $catalogId
+     * @param $id
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function deleteProduct($catalogId, $id)
+    {
+        return $this->call('DELETE', '/catalogs/' . $catalogId . '/products/' . $id);
+    }
+
+    /**
      * Calls api v3
      *
      * @param $method
@@ -69,7 +123,7 @@ class ApiV3 extends EgoiRestApi
         $curl = curl_init();
         $url = self::API_URL . $url;
         $headers = array(
-            "Apikey: e67c6ab91304fcc6929cbee346959f25fda3d7ec",
+            "Apikey: $this->apiKey",
             'Pluginkey: ' . SmartMarketingPs::PLUGIN_KEY
         );
 
@@ -79,7 +133,8 @@ class ApiV3 extends EgoiRestApi
                 $url = sprintf("%s?%s", $url, http_build_query($data));
                 break;
             case 'POST':
-                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+            case 'PATCH':
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
                 $headers[] = 'Content-Type: application/json';
                 curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
                 break;
@@ -92,13 +147,13 @@ class ApiV3 extends EgoiRestApi
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $result = curl_exec($curl);
-        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        if ($result) {
+        if ($result && $httpCode !== 500) {
             return json_decode($result, true);
         }
 
-        return $httpcode;
+        return $httpCode;
     }
 }

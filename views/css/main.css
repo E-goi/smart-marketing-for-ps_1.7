@@ -192,12 +192,27 @@
     margin-left: 75px;
 }
 
+.delete-catalog-modal {
+    display: none;
+    padding-right: 15px;
+}
+
+.panel-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .p5 {
     padding: 5px;
 }
 
 .p10 {
     padding: 10px;
+}
+
+.pr10 {
+    padding-right: 10px;
 }
 
 .mt20 {
@@ -210,4 +225,12 @@
 
 .uppercase {
     text-transform: uppercase;
+}
+
+.close-panel-btn {
+    font-size: 32px !important;
+}
+
+.close-panel-btn:focus {
+    outline: none !important;
 }
