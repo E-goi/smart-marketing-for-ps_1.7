@@ -6,7 +6,7 @@
 *  @license   LICENSE.txt
 *}
 
-<div class="sms-notifications-margin-top">
+<div class="mt20">
     <label>{l s='Customization Codes' mod='smartmarketingps'}</label>
     <p>{l s="You can use these codes to customize your messages" mod='smartmarketingps'}</p>
 

@@ -22,6 +22,94 @@ class ApiV3 extends EgoiRestApi
     }
 
     /**
+     * Returns all catalogs
+     *
+     * @return mixed
+     */
+    public function getCatalogs()
+    {
+        return $this->call('GET', '/catalogs');
+    }
+
+    /**
+     * Creates a catalog
+     *
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function createCatalog($data)
+    {
+        return $this->call('POST', '/catalogs', $data);
+    }
+
+    /**
+     * Deletes a catalog
+     *
+     * @param $id
+     *
+     * @return mixed
+     */
+    public function deleteCatalog($id)
+    {
+        return $this->call('DELETE', '/catalogs/' . $id);
+    }
+
+    /**
+     * Imports products to a catalog
+     *
+     * @param $id
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function importProducts($id, $data)
+    {
+        return $this->call('POST', '/catalogs/' . $id . '/products/actions/import', $data);
+    }
+
+    /**
+     * Creates a product
+     *
+     * @param $catalogId
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function createProduct($catalogId, $data)
+    {
+        return $this->call('POST', '/catalogs/' . $catalogId . '/products', $data);
+    }
+
+    /**
+     * Updates a product
+     *
+     * @param $catalogId
+     * @param $id
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function updateProduct($catalogId, $id, $data)
+    {
+        return $this->call('PATCH', '/catalogs/' . $catalogId . '/products/' . $id, $data);
+    }
+
+    /**
+     * Deletes a product
+     *
+     * @param $catalogId
+     * @param $id
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function deleteProduct($catalogId, $id)
+    {
+        return $this->call('DELETE', '/catalogs/' . $catalogId . '/products/' . $id);
+    }
+
+    /**
      * Calls api v3
      *
      * @param $method
@@ -39,20 +127,33 @@ class ApiV3 extends EgoiRestApi
             'Pluginkey: ' . SmartMarketingPs::PLUGIN_KEY
         );
 
-        //TODO implement POST, PUT, PATCH and DELETE
-        $url = sprintf("%s?%s", $url, http_build_query($data));
+        switch ($method) {
+            case 'GET':
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+                $url = sprintf("%s?%s", $url, http_build_query($data));
+                break;
+            case 'POST':
+            case 'PATCH':
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+                $headers[] = 'Content-Type: application/json';
+                curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+                break;
+            case 'DELETE':
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+            default:
+        }
 
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $result = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        if ($result) {
+        if ($result && $httpCode !== 500) {
             return json_decode($result, true);
         }
 
-        return false;
+        return $httpCode;
     }
 }

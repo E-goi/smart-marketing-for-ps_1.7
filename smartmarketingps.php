@@ -58,7 +58,7 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Custom Override file
-	 * 
+	 *
 	 * @var string
 	 */
 	protected $custom_override = '/../../override/classes/WebserviceSpecificManagementEgoi.php';
@@ -84,6 +84,13 @@ class SmartMarketingPs extends Module
      */
 	protected $transactionalApi;
 
+    /**
+     * API v3
+     *
+     * @var $transactionalApi
+     */
+    protected $apiv3;
+
 	/**
 	* Module Constructor
 	*/
@@ -92,7 +99,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.2.2';
+	    $this->version = '1.3.0';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -116,6 +123,7 @@ class SmartMarketingPs extends Module
         spl_autoload_register(array($this, 'autoloadApi'));
 
         $this->transactionalApi = new TransactionalApi();
+        $this->apiv3 = new ApiV3();
 
 	    if (!Configuration::get('SMART_MARKETING')) {
 	      	$this->warning = $this->l('No name provided');
@@ -136,10 +144,10 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Autoload API
-	 * 
+	 *
 	 * @return void
 	 */
-	public function autoloadApi() 
+	public function autoloadApi()
 	{
         include_once dirname(__FILE__) . '/lib/EgoiRestApi.php';
         include_once dirname(__FILE__) . '/lib/SmartApi.php';
@@ -149,7 +157,7 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Install App
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function install()
@@ -164,6 +172,10 @@ class SmartMarketingPs extends Module
                     'actionObjectCustomerUpdateAfter',
 	  		        'actionObjectCustomerDeleteAfter',
 	  		        'actionOrderStatusPostUpdate',
+	  		        'actionObjectCategoryUpdateAfter',
+	  		        'actionObjectCategoryDeleteAfter',
+	  		        'actionObjectProductUpdateAfter',
+                    'actionObjectProductDeleteAfter',
 	  		        'displayHome',
 	  		        'displayTop',
 	  		        'displayFooter'
@@ -178,15 +190,15 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Install required Tables
-	 * 
+	 *
 	 * @return bool
 	 */
-	protected function installDb() 
+	protected function installDb()
 	{
 		$return = true;
 		$sql = array();
 		include dirname(__FILE__) . '/install/sql.php';
-		
+
 		foreach ($sql as $s){
 		    $return &= Db::getInstance()->execute($s);
 		}
@@ -426,7 +438,7 @@ class SmartMarketingPs extends Module
 
     /**
 	 * Create menu
-	 * 
+	 *
 	 * @return bool
 	 */
 	private function createMenu()
@@ -435,23 +447,24 @@ class SmartMarketingPs extends Module
 			'Account' => $this->l('Account'),
 			'Sync' => $this->l('Sync Contacts'),
 			'Forms' => $this->l('Forms'),
-            'SmsNotifications' => $this->l('SMS Notifications')
+            'SmsNotifications' => $this->l('SMS Notifications'),
+            'Products' => $this->l('Products')
 		);
 
-		foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ', 'SMSNOTIFICATIONS_READ') as $val) {
+		foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ', 'SMSNOTIFICATIONS_READ', 'PRODUCTS_READ') as $val) {
 			$result = Db::getInstance()->getValue("SELECT slug FROM "._DB_PREFIX_."authorization_role WHERE slug = 'ROLE_MOD_TAB_".$val."'");
-			
+
 			if (isset($result) && ($result)) {
 				continue;
 			}
 
-			Db::getInstance()->insert('authorization_role', 
+			Db::getInstance()->insert('authorization_role',
 				array(
 	    			'slug' => 'ROLE_MOD_TAB_'.$val
 	    		)
 			);
 
-			Db::getInstance()->insert('access', 
+			Db::getInstance()->insert('access',
 				array(
 					'id_profile' => '1',
 	    			'id_authorization_role' => Db::getInstance()->Insert_ID()
@@ -460,7 +473,7 @@ class SmartMarketingPs extends Module
 		}
 
 		// main tab
-		Db::getInstance()->insert('tab', 
+		Db::getInstance()->insert('tab',
 			array(
 				'position' => '11',
     			'module' => 'smartmarketingps',
@@ -468,20 +481,20 @@ class SmartMarketingPs extends Module
     			'active' => 1
     		)
 		);
-		
+
 		// main tab lang
 		$main_id = Db::getInstance()->Insert_ID();
-		Db::getInstance()->insert('tab_lang', 
+		Db::getInstance()->insert('tab_lang',
 			array(
 				'id_tab' => $main_id,
     			'id_lang' => 1,
     			'name' => 'Smart Marketing'
     		)
 		);
-		
+
 		$index = 1;
 		foreach ($subtabs as $key => $val) {
-			Db::getInstance()->insert('tab', 
+			Db::getInstance()->insert('tab',
 				array(
 					'id_parent' => $main_id,
 					'position' => $index,
@@ -494,14 +507,14 @@ class SmartMarketingPs extends Module
 			// insert 2 langs for Menus
 			$tab_id = Db::getInstance()->Insert_ID();
 
-			Db::getInstance()->insert('tab_lang', 
+			Db::getInstance()->insert('tab_lang',
 				array(
 					'id_tab' => $tab_id,
 	    			'id_lang' => 1,
 	    			'name' => $val
 	    		)
 			);
-			Db::getInstance()->insert('tab_lang', 
+			Db::getInstance()->insert('tab_lang',
 				array(
 					'id_tab' => $tab_id,
 	    			'id_lang' => 2,
@@ -512,7 +525,7 @@ class SmartMarketingPs extends Module
 			// get spanish lang
 			$idlang = Db::getInstance()->getValue("SELECT id_lang FROM "._DB_PREFIX_."lang WHERE iso_code='es'");
 			if (isset($idlang) && ($idlang)) {
-				Db::getInstance()->insert('tab_lang', 
+				Db::getInstance()->insert('tab_lang',
 					array(
 						'id_tab' => $tab_id,
 		    			'id_lang' => $idlang,
@@ -529,10 +542,10 @@ class SmartMarketingPs extends Module
 
     /**
      * Uninstall required tables
-     * 
+     *
      * @return bool
      */
-    protected function uninstallDb() 
+    protected function uninstallDb()
 	{
 		// drop all tables from the plugin
 		include dirname(__FILE__) . '/install/sql.php';
@@ -549,7 +562,7 @@ class SmartMarketingPs extends Module
 
         Configuration::deleteByName(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
         Configuration::deleteByName(self::SMS_NOTIFICATIONS_ADMINISTRATOR_CONFIGURATION);
-		
+
 		// remove webservice
 		$this->uninstallWebService();
 
@@ -563,7 +576,7 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Uninstall App
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function uninstall()
@@ -580,7 +593,7 @@ class SmartMarketingPs extends Module
     * @return $force_all
     * @param bool
     */
-    public function enable($force_all = false) 
+    public function enable($force_all = false)
     {
         return parent::enable($force_all);
     }
@@ -591,17 +604,17 @@ class SmartMarketingPs extends Module
     * @return $force_all
     * @param bool
     */
-    public function disable($force_all = false) 
+    public function disable($force_all = false)
     {
         return parent::disable($force_all);
     }
 
 	/**
 	 * Register WebService Overrides
-	 * 
+	 *
 	 * @return bool
 	 */
-	public function registerWebService() 
+	public function registerWebService()
 	{
 		Db::getInstance()->insert('webservice_account', array(
 			'key' => md5(time()),
@@ -617,7 +630,7 @@ class SmartMarketingPs extends Module
 			$id_webservice = $row['id_webservice_account'];
 
 			// add webservice relation
-			Db::getInstance()->insert('webservice_account_shop', 
+			Db::getInstance()->insert('webservice_account_shop',
 				array(
 					'id_webservice_account' => $id_webservice,
 					'id_shop' => 1,
@@ -625,7 +638,7 @@ class SmartMarketingPs extends Module
 			);
 
 			// assign webservice permissions
-			Db::getInstance()->insert('webservice_permission', 
+			Db::getInstance()->insert('webservice_permission',
 				array(
 					'id_webservice_account' => $id_webservice,
 					'resource' => 'egoi',
@@ -643,10 +656,10 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Uninstall WebService Overrides
-	 * 
+	 *
 	 * @return bool
 	 */
-	public function uninstallWebService() 
+	public function uninstallWebService()
 	{
 		$row = Db::getInstance()
 					->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
@@ -667,7 +680,7 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Filter Request data from Configuration page
-	 * 
+	 *
 	 * @return string
 	 */
 	public function getContent()
@@ -675,7 +688,7 @@ class SmartMarketingPs extends Module
 	    if (Tools::isSubmit('submit_api_key')) {
 
 	    	$api_key = Tools::getValue('smart_api_key');
-	    	
+
 	    	if (!$api_key)
                 $this->error_msg = $this->displayError($this->l('Indicate correct API key.'));
 
@@ -691,15 +704,15 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Show Configuration Form
-	 * 
+	 *
 	 * @return mixed
 	 */
-	public function displayForm() 
+	public function displayForm()
 	{
 		//add headers
 		$this->context->controller->addJS($this->_path. 'views/js/config.js');
 		$this->context->controller->addCSS($this->_path. 'views/css/main.css');
-		
+
 		// assign vars
         $this->assign($this->success_msg, 'success_msg');
         $this->assign($this->error_msg, 'error_msg');
@@ -710,7 +723,7 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Validate Api Key
-	 * 
+	 *
 	 * @return void
 	 */
 	public function validateApiKey()
@@ -736,25 +749,25 @@ class SmartMarketingPs extends Module
     * @param array $params
     * @return bool
     */
-    public function hookActionObjectCustomerAddAfter($params) 
+    public function hookActionObjectCustomerAddAfter($params)
     {
 		return $this->addCustomer($params);
 	}
 
 	/**
 	 * Hook for Update customer
-	 * 
+	 *
 	 * @param array $params
 	 * @return bool
 	 */
 	public function hookActionObjectCustomerUpdateAfter($params)
 	{
-		return $this->addCustomer($params);
+		return $this->updateCustomer($params);
 	}
 
 	/**
 	 * Hook for Delete customer
-	 * 
+	 *
 	 * @param array $params
 	 * @return bool
 	 */
@@ -784,6 +797,177 @@ class SmartMarketingPs extends Module
     {
         return $this->sendSmsNotification($params);
     }
+
+    /**
+     * Hook for category update
+     *
+     * @param $params
+     */
+    public function hookActionObjectCategoryUpdateAfter($params)
+    {
+        $this->updateCategories();
+    }
+
+    /**
+     * Hook for category removal
+     *
+     * @param $params
+     */
+    public function hookActionObjectCategoryDeleteAfter($params)
+    {
+        $this->updateCategories();
+    }
+
+    private function updateCategories()
+    {
+        $catalogsEnabled = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs ORDER BY catalog_id DESC");
+        if(!empty($catalogsEnabled)) {
+            Configuration::updateValue('egoi_import_categories', true);
+        }
+    }
+
+    /**
+     * Hook for product update
+     *
+     * @param array $params
+     */
+    public function hookActionObjectProductUpdateAfter($params)
+    {
+        $product = $params['object'];
+        if ($product->active) {
+            $languages = Language::getLanguages(true, Context::getContext()->shop->id);
+            $currencies = Currency::getCurrencies(true);
+            $catalogsEnabled = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs ORDER BY catalog_id DESC");
+            foreach ($catalogsEnabled as $catalog) {
+                if (!$this->checkLangCurrency($languages, $langId, $currencies, $currencyId, $catalog) || !$catalog['active']) {
+                    continue;
+                }
+
+                $data = static::mapProduct($product, $langId, $currencyId);
+                $result = $this->apiv3->createProduct($catalog['catalog_id'], $data);
+
+                if (!empty($result['errors']['product_already_exists'])) {
+                    $id = $data['product_identifier'];
+                    unset($data['product_identifier']);
+                    $this->apiv3->updateProduct($catalog['catalog_id'], $id, $data);
+                }
+            }
+        }
+    }
+
+    /**
+     * Hook for product add
+     *
+     * @param array $params
+     */
+    public function hookActionObjectProductDeleteAfter($params)
+    {
+        $product = $params['object'];
+        if ($product->active) {
+            $languages = Language::getLanguages(true, Context::getContext()->shop->id);
+            $currencies = Currency::getCurrencies(true);
+            $catalogsEnabled = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs ORDER BY catalog_id DESC");
+            foreach ($catalogsEnabled as $catalog) {
+                if (!$this->checkLangCurrency($languages, $langId, $currencies, $currencyId, $catalog) || !$catalog['active']) {
+                    continue;
+                }
+
+                $this->apiv3->deleteProduct($catalog['catalog_id'], $product->id);
+            }
+        }
+    }
+
+    private function checkLangCurrency($languages, &$langId, $currencies, &$currencyId, $catalog)
+    {
+        $langId = 0;
+        foreach ($languages as $language) {
+            if ($language['iso_code'] === strtolower($catalog['language'])) {
+                $langId = $language['id_lang'];
+            }
+        }
+        if ($langId === 0) {
+            return false;
+        }
+
+        $currencyId = 0;
+        foreach ($currencies as $currency) {
+            if ($currency->iso_code === $catalog['currency']) {
+                $currencyId = $currency->id;
+            }
+        }
+        if ($currencyId === 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function mapProduct($product, $lang, $currency)
+    {
+        if (is_array($product)) {
+            $product = new Product($product['id_product'], true, $lang);
+        } else {
+            $product = new Product($product->id, true, $lang);
+        }
+
+        $link = new Link();
+
+        $desc = filter_var($product->description_short, FILTER_SANITIZE_STRING);
+
+        $price = round(Tools::convertPrice($product->base_price, $currency), 2);
+        $salePrice = Tools::convertPrice($product->price, $currency);
+
+        $url = $link->getProductLink($product, null, null, null, $lang, null) . '&SubmitCurrency=1&id_currency=' . $currency;
+
+        $img = $product->getCover($product->id);
+        $ssl = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
+        $imageUrl = $ssl . $link->getImageLink(isset($product->link_rewrite) ? $product->link_rewrite : $product->name, (int)$img['id_image'], 'home_default');
+
+        $categories = static::buildBreadcrumbs($product->getCategories(), $lang);
+
+        $relatedProducts = array();
+
+        $acessories = Product::getAccessoriesLight($lang, $product->id);
+        foreach ($acessories as $item) {
+            $relatedProducts[] = $item['id_product'];
+        }
+
+        return array(
+            'product_identifier' => $product->id,
+            'name' => $product->name,
+            'description' => $desc,
+            'sku' => $product->reference,
+            'upc' => $product->upc,
+            'ean' => $product->ean13,
+            'link' => $url,
+            'image_link' => $imageUrl,
+            'price' => $price,
+            'sale_price' => $salePrice,
+            'brand' => $product->manufacturer_name,
+            'categories' => $categories,
+            'related_products' => $relatedProducts
+        );
+    }
+
+    private static function buildBreadcrumbs($categories, $lang)
+    {
+        $categoryCount = count($categories);
+        $result = array();
+        for ($i = 0; $i < $categoryCount; $i++) {
+            $category = new Category($categories[$i], $lang);
+            $breadcrumb = $category->name;
+
+            while ($category->id_parent !== '1' && $category->id_parent !== '0') {
+                $category = new Category($category->id_parent, $lang);
+                $breadcrumb = $category->name . '>' . $breadcrumb;
+            }
+
+            $result[] = $breadcrumb;
+        }
+
+        return $result;
+    }
+
 
     /**
      * Triggers reminders
@@ -1203,14 +1387,14 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Add customer
-	 * 
+	 *
 	 * @param  $params
 	 * @return bool
 	 */
 	protected function addCustomer($params)
 	{
 		$api = new SmartApi();
-		
+
 		$fields = array(
 			'email' => $params['object']->email
 		);
@@ -1223,112 +1407,43 @@ class SmartMarketingPs extends Module
 
 		if (count($fields) <= 1) {
 			// default fields to be passed to E-goi in case the fields are not mapped
-			$fields = array_merge($fields, 
+			$fields = array_merge($fields,
 				array(
-					'first_name'    => $params['object']->firstname,
-					'last_name'     => $params['object']->lastname,
-					'birth_date'    => $params['object']->birthday
+					'first_name' => $params['object']->firstname,
+					'last_name' => $params['object']->lastname,
+					'birth_date' => $params['object']->birthday
 				)
 			);
 		}
 
         $res = $this->getClientData();
+		if($res['sync']) {
+            // check if is a role defined
+            if (!$this->getRole($params['object']->id, $res['role'])) {
+                return false;
+            }
 
-        // check if is a role defined
-        if (
-            (
-                !$res['sync']
-                || ((bool) $res['newsletter_sync'] && !(bool)$params['object']->newsletter)
-            )
-            ||
-            (
-                !$this->getRole($params['object']->id, $res['role'])
-            )
-        ) {
-            return false;
-        }
+			$fields['listID'] = $res['list_id'];
+			$fields['validate_email'] = '0';
 
-        $fields['listID'] = $res['list_id'];
-        $fields['validate_email'] = '0';
-        $ts = [];
+            if($params['object']->newsletter == '0') {
+                return false;
+            }
 
-        if(!empty($params['object']->id_shop)) {
-            $ts[] = self::getShopsName($params['object']->id_shop);
-        }
-        if(!empty($params['object']->newsletter) && $params['object']->newsletter == '1') {
-            $ts[] = 'newsletter';
-        }
+			$add = $api->addSubscriber($fields);
+			if(isset($add['ERROR']) && ($add['ERROR'])) {
+				return false;
+			}
 
-        $fields['tags'] = self::makeTagMap($ts);
+            $client_data = $api->getClientData();
+            $client = (int)$client_data['CLIENTE_ID'];
 
-        $add = $api->addSubscriber($fields);
-        if(isset($add['ERROR']) && ($add['ERROR'])) {
-            return false;
-        }
-
-        $client_data = $api->getClientData();
-        $client = (int)$client_data['CLIENTE_ID'];
-
-        return Db::getInstance()->update('egoi',
-            array(
-                'total' => (int)$res['total']
-            ), "client_id = $client");
+			return Db::getInstance()->update('egoi',
+				array(
+					'total' => (int)$res['total']
+				), "client_id = $client");
+		}
 	}
-
-    public static function getShopsName($id){
-        try{
-            $sql = 'SELECT * FROM '._DB_PREFIX_.'shop where id_shop = '.$id;
-            $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-            return empty($rq[0]['name'])?false:$rq[0]['name'];
-        }catch (Exception $e){
-            return false;
-        }
-    }
-
-    /*
-     * Count size of list by store
-     * */
-    public static function sizeList(){
-        $options = self::getClientData();
-        $add = '';
-        if(!empty($options['newsletter_sync'])){
-            $add = 'AND newsletter="1"';
-        }
-        $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" '.$add.' group by id_shop';//AND newsletter="1"
-
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-    }
-
-	/*
-	 * gets tag number from name (creates if they dont exist)
-	 * */
-    public static function makeTagMap($ts = []){
-        $api = new SmartApi();
-
-
-        $resp = $api->getTags();
-
-        foreach ($resp as $tag){
-            for($i = 0;$i<count($ts);$i++){
-                if(strcasecmp($tag['NAME'], $ts[$i]) == 0)
-                    $ts[$ts[$i]] = $tag['ID'];
-            }
-        }
-        for($i = 0;$i<count($ts);$i++){
-            if(empty($ts[$ts[$i]])){
-                $resp = $api->addTag($ts[$i]);
-                isset($resp['ID']) ? $ts[$ts[$i]] = $resp['ID'] : null;
-            }
-        }
-
-        $tags = [];
-
-        foreach ($ts as $key => $tagID){
-            if(!empty($tagID))
-                array_push($tags, $tagID);
-        }
-        return $tags;
-    }
 
 	/**
 	 * Update customer
@@ -1363,7 +1478,7 @@ class SmartMarketingPs extends Module
 
 					if (count($fields) <= 1) {
 						// default fields to be passed to E-goi in case the fields are not mapped
-						$fields = array_merge($fields, 
+						$fields = array_merge($fields,
 							array(
 								'first_name' => $customer->firstname,
 								'last_name' => $customer->lastname,
@@ -1430,7 +1545,7 @@ class SmartMarketingPs extends Module
 				$client_data = $api->getClientData();
 				$client = (int)$client_data['CLIENTE_ID'];
 
-				return Db::getInstance()->update('egoi', 
+				return Db::getInstance()->update('egoi',
                     array(
                         'total' => (int)($res['total']-1)
                     ), "client_id = $client");
@@ -1459,7 +1574,7 @@ class SmartMarketingPs extends Module
 
 	/**
    	 * Hook for display content in Top Page
-   	 * 
+   	 *
    	 * @param array $params
    	 * @return mixed
    	 */
@@ -1476,8 +1591,8 @@ class SmartMarketingPs extends Module
 		          	'activate' => 1
 		      	)
 		  	);
-			
-			// check if this block is activated 
+
+			// check if this block is activated
 			if($this->processBlockOptions('header')) {
 				return $this->display(__FILE__, 'smartmarketingps.tpl');
 			}
@@ -1488,13 +1603,13 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Hook for display content in Bottom Page
-	 * 
+	 *
 	 * @param  array $params
-	 * @return mixed        
+	 * @return mixed
 	 */
 	public function hookDisplayFooter($params)
 	{
-		// check if this block is activated 
+		// check if this block is activated
 		if($this->processBlockOptions('footer')) {
 			return $this->display(__FILE__, 'smartmarketingps.tpl');
 		}
@@ -1502,13 +1617,13 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Hook for display content in Home Page
-	 * 
+	 *
 	 * @param  array $params
 	 * @return mixed
 	 */
 	public function hookDisplayHome($params)
 	{
-		// check if this block is activated 
+		// check if this block is activated
 		if($this->processBlockOptions('home')) {
 			return $this->display(__FILE__, 'smartmarketingps.tpl');
 		}
@@ -1516,29 +1631,29 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Abandoned cart hook
-	 * 
+	 *
 	 * @param  array $params
-	 * @return void        
+	 * @return void
 	 */
-	public function hookActionCartSave($params) 
+	public function hookActionCartSave($params)
 	{
 		$this->addToCart($params);
 	}
 
 	/**
 	 * Abandoned cart hook
-	 * 
+	 *
 	 * @param  array $params
-	 * @return void        
+	 * @return void
 	 */
-	public function hookCart($params) 
+	public function hookCart($params)
 	{
 		$this->addToCart($params);
 	}
 
 	/**
 	 * Track&Engage - check is customer has an Abandoned Cart
-	 * 
+	 *
 	 * @return string|bool
 	 */
 	public function te()
@@ -1548,7 +1663,7 @@ class SmartMarketingPs extends Module
 			$list_id = $res['list_id'];
 			$client = $res['client_id'];
 			$track = $res['track'];
-			
+
 			if($client && $list_id && $track) {
 				if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
 					return false;
@@ -1560,7 +1675,7 @@ class SmartMarketingPs extends Module
 				$cart_id = $this->getCartId($this->getCustomerId());
 				$cart = new Cart($cart_id);
 				$products = $cart->getProducts();
-				
+
 				$cart_zero = 0;
 				if ($cart_id) {
 					if (empty($products)) {
@@ -1580,10 +1695,10 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Add to Cart
-	 * 
+	 *
 	 * @param array $params
 	 */
-	protected function addToCart($params) 
+	protected function addToCart($params)
 	{
 	 	$json = isset($params['json']) && is_array($params['json']) ? json_decode($params['json']['id']) : $params['cookie']->id_cart;
 
@@ -1596,7 +1711,7 @@ class SmartMarketingPs extends Module
 				// check if customer has products in the cart (has cart ID?)
 				if($json) {
 					$idc = $this->getCustomerId();
-					
+
 					if(empty($this->getCartId($idc))) {
 						Db::getInstance()->insert('egoi_customers', array(
 							'customer' => $idc,
@@ -1611,10 +1726,10 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Track&Engage - TrackOrder
-	 * 
+	 *
 	 * @return void
 	 */
-	public function teOrder() 
+	public function teOrder()
 	{
 		$res = $this->getClientData('track', 1);
 
@@ -1671,7 +1786,7 @@ class SmartMarketingPs extends Module
      * @param $field
      * @return string
      */
-    public static function getFieldMap($name = false, $field = false)
+    public function getFieldMap($name = false, $field = false)
     {
         if ($field) {
             $sql = "SELECT * FROM " . _DB_PREFIX_ . "egoi_map_fields WHERE ps='" . pSQL($field) . "'";
@@ -1682,31 +1797,6 @@ class SmartMarketingPs extends Module
         return $rq['egoi'];
     }
 
-    /*
-     * Map subscriber to egoi map
-     * */
-    public static function mapSubscriber($row){
-        $subscriber=[//default map
-            'first_name'    => $row['firstname'],
-            'email'         => $row['email'],
-            'last_name'     => $row['lastname'],
-            'birth_date'    => $row['birthdate'],
-            'status'        => 1,
-        ];
-        foreach ($row as $field => $value){
-            $field = self::getFieldMap(0, $field);
-
-            if(empty($field)){
-                continue;
-            }
-
-            $subscriber[$field] = $value;
-        }
-
-        return $subscriber;
-
-    }
-
 	/**
 	 * Get Client Data from DB
 	 *
@@ -1714,18 +1804,18 @@ class SmartMarketingPs extends Module
      * @param $val
 	 * @return array|null
 	 */
-	public static function getClientData($field = false, $val = false)
+	private function getClientData($field = false, $val = false)
 	{
 		$instance = Db::getInstance(_PS_USE_SQL_SLAVE_);
 		if ($field && $val) {
 			$instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' and $field='$val' order by egoi_id DESC");
 		}
-		return $instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' order by egoi_id DESC");	
+		return $instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' order by egoi_id DESC");
 	}
 
 	/**
      * Process Overrides
-     * 
+     *
      * @return void
      */
     private function installSmartOverrides()
@@ -1746,7 +1836,7 @@ class SmartMarketingPs extends Module
 
     /**
      * Remove overrides
-     * 
+     *
      * @return void
      */
     private function uninstallSmartOverrides()
@@ -1777,21 +1867,21 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Get Cart ID from Customer Id
-	 * 
+	 *
 	 * @param  $customerId
 	 * @return mixed
 	 */
-	private function getCartId($customerId) 
+	private function getCartId($customerId)
 	{
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)
 					->getValue("SELECT id_cart FROM "._DB_PREFIX_."egoi_customers WHERE customer='".(int)$customerId."'");
 	}
 
 	/**
-	 * Get Order details from ID 
-	 * 
+	 * Get Order details from ID
+	 *
 	 * @param int $orderId
-	 * @return mixed     
+	 * @return mixed
 	 */
 	private function getOrderDetails($orderId)
 	{
@@ -1801,20 +1891,20 @@ class SmartMarketingPs extends Module
 
 	/**
 	 * Get current customer ID from cookie or from session
-	 * 
+	 *
 	 * @return int|null
 	 */
-	private function getCustomerId() 
+	private function getCustomerId()
 	{
 		return (int)$this->context->cookie->id_customer;
 	}
 
 	/**
 	 * Remove customer cart from DB
-	 * 
+	 *
 	 * @return bool
 	 */
-	private function removeCart() 
+	private function removeCart()
 	{
 		$idc = $this->getCustomerId();
 		return Db::getInstance()->delete('egoi_customers', "customer='$idc'");
@@ -1822,7 +1912,7 @@ class SmartMarketingPs extends Module
 
    	/**
    	 * Process Block Options
-   	 * 
+   	 *
    	 * @param  $blockName
    	 * @return bool
    	 */
@@ -1873,7 +1963,7 @@ class SmartMarketingPs extends Module
    	 * @param $key
    	 * @return void
    	 */
-   	private function assign($values, $key = false) 
+   	private function assign($values, $key = false)
    	{
     	if(!empty($values) && is_array($values)){
 	        foreach ($values as $key => $value) {
@@ -1889,16 +1979,16 @@ class SmartMarketingPs extends Module
 
     /**
      * Add new Client ID
-     * 
+     *
      * @param array $post
      * @return bool
      */
-    private function addClientId($post) 
+    private function addClientId($post)
     {
     	// clean table
 		Db::getInstance()->execute('TRUNCATE TABLE '._DB_PREFIX_.'egoi');
 		// then insert new data
-		Db::getInstance()->insert('egoi', 
+		Db::getInstance()->insert('egoi',
 			array(
 				'client_id' => (int)$post['egoi_client_id']
 			)

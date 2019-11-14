@@ -19,7 +19,7 @@
         {include file='./partials/language_selection.tpl'}
         {include file='./partials/custom_information.tpl'}
 
-        <table class="table col-xs-12 sms-notifications-margin-top">
+        <table class="table col-xs-12 mt20">
             <tr valign="top">
                 <th scope="row" class="col-xs-3 egoi-td">{l s='Order Status' mod='smartmarketingps'}</th>
                 <th scope="row" class="egoi-td">{l s='Client Message' mod='smartmarketingps'}</th>
@@ -40,7 +40,8 @@
             {/foreach}
         </table>
 
-        <div class="col-xs-12 sms-notifications-margin-top">
+        <div class="col-xs-12 mt20">
+            <input type="hidden" name="token" value="{$token|escape:'htmlall':'UTF-8'}">
             <input type="submit" id="save-messages" name="save-messages"
                    value="{l s='Save Messages' mod='smartmarketingps'}" class="btn btn-primary">
         </div>

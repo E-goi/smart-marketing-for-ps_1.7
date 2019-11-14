@@ -6,7 +6,7 @@
 *  @license LICENSE.txt
 *}
 
-<div class="row sms-notifications-margin-top">
+<div class="row mt20">
     <label class="col-xs-3 p5" for="egoi-sms-messages-languages">{l s='Language' mod='smartmarketingps'}</label>
     <div class="col-xs-9">
         <select id="egoi-sms-messages-languages" class="form-control" name="egoi-sms-messages-languages" onchange="this.form.submit()">
