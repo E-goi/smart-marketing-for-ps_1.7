@@ -922,9 +922,6 @@ class SmartMarketingPs extends Module
         $img = $product->getCover($product->id);
         $ssl = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
         $imageUrl = $ssl . $link->getImageLink(isset($product->link_rewrite) ? $product->link_rewrite : $product->name, (int)$img['id_image'], 'home_default');
-        if (strpos($imageUrl, 'home_default') !== false) {
-            $imageUrl = 'https://goidini.e-goi.com/media/images/noimage.jpg';
-        }
 
         $categories = static::buildBreadcrumbs($product->getCategories(), $lang);
 
