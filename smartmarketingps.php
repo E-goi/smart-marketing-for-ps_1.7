@@ -99,7 +99,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.3.0';
+	    $this->version = '1.3.2';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -917,6 +917,10 @@ class SmartMarketingPs extends Module
         $price = round(Tools::convertPrice($product->base_price, $currency), 2);
         $salePrice = Tools::convertPrice($product->price, $currency);
 
+        if ($price == $salePrice) {
+            $salePrice = 0;
+        }
+
         $url = $link->getProductLink($product, null, null, null, $lang, null) . '&SubmitCurrency=1&id_currency=' . $currency;
 
         $img = $product->getCover($product->id);
@@ -1445,7 +1449,63 @@ class SmartMarketingPs extends Module
 		}
 	}
 
-	/**
+    public static function getShopsName($id){
+        try{
+            $sql = 'SELECT * FROM '._DB_PREFIX_.'shop where id_shop = '.$id;
+            $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+            return empty($rq[0]['name'])?false:$rq[0]['name'];
+        }catch (Exception $e){
+            return false;
+        }
+    }
+
+    /*
+     * Count size of list by store
+     * */
+    public static function sizeList(){
+        $options = self::getClientData();
+        $add = '';
+        if(!empty($options['newsletter_sync'])){
+            $add = 'AND newsletter="1"';
+        }
+        $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" '.$add.' group by id_shop';//AND newsletter="1"
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+    }
+
+    /*
+     * gets tag number from name (creates if they dont exist)
+     * */
+    public static function makeTagMap($ts = []){
+        $api = new SmartApi();
+
+
+        $resp = $api->getTags();
+
+        foreach ($resp as $tag){
+            for($i = 0;$i<count($ts);$i++){
+                if(strcasecmp($tag['NAME'], $ts[$i]) == 0)
+                    $ts[$ts[$i]] = $tag['ID'];
+            }
+        }
+        for($i = 0;$i<count($ts);$i++){
+            if(empty($ts[$ts[$i]])){
+                $resp = $api->addTag($ts[$i]);
+                isset($resp['ID']) ? $ts[$ts[$i]] = $resp['ID'] : null;
+            }
+        }
+
+        $tags = [];
+
+        foreach ($ts as $key => $tagID){
+            if(!empty($tagID))
+                array_push($tags, $tagID);
+        }
+        return $tags;
+    }
+
+
+    /**
 	 * Update customer
 	 *
      * @param array $params
@@ -1797,7 +1857,33 @@ class SmartMarketingPs extends Module
         return $rq['egoi'];
     }
 
-	/**
+    /*
+     * Map subscriber to egoi map
+     * */
+    public static function mapSubscriber($row){
+        $subscriber=[//default map
+            'first_name'    => $row['firstname'],
+            'email'         => $row['email'],
+            'last_name'     => $row['lastname'],
+            'birth_date'    => $row['birthdate'],
+            'status'        => 1,
+        ];
+        foreach ($row as $field => $value){
+            $field = self::getFieldMap(0, $field);
+
+            if(empty($field)){
+                continue;
+            }
+
+            $subscriber[$field] = $value;
+        }
+
+        return $subscriber;
+
+    }
+
+
+    /**
 	 * Get Client Data from DB
 	 *
      * @param $field

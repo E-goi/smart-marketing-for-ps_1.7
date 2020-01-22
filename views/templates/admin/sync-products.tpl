@@ -4,8 +4,49 @@
         $('#confirm_modal').modal('show');
     }
 
+    var lastPage;
+
     function syncCatalog(id, language, currency) {
-        window.location.replace("{$smarty.server.REQUEST_URI}&syncCatalog=" + id + '&language=' + language + '&currency=' + currency);
+        var catalogSync = $("#catalog_" + id).children();
+        $(catalogSync[0]).parent('a').addClass('not-clickable');
+        $(catalogSync[1]).show();
+        $(catalogSync[0]).hide();
+
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var jsonResponse = JSON.parse(xhr.responseText);
+                lastPage = jsonResponse.lastPage;
+                syncBatch(1, id, language, currency);
+            }
+        };
+
+        xhr.open('GET', "{$smarty.server.REQUEST_URI}&countProducts=1", true);
+        xhr.send();
+    }
+
+    function syncBatch(page, id, language, currency) {
+        if (page > lastPage) {
+            var catalogSync = $("#catalog_" + id).children();
+            $(catalogSync[0]).parent('a').removeClass('not-clickable');
+            $(catalogSync[1]).hide();
+            $(catalogSync[0]).show();
+            var msg = '{l s='Products were successfully imported to E-goi' mod='smartmarketingps'}';
+            $.growl.notice({ title: '', message: msg });
+            return;
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                syncBatch(++page, id, language, currency);
+            }
+        };
+
+        var url = "{$smarty.server.REQUEST_URI}&syncCatalog=" + id + '&language=' + language + '&currency=' + currency + '&page=' + page;
+        xhr.open('GET', url, true);
+        xhr.send();
     }
 
     function toggleSync(id, value) {
@@ -147,10 +188,11 @@
                         {/if}
                     </td>
                     <td class="action-type text-center">
-                        <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Sync now' mod='smartmarketingps'}">
+                        <span id="sync-catalog{$catalog.catalog_id}" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Sync now' mod='smartmarketingps'}">
                             <a class="btn tooltip-link js-submit-row-action dropdown-item"
-                               onclick="syncCatalog({$catalog.catalog_id}, '{$catalog.language}', '{$catalog.currency}')">
+                               onclick="syncCatalog({$catalog.catalog_id}, '{$catalog.language}', '{$catalog.currency}')" id="catalog_{$catalog.catalog_id}">
                                 <i class="material-icons">refresh</i>
+                                <div class="loader" style="display: none;"></div>
                             </a>
                         </span>
                         <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Delete catalog' mod='smartmarketingps'}">

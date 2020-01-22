@@ -51,14 +51,21 @@ class ProductsController extends SmartMarketingBaseController
         parent::initContent();
 
         if ($this->isValid()) {
-            if (!empty($_GET['createCatalog'])) {
+            if (!empty($_GET['countProducts'])) {
+                $productCount = (int)Db::getInstance()->getValue('SELECT COUNT(id_product) FROM '._DB_PREFIX_.'product WHERE active=1;');
+                $productCount = ceil($productCount/100);
+                echo json_encode(array('lastPage' => $productCount));
+                header('Content-Type: application/json');
+                exit;
+            } elseif (!empty($_GET['createCatalog'])) {
                 $this->createCatalog();
             } elseif (!empty($_GET['deleteCatalog'])) {
                 $this->deleteCatalog($_GET['deleteCatalog']);
             } elseif (!empty($_GET['toggleSync']) && isset($_GET['value'])) {
                 $this->toggleSync($_GET['toggleSync']);
             } elseif (!empty($_GET['syncCatalog']) && !empty($_GET['language']) && !empty($_GET['currency'])) {
-                $this->syncCatalog($_GET['syncCatalog'], $_GET['language'], $_GET['currency']);
+                $this->syncCatalog($_GET['syncCatalog'], $_GET['language'], $_GET['currency'], true, $_GET['page']);
+                exit;
             } elseif (!empty($_GET['syncAllCatalogs'])) {
                 $this->syncProducts(true);
             } else {
@@ -97,9 +104,9 @@ class ProductsController extends SmartMarketingBaseController
                     )
                 );
 
-                if (!empty($catalogSync)) {
-                    $this->syncCatalog($result['catalog_id'], $result['language'], $result['currency']);
-                }
+                /*if (!empty($catalogSync)) {
+                    $this->syncCatalog($result['catalog_id'], $result['language'], $result['currency'], false);
+                }*/
 
                 $this->redirectProducts('catalog_created');
             } else {
@@ -141,7 +148,7 @@ class ProductsController extends SmartMarketingBaseController
         }
     }
 
-    private function syncCatalog($id, $lang, $curr, $skip = false)
+    private function syncCatalog($id, $lang, $curr, $skip = false, $page = 0)
     {
         $this->checkCatalogValid($id);
 
@@ -169,7 +176,10 @@ class ProductsController extends SmartMarketingBaseController
             $this->redirectProducts('currency_not_active');
         }
 
-        $products = Product::getProducts($langId, 0, 0, 'id_product', 'DESC', false, true);
+        if ($page != 0) {
+            $page = ($page - 1) * 100;
+        }
+        $products = Product::getProducts($langId, $page, 100, 'id_product', 'DESC', false, true);
         foreach ($products as $product) {
             $data['products'][] = SmartMarketingPs::mapProduct($product, $langId, $currencyId);
         }

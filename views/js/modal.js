@@ -46,7 +46,6 @@ function initModal() {
 
     if (showOnce.innerText == 1) {
         var cookie = getCookie('show_popup');
-        console.log(cookie);
         if (cookie == 0) {
             setCookie('show_popup', 1);
             triggerModal();
