@@ -556,6 +556,7 @@ class SmartMarketingPs extends Module
    		// remove menus
    		Db::getInstance()->delete('tab', "module = '$this->name'");
    		Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='Forms' or name='SMS Notifications'");
+        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Conta' or name='Sincronizar contactos' or name='Formulários' or name='Notificações SMS'");
 
    		// remove API Key in cache
    		Configuration::deleteByName('smart_api_key');
@@ -1890,7 +1891,7 @@ class SmartMarketingPs extends Module
      * @param $val
 	 * @return array|null
 	 */
-	private function getClientData($field = false, $val = false)
+	public static function getClientData($field = false, $val = false)
 	{
 		$instance = Db::getInstance(_PS_USE_SQL_SLAVE_);
 		if ($field && $val) {
