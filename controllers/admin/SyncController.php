@@ -398,7 +398,7 @@ class SyncController extends SmartMarketingBaseController
 
         Db::getInstance()->update('egoi',
             array(
-                'total' => $this->api->getAllSubscribers()
+                'total' => $this->api->getAllSubscribers($list_id)
             ), "client_id = $client_id");
 
         $count++;

@@ -99,7 +99,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.3.2';
+	    $this->version = '1.3.3';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -1431,7 +1431,9 @@ class SmartMarketingPs extends Module
 			$fields['listID'] = $res['list_id'];
 			$fields['validate_email'] = '0';
 
-            if($params['object']->newsletter == '0') {
+            $options = self::getClientData();
+
+            if( !empty($options['newsletter_sync']) && $params['object']->newsletter == '0') {
                 return false;
             }
 
@@ -1483,26 +1485,25 @@ class SmartMarketingPs extends Module
 
         $resp = $api->getTags();
 
+        $mapped_ids = [];
+
         foreach ($resp as $tag){
             for($i = 0;$i<count($ts);$i++){
-                if(strcasecmp($tag['NAME'], $ts[$i]) == 0)
-                    $ts[$ts[$i]] = $tag['ID'];
-            }
-        }
-        for($i = 0;$i<count($ts);$i++){
-            if(empty($ts[$ts[$i]])){
-                $resp = $api->addTag($ts[$i]);
-                isset($resp['ID']) ? $ts[$ts[$i]] = $resp['ID'] : null;
+                if(strcasecmp($tag['NAME'], $ts[$i]) == 0){
+                    unset($ts[$i]);
+                    array_push($mapped_ids, $tag['ID']);
+                }
             }
         }
 
-        $tags = [];
-
-        foreach ($ts as $key => $tagID){
-            if(!empty($tagID))
-                array_push($tags, $tagID);
+        foreach ($ts as $tagName){
+            $resp = $api->addTag($tagName);
+            if(isset($resp['ID'])){
+                array_push($mapped_ids, $resp['ID']);
+            }
         }
-        return $tags;
+
+        return $mapped_ids;
     }
 
 
@@ -1866,7 +1867,7 @@ class SmartMarketingPs extends Module
             'first_name'    => $row['firstname'],
             'email'         => $row['email'],
             'last_name'     => $row['lastname'],
-            'birth_date'    => $row['birthdate'],
+            'birth_date'    => isset($row['birthdate'])?$row['birthdate']:$row['birthday'],
             'status'        => 1,
         ];
         foreach ($row as $field => $value){
