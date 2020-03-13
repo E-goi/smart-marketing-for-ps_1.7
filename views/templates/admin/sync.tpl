@@ -103,6 +103,19 @@
 						<p class="help">{l s='Select "yes" if you want to track all changes in your customers and trigger custom actions' mod='smartmarketingps'}</p>
 					</td>
 				</tr>
+				<tr>
+					<th class="egoi-td" scope="row">{l s='Enable Social Track&Engage' mod='smartmarketingps'}</th>
+					<td class="nowrap input-group">
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="social_track" id="social_track0" value="1" {if $social_track eq '1'} checked {/if}>
+							<label for="social_track0">{l s='Yes' mod='smartmarketingps'}</label>
+							<input type="radio" name="social_track" id="social_track1" value="0" {if $social_track eq '0' or $social_track eq ''} checked {/if}>
+							<label for="social_track1">{l s='No' mod='smartmarketingps'}</label>
+							<a class="slide-button btn"></a>
+						</span>
+						<p class="help">{l s='Select "yes" if you plan on using remarketing and targetted ads in the future.' mod='smartmarketingps'}</p>
+					</td>
+				</tr>
 			{/if}
 
 			{if isset($sync) and ($sync)}

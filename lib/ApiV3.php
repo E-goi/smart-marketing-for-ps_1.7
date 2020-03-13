@@ -110,6 +110,16 @@ class ApiV3 extends EgoiRestApi
     }
 
     /**
+     * Asks for a social track ID
+     *
+     * @return string social_track_id
+     */
+    public function getSocialTrackID($data)
+    {
+        return $this->call('POST', '/ads/socialtrack', $data);
+    }
+
+    /**
      * Calls api v3
      *
      * @param $method

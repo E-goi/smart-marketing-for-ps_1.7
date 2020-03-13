@@ -1727,6 +1727,8 @@ class SmartMarketingPs extends Module
 			$list_id = $res['list_id'];
 			$client = $res['client_id'];
 			$track = $res['track'];
+            $social_track = $res['social_track'];
+            $social_track_id = $res['social_track_id'];
 
 			if($client && $list_id && $track) {
 				if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
@@ -1749,7 +1751,10 @@ class SmartMarketingPs extends Module
 
 				$this->removeCart();
 
-				include 'includes/te.php';
+                include 'includes/te.php';
+                if($social_track){
+				    include 'includes/TrackingSocial.php';
+                }
 				return $te;
 			}
 		}

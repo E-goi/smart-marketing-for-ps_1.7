@@ -14,6 +14,11 @@ include_once dirname(__FILE__).'/../../smartmarketingps.php';
 class SyncController extends SmartMarketingBaseController 
 {
 
+    /**
+     * @var ApiV3 $apiv3
+     */
+	protected $apiv3;
+	
 	/**
 	 * Constructor
 	 */
@@ -23,6 +28,7 @@ class SyncController extends SmartMarketingBaseController
 
 		// instantiate API
 		$this->activateApi();
+        $this->apiv3 = new ApiV3();
 
 		$this->bootstrap = true;
 		$this->cfg = 0;
@@ -99,6 +105,8 @@ class SyncController extends SmartMarketingBaseController
 				$list_id = $rq['list_id'];
 				$sync = $rq['sync'];
 				$track = $rq['track'];
+				$social_track = $rq['social_track'];
+				$social_track_id = $rq['social_track_id'];
 				$role = $rq['role'];
                 $optin = $rq['optin'];
                 $newsletter_sync = $rq['newsletter_sync'];
@@ -162,6 +170,7 @@ class SyncController extends SmartMarketingBaseController
             $nsync = Tools::getValue('newsletter_sync', 0);
             $noptin = Tools::getValue('newsletter_optin', 0);
 			$track = Tools::getValue('track', 1);
+			$social_track = Tools::getValue('social_track', 1);
 
 			// compare client ID -> API with DB
 			$client_data = $this->api->getClientData();
@@ -169,6 +178,12 @@ class SyncController extends SmartMarketingBaseController
 
 			$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
 						->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id='.(int)$client);
+			
+			if($social_track){
+				if(is_null($res['social_track'])){
+					Db::getInstance()->Execute("ALTER TABLE `'._DB_PREFIX_.'egoi` ADD `social_track` varchar(255) NOT NULL DEFAULT \'1\', `social_track_id` varchar(255) NOT NULL DEFAULT \'0\'");
+				}
+			}
 
 			// temporary - alter table with new column
 			if ($nsync) {
@@ -183,6 +198,8 @@ class SyncController extends SmartMarketingBaseController
 				'client_id' => (int)$client,
 				'sync' => (int)$sync,
 				'track' => (int)$track,
+				'social_track' => (int)$social_track,
+				'social_track_id' => $res['social_track_id'],
 				'role' => pSQL($role),
 				'newsletter_sync' => (int)$nsync,
 				'optin' => (int)$noptin,
@@ -190,6 +207,10 @@ class SyncController extends SmartMarketingBaseController
                 'total' => 0
 			);
 
+			if($social_track && empty($social_track_id)){
+				$values['social_track_id'] = $this->apiv3->getSocialTrackID(_PS_BASE_URI_);
+				Db::getInstance()->update('egoi', $values, "social_track_id = "."TRACKINGID");
+			}
 			if(isset($res['client_id']) && ($res['client_id'])) {
 				$this->assign('success_message', $this->displaySuccess($this->l('Settings updated')));
 				return Db::getInstance()->update('egoi', $values, "client_id = ".(int)$client);

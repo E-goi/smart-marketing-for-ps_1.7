@@ -15,6 +15,8 @@ $sql[_DB_PREFIX_.'egoi'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi` (
 			  `sync` int(11) NOT NULL,
 			  `total` varchar(255) NOT NULL,
 			  `track` varchar(255) NOT NULL DEFAULT \'1\',
+			  `social_track` varchar(255) NOT NULL DEFAULT \'0\',
+			  `social_track_id` varchar(255) NOT NULL DEFAULT \'0\',
 			  `role` varchar(255) NOT NULL,
 			  `newsletter_sync` int(11) NOT NULL DEFAULT \'0\',
 			  `optin` int(11) NOT NULL DEFAULT \'0\',
