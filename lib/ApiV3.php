@@ -114,9 +114,31 @@ class ApiV3 extends EgoiRestApi
      *
      * @return string social_track_id
      */
-    public function getSocialTrackID($data)
+    public function getSocialTrackID()
     {
-        return $this->call('POST', '/ads/socialtrack', $data);
+        $accountData = $this->getMyAccount();
+        $data = array(
+            'account_id' => $accountData['general_info']['client_id'], 
+            'domain' => _PS_BASE_URI_
+        );
+        $curl = curl_init();
+        $url = "https://egoiapp2.com/ads/getPixel";
+
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+        $headers[] = 'Content-Type: application/json';
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($result && $httpCode !== 500) {
+            return json_decode($result, true);
+        }
+
+        return $httpCode;
     }
 
     /**

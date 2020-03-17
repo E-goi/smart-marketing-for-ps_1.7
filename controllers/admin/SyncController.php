@@ -121,6 +121,7 @@ class SyncController extends SmartMarketingBaseController
 				$this->assign('role_id', $role);
 				$this->assign('optin', $optin);
 				$this->assign('newsletter_sync', $newsletter_sync);
+				$this->assign('social_track', $social_track);
 
 				//map fields
 				$egoi_fields = array(
@@ -170,7 +171,7 @@ class SyncController extends SmartMarketingBaseController
             $nsync = Tools::getValue('newsletter_sync', 0);
             $noptin = Tools::getValue('newsletter_optin', 0);
 			$track = Tools::getValue('track', 1);
-			$social_track = Tools::getValue('social_track', 1);
+			$social_track = Tools::getValue('social_track', 0);
 
 			// compare client ID -> API with DB
 			$client_data = $this->api->getClientData();
@@ -181,7 +182,7 @@ class SyncController extends SmartMarketingBaseController
 			
 			if($social_track){
 				if(is_null($res['social_track'])){
-					Db::getInstance()->Execute("ALTER TABLE `'._DB_PREFIX_.'egoi` ADD `social_track` varchar(255) NOT NULL DEFAULT \'1\', `social_track_id` varchar(255) NOT NULL DEFAULT \'0\'");
+					Db::getInstance()->execute('ALTER TABLE `'._DB_PREFIX_.'egoi` ADD COLUMN `social_track` INT(1) DEFAULT 1, ADD COLUMN `social_track_id` VARCHAR(50) DEFAULT 0;');
 				}
 			}
 
@@ -192,24 +193,23 @@ class SyncController extends SmartMarketingBaseController
 					Db::getInstance()->execute($query);
 				}
 			}
-
+			
 			$values = array(
 				'list_id' => (int)$list, 
 				'client_id' => (int)$client,
 				'sync' => (int)$sync,
 				'track' => (int)$track,
-				'social_track' => (int)$social_track,
-				'social_track_id' => $res['social_track_id'],
 				'role' => pSQL($role),
 				'newsletter_sync' => (int)$nsync,
 				'optin' => (int)$noptin,
 				'estado' => 1,
-                'total' => 0
+                'total' => 0,
+				'social_track' => (int)$social_track,
+				'social_track_id' => $res['social_track_id']
 			);
-
-			if($social_track && empty($social_track_id)){
-				$values['social_track_id'] = $this->apiv3->getSocialTrackID(_PS_BASE_URI_);
-				Db::getInstance()->update('egoi', $values, "social_track_id = "."TRACKINGID");
+			
+			if($social_track && empty($res['social_track_id'])){
+				$values['social_track_id'] = $this->apiv3->getSocialTrackID();
 			}
 			if(isset($res['client_id']) && ($res['client_id'])) {
 				$this->assign('success_message', $this->displaySuccess($this->l('Settings updated')));

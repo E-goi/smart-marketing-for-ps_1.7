@@ -1753,8 +1753,9 @@ class SmartMarketingPs extends Module
 
                 include 'includes/te.php';
                 if($social_track){
-				    include 'includes/TrackingSocial.php';
+                    include 'includes/TrackingSocial.php';
                 }
+
 				return $te;
 			}
 		}
@@ -1806,7 +1807,9 @@ class SmartMarketingPs extends Module
 			$list_id = $res['list_id'];
 			$track = $res['track'];
 			$client = $res['client_id'];
-
+            $social_track = $res['social_track'];
+            $social_track_id = $res['social_track_id'];
+            
 			if($client && $track && $list_id) {
 
 				$cart = new Cart(Tools::getValue('id_cart'));
@@ -1821,8 +1824,11 @@ class SmartMarketingPs extends Module
 				$order_discount = $order['total_discounts'];
 				//$products = $cart->getProducts();
 
-				include 'includes/te.php';
-
+                include 'includes/te.php';
+                if($social_track){
+                    include 'includes/TrackingSocial.php';
+                }
+                
 				$this->assign(
 				    array(
 			          	'te' => $te,

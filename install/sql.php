@@ -15,12 +15,12 @@ $sql[_DB_PREFIX_.'egoi'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi` (
 			  `sync` int(11) NOT NULL,
 			  `total` varchar(255) NOT NULL,
 			  `track` varchar(255) NOT NULL DEFAULT \'1\',
-			  `social_track` varchar(255) NOT NULL DEFAULT \'0\',
-			  `social_track_id` varchar(255) NOT NULL DEFAULT \'0\',
 			  `role` varchar(255) NOT NULL,
 			  `newsletter_sync` int(11) NOT NULL DEFAULT \'0\',
 			  `optin` int(11) NOT NULL DEFAULT \'0\',
 			  `estado` int(1) NOT NULL,
+			  `social_track` int(1) DEFAULT \'0\',
+			  `social_track_id` varchar(50) DEFAULT \'0\',
 			  PRIMARY KEY (`egoi_id`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
 
