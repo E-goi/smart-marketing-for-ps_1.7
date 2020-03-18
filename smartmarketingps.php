@@ -1401,7 +1401,8 @@ class SmartMarketingPs extends Module
 		$api = new SmartApi();
 
 		$fields = array(
-			'email' => $params['object']->email
+			'email' => $params['object']->email,
+            'lang' => Language::getLanguage($params['object']->id_lang)['iso_code']
 		);
 		foreach ($params['object'] as $key => $value) {
 			$row = $this->getFieldMap(0, $key);
@@ -1528,7 +1529,8 @@ class SmartMarketingPs extends Module
                     }
 
 					$fields = array(
-						'email' => $customer->email
+						'email' => $customer->email,
+                        'lang' => Language::getLanguage($params['object']->id_lang)['iso_code']
 					);
 					foreach ($customer as $key => $value) {
 						$row = $this->getFieldMap(0, $key);
@@ -1869,6 +1871,7 @@ class SmartMarketingPs extends Module
             'last_name'     => $row['lastname'],
             'birth_date'    => isset($row['birthdate'])?$row['birthdate']:$row['birthday'],
             'status'        => 1,
+            'lang'          => Language::getLanguage($row['id_lang'])['iso_code']
         ];
         foreach ($row as $field => $value){
             $field = self::getFieldMap(0, $field);
