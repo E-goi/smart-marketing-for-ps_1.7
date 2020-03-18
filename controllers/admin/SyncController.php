@@ -379,7 +379,7 @@ class SyncController extends SmartMarketingBaseController
         $count = intval($subs);
 
 
-        $sqlc = 'SELECT email, firstname, lastname, birthday, newsletter, optin, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" '.$add.$store_filter.'LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
+        $sqlc = 'SELECT email, firstname, lastname, birthday, newsletter, optin, id_shop, id_lang FROM '._DB_PREFIX_.'customer WHERE active="1" '.$add.$store_filter.'LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
 
         if(empty($getcs)){
