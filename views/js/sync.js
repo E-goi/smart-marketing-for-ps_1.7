@@ -239,4 +239,13 @@ $(document).ready(function() {
             }
         }
     }
+
+	// Hidden options
+	$('.egoi_json_trigger' ).change( function() {
+		if ( $('.egoi_track_social').first().is( ':checked' ) ) {
+			$('#egoi_track_json' ).css("display", "table-row");
+		} else {
+			$('#egoi_track_json' ).hide();
+		}
+	});
 });

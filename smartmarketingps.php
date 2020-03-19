@@ -1728,6 +1728,7 @@ class SmartMarketingPs extends Module
 			$client = $res['client_id'];
 			$track = $res['track'];
             $social_track = $res['social_track'];
+            $social_track_json = $res['social_track_json'];
             $social_track_id = $res['social_track_id'];
 
 			if($client && $list_id && $track) {
@@ -1755,7 +1756,13 @@ class SmartMarketingPs extends Module
                 if($social_track){
                     include 'includes/TrackingSocial.php';
                 }
-
+                if ($this->context->controller instanceof ProductController && $social_track_json)
+                {
+                    $product = $this->context->controller->getProduct();
+                    if($product instanceof Product){
+                        include 'includes/TrackingLdJson.php';
+                    }
+                }
 				return $te;
 			}
 		}
@@ -1827,6 +1834,10 @@ class SmartMarketingPs extends Module
                 include 'includes/te.php';
                 if($social_track){
                     include 'includes/TrackingSocial.php';
+                }
+                if ($this->context->controller instanceof ProductController && $social_track_json)
+                {
+                    include 'includes/TrackingLdJson.php';
                 }
                 
 				$this->assign(
