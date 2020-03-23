@@ -104,7 +104,7 @@
 					</td>
 				</tr>
 				<tr>
-					<th class="egoi-td" scope="row">{l s='Enable Social Track&Engage' mod='smartmarketingps'}</th>
+					<th class="egoi-td" scope="row">{l s='Enable Remarketing' mod='smartmarketingps'}</th>
 					<td class="nowrap input-group">
 						<span class="switch prestashop-switch fixed-width-lg">
 							<input type="radio" name="social_track" id="social_track0" class="egoi_json_trigger egoi_track_social" value="1" {if $social_track eq '1'} checked {/if}>
@@ -113,7 +113,7 @@
 							<label for="social_track1">{l s='No' mod='smartmarketingps'}</label>
 							<a class="slide-button btn"></a>
 						</span>
-						<p class="help">{l s='Select "yes" if you plan on using remarketing and targetted ads in the future.' mod='smartmarketingps'}</p>
+						<p class="help">{l s='Select "yes" if you plan on targetting your website audience in Ads.' mod='smartmarketingps'}</p>
 					</td>
 				</tr>
 				<tr id="egoi_track_json" {if $social_track eq '0' or $social_track eq ''} style="display:none" {/if}>
@@ -126,7 +126,7 @@
 							<label for="social_track_json1">{l s='No' mod='smartmarketingps'}</label>
 							<a class="slide-button btn"></a>
 						</span>
-						<p class="help">{l s='Select "yes" so we can inject the correct schema so crawlers can detect your products.' mod='smartmarketingps'}</p>
+						<p class="help">{l s='Select "yes" to improve your products SEO, Egoi will use it for dynamic product Ads.' mod='smartmarketingps'}</p>
 					</td>
 				</tr>
 			{/if}

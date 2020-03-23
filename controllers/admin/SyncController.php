@@ -212,11 +212,18 @@ class SyncController extends SmartMarketingBaseController
 				'social_track_id' => $res['social_track_id']
 			);
 			
-			if($social_track && empty($res['social_track_id'])){
-				$values['social_track_id'] = $this->apiv3->getSocialTrackID();
+			if($social_track){
+				$social_track_id = $this->apiv3->getSocialTrackID();
+				if(!empty($social_track_id)){
+					$values['social_track_id'] = $social_track_id;
+				} else {
+					$values['social_track'] = $values['social_track_json'] = 0;
+				}
+			}
+			if(!$social_track_id && $social_track){
+				$this->assign('error_message', $this->displayWarning($this->l('Something failed retrieving remarketing configuration, please try again later.')));
 			}
 			if(isset($res['client_id']) && ($res['client_id'])) {
-				$this->assign('success_message', $this->displaySuccess($this->l('Settings updated')));
 				return Db::getInstance()->update('egoi', $values, "client_id = ".(int)$client);
 			}else{
 				$this->assign('success_message', $this->displaySuccess($this->l('Settings saved')));
