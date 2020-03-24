@@ -29,4 +29,4 @@ $te .= '
     ]
 }
 </script>
-<script>var egoi_product_id = "'.$product->id.'";</script>';
+<script>var egoi_product = { "id":"'.$product->id.'","name":"'.$product->name.'","price":"'.round($product->price ? $product->price : $product->base_price, 2).'"};</script>';

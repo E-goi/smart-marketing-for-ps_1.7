@@ -1751,11 +1751,11 @@ class SmartMarketingPs extends Module
 				}
 
 				$this->removeCart();
-
                 include 'includes/te.php';
-                if($social_track){
-                    include 'includes/TrackingSocial.php';
-                }
+
+			}
+            if($social_track){
+                include 'includes/TrackingSocial.php';
                 if ($this->context->controller instanceof ProductController && $social_track_json)
                 {
                     $product = $this->context->controller->getProduct();
@@ -1763,8 +1763,8 @@ class SmartMarketingPs extends Module
                         include 'includes/TrackingLdJson.php';
                     }
                 }
-				return $te;
-			}
+            }
+            return $te;
 		}
 
 		return false;
@@ -1831,26 +1831,26 @@ class SmartMarketingPs extends Module
 				$order_discount = $order['total_discounts'];
 				//$products = $cart->getProducts();
 
+                $this->removeCart();
                 include 'includes/te.php';
-                if($social_track){
-                    include 'includes/TrackingSocial.php';
-                }
+			}
+            if($social_track){
+                include 'includes/TrackingSocial.php';
                 if ($this->context->controller instanceof ProductController && $social_track_json)
                 {
                     include 'includes/TrackingLdJson.php';
                 }
-                
-				$this->assign(
-				    array(
-			          	'te' => $te,
-		          		'activate' => 1
-			      	)
-			  	);
+            }
+            
+            $this->assign(
+                array(
+                    'te' => $te,
+                    'activate' => 1
+                )
+            );
 
-                $this->context->cookie->__set('order', 1);
-                $this->context->cookie->write();
-				$this->removeCart();
-			}
+            $this->context->cookie->__set('order', 1);
+            $this->context->cookie->write();
 		}
 	}
 

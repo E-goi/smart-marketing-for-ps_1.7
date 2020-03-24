@@ -118,7 +118,7 @@ class ApiV3 extends EgoiRestApi
     {
         $accountData = $this->getMyAccount();
         $curl = curl_init();
-        $url = "https://egoiapp2.com/ads/getPixel?account_id=" . $accountData['general_info']['client_id'] . "&domain=" . _PS_BASE_URL_;
+        $url = "https://egoiapp2.com/ads/createPixel?account_id=" . $accountData['general_info']['client_id'] . "&domain=" . _PS_BASE_URL_;
 
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         $headers[] = 'Content-Type: application/json';
@@ -131,7 +131,7 @@ class ApiV3 extends EgoiRestApi
 
         if ($result && $httpCode === 200) {
             $json = json_decode($result, true);
-            return $json['data'][0]['code'];
+            return $json['data']['code'];
         }
 
         return false;
