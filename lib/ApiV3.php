@@ -117,8 +117,9 @@ class ApiV3 extends EgoiRestApi
     public function getSocialTrackID()
     {
         $accountData = $this->getMyAccount();
+        $domain = preg_replace("(^https?://)", "", _PS_BASE_URL_);
         $curl = curl_init();
-        $url = "https://egoiapp2.com/ads/createPixel?account_id=" . $accountData['general_info']['client_id'] . "&domain=" . _PS_BASE_URL_;
+        $url = "https://egoiapp2.com/ads/createPixel?account_id=" . $accountData['general_info']['client_id'] . "&domain=" . $domain;
 
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         $headers[] = 'Content-Type: application/json';
