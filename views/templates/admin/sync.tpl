@@ -103,6 +103,32 @@
 						<p class="help">{l s='Select "yes" if you want to track all changes in your customers and trigger custom actions' mod='smartmarketingps'}</p>
 					</td>
 				</tr>
+				<tr>
+					<th class="egoi-td" scope="row">{l s='Enable Remarketing' mod='smartmarketingps'}</th>
+					<td class="nowrap input-group">
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="social_track" id="social_track0" class="egoi_json_trigger egoi_track_social" value="1" {if $social_track eq '1'} checked {/if}>
+							<label for="social_track0">{l s='Yes' mod='smartmarketingps'}</label>
+							<input type="radio" name="social_track" id="social_track1" class="egoi_json_trigger" value="0" {if $social_track eq '0' or $social_track eq ''} checked {/if}>
+							<label for="social_track1">{l s='No' mod='smartmarketingps'}</label>
+							<a class="slide-button btn"></a>
+						</span>
+						<p class="help">{l s='Select "yes" if you would like to target your website audience using E-goi Ads.' mod='smartmarketingps'}</p>
+					</td>
+				</tr>
+				<tr id="egoi_track_json" {if $social_track eq '0' or $social_track eq ''} style="display:none" {/if}>
+					<th class="egoi-td" scope="row">{l s='Enable Product Microdata' mod='smartmarketingps'}</th>
+					<td class="nowrap input-group">
+						<span class="switch prestashop-switch fixed-width-lg">
+							<input type="radio" name="social_track_json" id="social_track_json0" value="1" {if $social_track_json eq '1'} checked {/if}>
+							<label for="social_track_json0">{l s='Yes' mod='smartmarketingps'}</label>
+							<input type="radio" name="social_track_json" id="social_track_json1" value="0" {if $social_track_json eq '0' or $social_track_json eq ''} checked {/if}>
+							<label for="social_track_json1">{l s='No' mod='smartmarketingps'}</label>
+							<a class="slide-button btn"></a>
+						</span>
+						<p class="help">{l s='Select "yes" to improve your products SEO and create dynamic product ads.' mod='smartmarketingps'}</p>
+					</td>
+				</tr>
 			{/if}
 
 			{if isset($sync) and ($sync)}

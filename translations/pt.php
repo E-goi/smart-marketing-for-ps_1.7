@@ -16,7 +16,7 @@ $_MODULE['<{smartmarketingps}prestashop>smartmarketingps_229630365cfc31edb1df933
 $_MODULE['<{smartmarketingps}prestashop>synccontroller_e3b37519bdd0f8636e351f612357b6a1'] = 'Sincronizar contatos E-goi';
 $_MODULE['<{smartmarketingps}prestashop>synccontroller_9daf1fb753b42c3cdc8f1d01669cd6d8'] = 'Guardar opções';
 $_MODULE['<{smartmarketingps}prestashop>synccontroller_e6b53e4376d2d85b9aaa44f9a56928eb'] = '$( \'#action_add\' ).click();';
-$_MODULE['<{smartmarketingps}prestashop>synccontroller_c888438d14855d7d96a2724ee9c306bd'] = 'Opções atualizadas';
+$_MODULE['<{smartmarketingps}prestashop>synccontroller_3a16b9c7210c8e9e7f3ed9b5367daead'] = 'Não foi possível obter a configuração de remarketing, por favor tente mais tarde.';
 $_MODULE['<{smartmarketingps}prestashop>synccontroller_96d4dadd096605d5813d2c6bdf82e82c'] = 'Opções gravadas';
 $_MODULE['<{smartmarketingps}prestashop>formscontroller_60e891de2fbf8b6a5a17ad4ddf61f929'] = 'Formulários E-goi';
 $_MODULE['<{smartmarketingps}prestashop>formscontroller_4abf00b2d141d640a689a148587aa875'] = 'Gravar formulário';
@@ -145,6 +145,10 @@ $_MODULE['<{smartmarketingps}prestashop>sync_6812a65cef34e4e7ddde2fec25ec1069'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_45a314b66aead219143995a24011ca60'] = 'Escolha a função dos clientes que se vão sincronizar com o E-goi.';
 $_MODULE['<{smartmarketingps}prestashop>sync_f1c516c629bb3db70bfb9fb2c07b2995'] = 'Ativar o Track&Engage';
 $_MODULE['<{smartmarketingps}prestashop>sync_8b0d34db7b2a9c1089cc7ab4f9a1066f'] = 'Escolha \"Sim\" se quiser que o E-goi envie mensagens e automatize ações com base no que as pessoas fazem na sua loja PrestaShop.';
+$_MODULE['<{smartmarketingps}prestashop>sync_0d381177b4015bd69155abdae8b4e07c'] = 'Enable Remarketing';
+$_MODULE['<{smartmarketingps}prestashop>sync_c3ebb97862962ffba1a124fbe51a2d37'] = 'Select \"yes\" if you would like to target your website audience using E-goi Ads.	';
+$_MODULE['<{smartmarketingps}prestashop>sync_d65b5fd86baab166a8b3d9c8db446deb'] = 'Enable Product Microdata';
+$_MODULE['<{smartmarketingps}prestashop>sync_dec55817eea8aa3505d0199060b0df69'] = 'Select \"yes\" to improve your products SEO and create dynamic product ads.';
 $_MODULE['<{smartmarketingps}prestashop>sync_589ca61b9e09ea327436789703d138d2'] = 'Sincronizar clientes existentes';
 $_MODULE['<{smartmarketingps}prestashop>sync_807fd99630e69024d31093550e559785'] = 'Sincronizar clientes';
 $_MODULE['<{smartmarketingps}prestashop>sync_7a0a9ce86257a7eb845957491ab841e6'] = 'Sincroniza os clientes PrestaShop já existentes com a sua lista E-goi.';
@@ -210,6 +214,13 @@ $_MODULE['<{smartmarketingps}prestashop>forms_dae8ace18bdcbcc6ae5aece263e14fe8']
 $_MODULE['<{smartmarketingps}prestashop>forms_f2a6c498fb90ee345d997f888fce3b18'] = 'Eliminar';
 $_MODULE['<{smartmarketingps}prestashop>forms_ce0ab55a58e0da0932764ae8eb272f1b'] = 'Ainda não adicionou formulários E-goi ao seu PrestaShop';
 $_MODULE['<{smartmarketingps}prestashop>forms_155cce2d7dd751acd7fc6a56e81b5e6c'] = 'Quer mesmo eliminar este formulário?';
+$_MODULE['<{smartmarketingps}prestashop>reminders_853a6e1b99f208244cddf6b61af8521c'] = 'Lembretes de pagamento';
+$_MODULE['<{smartmarketingps}prestashop>reminders_d73c82a3136b9f78291b97c1fc9fddee'] = 'Ativar lembrete';
+$_MODULE['<{smartmarketingps}prestashop>reminders_01505c0ec21a660699319d7abdebdf7a'] = 'Lembrar após';
+$_MODULE['<{smartmarketingps}prestashop>reminders_72225abdfcc70958cb6797c9fcfbe443'] = 'Escolha quanto tempo depois do pedido vai ser enviado o lembrete.';
+$_MODULE['<{smartmarketingps}prestashop>reminders_4d69d9e6846fac4f609622ab3a1cb1e8'] = 'Lembrete de pagamento';
+$_MODULE['<{smartmarketingps}prestashop>reminders_6b895bbdb066c702fe2b18a4044fbfaa'] = 'Gravar lembretes';
+$_MODULE['<{smartmarketingps}prestashop>reminders_4cfee247980cfb011e5057b23bc7d33d'] = 'O módulo de pagamento ainda não foi configurado';
 $_MODULE['<{smartmarketingps}prestashop>configuration_39fb2442d486961bda5dfa2ddf48c60a'] = 'Configuração das notificações SMS';
 $_MODULE['<{smartmarketingps}prestashop>configuration_21fa5815157c5b1b2e4d849b954414f6'] = 'Remetente das SMS';
 $_MODULE['<{smartmarketingps}prestashop>configuration_74e32e43c7d233ab21d8cc730c35ea31'] = 'Escolha o remetente que vai aparecer nas suas notificações SMS.';
@@ -225,13 +236,6 @@ $_MODULE['<{smartmarketingps}prestashop>configuration_577d7068826de925ea2aec01db
 $_MODULE['<{smartmarketingps}prestashop>configuration_7b7bc2512ee1fedcd76bdc68926d4f7b'] = 'Enviar ao administrador';
 $_MODULE['<{smartmarketingps}prestashop>configuration_08580e93520802cb11555ba3d1a7b842'] = 'Gravar configuração';
 $_MODULE['<{smartmarketingps}prestashop>configuration_a501675bd5a10b2699df011ffcc4429d'] = 'Erro ao obter os remetentes do E-goi';
-$_MODULE['<{smartmarketingps}prestashop>reminders_853a6e1b99f208244cddf6b61af8521c'] = 'Lembretes de pagamento';
-$_MODULE['<{smartmarketingps}prestashop>reminders_d73c82a3136b9f78291b97c1fc9fddee'] = 'Ativar lembrete';
-$_MODULE['<{smartmarketingps}prestashop>reminders_01505c0ec21a660699319d7abdebdf7a'] = 'Lembrar após';
-$_MODULE['<{smartmarketingps}prestashop>reminders_72225abdfcc70958cb6797c9fcfbe443'] = 'Escolha quanto tempo depois do pedido vai ser enviado o lembrete.';
-$_MODULE['<{smartmarketingps}prestashop>reminders_4d69d9e6846fac4f609622ab3a1cb1e8'] = 'Lembrete de pagamento';
-$_MODULE['<{smartmarketingps}prestashop>reminders_6b895bbdb066c702fe2b18a4044fbfaa'] = 'Gravar lembretes';
-$_MODULE['<{smartmarketingps}prestashop>reminders_4cfee247980cfb011e5057b23bc7d33d'] = 'O módulo de pagamento ainda não foi configurado';
 $_MODULE['<{smartmarketingps}prestashop>menu_254f642527b45bc260048e30704edb39'] = 'Configuração';
 $_MODULE['<{smartmarketingps}prestashop>menu_9370ba58a05dd440332d9577d0faf0cd'] = 'Mensagens SMS';
 $_MODULE['<{smartmarketingps}prestashop>menu_853a6e1b99f208244cddf6b61af8521c'] = 'Lembretes SMS';
@@ -240,6 +244,7 @@ $_MODULE['<{smartmarketingps}prestashop>messages_bbd3a18e6d45b8331cf8a715f3f0008
 $_MODULE['<{smartmarketingps}prestashop>messages_102d52dacc5c9593fde923f92c1dc288'] = 'Mensagens para o cliente';
 $_MODULE['<{smartmarketingps}prestashop>messages_e601b9ed24a8c0599b09a805a17d1bb3'] = 'Mensagens para o administrador';
 $_MODULE['<{smartmarketingps}prestashop>messages_bca435b74fbe4d4f1a27e6c9501345e7'] = 'Gravar mensagens';
+$_MODULE['<{smartmarketingps}prestashop>balance_8610be9376aa2240dbd0d765cb2ccfe0'] = 'Saldo no E-goi';
 $_MODULE['<{smartmarketingps}prestashop>custom_information_407feceab722be885492654f7fcfdf2f'] = 'Códigos de personalização';
 $_MODULE['<{smartmarketingps}prestashop>custom_information_a8dabd7e45792175101cc675763dc239'] = 'Pode usar estes códigos para personalizar as suas mensagens.';
 $_MODULE['<{smartmarketingps}prestashop>custom_information_1e860e56970a81a1ba3e1fcb7fccc846'] = 'Referência do pedido';
@@ -250,6 +255,5 @@ $_MODULE['<{smartmarketingps}prestashop>custom_information_9127fe218b2cac7f0c8ae
 $_MODULE['<{smartmarketingps}prestashop>custom_information_0b3f142ce3c618038190ef9abdc589a4'] = 'Nome no endereço de faturação';
 $_MODULE['<{smartmarketingps}prestashop>custom_information_1a434befae3f49ae09347ded52032f6f'] = 'Entidade';
 $_MODULE['<{smartmarketingps}prestashop>custom_information_2797f6c1df8655a129b522bd49572e53'] = 'Referência Multibanco';
-$_MODULE['<{smartmarketingps}prestashop>balance_8610be9376aa2240dbd0d765cb2ccfe0'] = 'Saldo no E-goi';
 $_MODULE['<{smartmarketingps}prestashop>language_selection_4994a8ffeba4ac3140beb89e8d41f174'] = 'Idioma';
 $_MODULE['<{smartmarketingps}prestashop>language_selection_dfbcfc41aeacad10a7a893c01983e5aa'] = 'Idioma do conteúdo da mensagem SMS.';

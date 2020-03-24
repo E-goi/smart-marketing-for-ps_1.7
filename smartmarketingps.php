@@ -1727,6 +1727,9 @@ class SmartMarketingPs extends Module
 			$list_id = $res['list_id'];
 			$client = $res['client_id'];
 			$track = $res['track'];
+            $social_track = $res['social_track'];
+            $social_track_json = $res['social_track_json'];
+            $social_track_id = $res['social_track_id'];
 
 			if($client && $list_id && $track) {
 				if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
@@ -1748,10 +1751,20 @@ class SmartMarketingPs extends Module
 				}
 
 				$this->removeCart();
+                include 'includes/te.php';
 
-				include 'includes/te.php';
-				return $te;
 			}
+            if($social_track){
+                include 'includes/TrackingSocial.php';
+                if ($this->context->controller instanceof ProductController && $social_track_json)
+                {
+                    $product = $this->context->controller->getProduct();
+                    if($product instanceof Product){
+                        include 'includes/TrackingLdJson.php';
+                    }
+                }
+            }
+            return $te;
 		}
 
 		return false;
@@ -1801,7 +1814,9 @@ class SmartMarketingPs extends Module
 			$list_id = $res['list_id'];
 			$track = $res['track'];
 			$client = $res['client_id'];
-
+            $social_track = $res['social_track'];
+            $social_track_id = $res['social_track_id'];
+            
 			if($client && $track && $list_id) {
 
 				$cart = new Cart(Tools::getValue('id_cart'));
@@ -1816,19 +1831,26 @@ class SmartMarketingPs extends Module
 				$order_discount = $order['total_discounts'];
 				//$products = $cart->getProducts();
 
-				include 'includes/te.php';
-
-				$this->assign(
-				    array(
-			          	'te' => $te,
-		          		'activate' => 1
-			      	)
-			  	);
-
-                $this->context->cookie->__set('order', 1);
-                $this->context->cookie->write();
-				$this->removeCart();
+                $this->removeCart();
+                include 'includes/te.php';
 			}
+            if($social_track){
+                include 'includes/TrackingSocial.php';
+                if ($this->context->controller instanceof ProductController && $social_track_json)
+                {
+                    include 'includes/TrackingLdJson.php';
+                }
+            }
+            
+            $this->assign(
+                array(
+                    'te' => $te,
+                    'activate' => 1
+                )
+            );
+
+            $this->context->cookie->__set('order', 1);
+            $this->context->cookie->write();
 		}
 	}
 

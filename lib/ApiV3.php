@@ -110,6 +110,35 @@ class ApiV3 extends EgoiRestApi
     }
 
     /**
+     * Asks for a social track ID
+     *
+     * @return string social_track_id
+     */
+    public function getSocialTrackID()
+    {
+        $accountData = $this->getMyAccount();
+        $domain = preg_replace("(^https?://)", "", _PS_BASE_URL_);
+        $curl = curl_init();
+        $url = "https://egoiapp2.com/ads/createPixel?account_id=" . $accountData['general_info']['client_id'] . "&domain=" . $domain;
+
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+        $headers[] = 'Content-Type: application/json';
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($result && $httpCode === 200) {
+            $json = json_decode($result, true);
+            return $json['data']['code'];
+        }
+
+        return false;
+    }
+
+    /**
      * Calls api v3
      *
      * @param $method
