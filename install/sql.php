@@ -20,6 +20,7 @@ $sql[_DB_PREFIX_.'egoi'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi` (
 			  `optin` int(11) NOT NULL DEFAULT \'0\',
 			  `estado` int(1) NOT NULL,
 			  `social_track` int(1) DEFAULT \'0\',
+			  `social_track_json` int(1) DEFAULT \'0\',
 			  `social_track_id` varchar(50) DEFAULT \'0\',
 			  PRIMARY KEY (`egoi_id`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
