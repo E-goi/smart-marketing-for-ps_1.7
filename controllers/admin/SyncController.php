@@ -219,10 +219,11 @@ class SyncController extends SmartMarketingBaseController
 				} else {
 					$values['social_track'] = $values['social_track_json'] = 0;
 				}
+				if(!$social_track_id){
+					$this->assign('error_message', $this->displayWarning($this->l('Something went wrong while retrieving remarketing configuration, please try again later.')));
+				}
 			}
-			if(!$social_track_id && $social_track){
-				$this->assign('error_message', $this->displayWarning($this->l('Something went wrong while retrieving remarketing configuration, please try again later.')));
-			}
+			
 			if(isset($res['client_id']) && ($res['client_id'])) {
 				return Db::getInstance()->update('egoi', $values, "client_id = ".(int)$client);
 			}else{
