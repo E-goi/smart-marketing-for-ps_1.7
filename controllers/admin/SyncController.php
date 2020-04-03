@@ -213,7 +213,7 @@ class SyncController extends SmartMarketingBaseController
 			);
 			
 			if($social_track){
-				$social_track_id = $this->apiv3->getSocialTrackID();
+				$social_track_id = $this->apiv3->updateSocialTrack('create');
 				if(!empty($social_track_id)){
 					$values['social_track_id'] = $social_track_id;
 				} else {
