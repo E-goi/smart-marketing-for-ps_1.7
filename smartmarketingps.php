@@ -1443,6 +1443,10 @@ class SmartMarketingPs extends Module
 				return false;
 			}
 
+			if ($add !== false) {
+                Configuration::updateValue('egoi_contacts', array($params['object']->email => $add));
+            }
+
             $client_data = $api->getClientData();
             $client = (int)$client_data['CLIENTE_ID'];
 
@@ -1820,7 +1824,12 @@ class SmartMarketingPs extends Module
 			if($client && $track && $list_id) {
 
 				$cart = new Cart(Tools::getValue('id_cart'));
-				$customer = $this->context->cookie->email;
+
+                $contactArr = Configuration::get('egoi_contacts');
+                $customer = $this->context->cookie->email;
+                if (isset($contactArr[$customer])) {
+                    $customer = $contactArr[$customer];
+                }
 
 				$order = $this->getOrderDetails(Tools::getValue('id_order'));
 				$order_id = $order['reference'];
@@ -1829,7 +1838,16 @@ class SmartMarketingPs extends Module
 				$order_tax = number_format($order['total_shipping'], 1);
 				$order_shipping = number_format($order['total_wrapping'], 1);
 				$order_discount = $order['total_discounts'];
-				//$products = $cart->getProducts();
+
+                $orderObj = new Order(Tools::getValue('id_order'));
+                $products = $orderObj->getProducts();
+
+                foreach ($products as $key => &$product) {
+                    $product['name'] = htmlentities($product['product_name']);
+                    $product['price_wt'] = $product['product_price_wt'];
+                }
+
+                $cart_zero = 0;
 
                 $this->removeCart();
                 include 'includes/te.php';
