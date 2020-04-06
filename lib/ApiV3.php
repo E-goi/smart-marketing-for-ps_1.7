@@ -114,13 +114,27 @@ class ApiV3 extends EgoiRestApi
      *
      * @return string social_track_id
      */
-    public function getSocialTrackID()
+    public function updateSocialTrack($method)
     {
+        if($method == 'update'){
+            $rq = Db::getInstance()->getRow('SELECT * FROM '._DB_PREFIX_.'egoi where client_id!=""');
+            if(!isset($rq['social_track']) || $rq['social_track'] == 0) return false;
+        }
         $accountData = $this->getMyAccount();
-        $domain = preg_replace("(^https?://)", "", _PS_BASE_URL_);
-        $curl = curl_init();
-        $url = "https://egoiapp2.com/ads/createPixel?account_id=" . $accountData['general_info']['client_id'] . "&domain=" . $domain;
+        $catalogs = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs WHERE active = 1");
 
+        $data = array(
+            'account_id' => $accountData['general_info']['client_id'],
+            'domain' => _PS_BASE_URL_,
+            'catalog' => []
+        );
+
+        for($i = 0; $i < count($catalogs); $i++)
+            $data['catalog'][] = $catalogs[$i]['catalog_id'];  
+
+        $url = "https://egoiapp2.com/ads/" . $method . 'Pixel?' . http_build_query($data);
+
+        $curl = curl_init();
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         $headers[] = 'Content-Type: application/json';
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
