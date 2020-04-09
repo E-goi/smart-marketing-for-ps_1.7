@@ -99,7 +99,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.5.3';
+	    $this->version = '1.5.4';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -1734,6 +1734,7 @@ class SmartMarketingPs extends Module
             $social_track = $res['social_track'];
             $social_track_json = $res['social_track_json'];
             $social_track_id = $res['social_track_id'];
+            $te = '';
 
 			if($client && $list_id && $track) {
 				if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
@@ -1756,19 +1757,20 @@ class SmartMarketingPs extends Module
 
 				$this->removeCart();
                 include 'includes/te.php';
+			}
 
-                if($social_track){
-                    include 'includes/TrackingSocial.php';
-                    if ($this->context->controller instanceof ProductController && $social_track_json)
-                    {
-                        $product = $this->context->controller->getProduct();
-                        if($product instanceof Product){
-                            include 'includes/TrackingLdJson.php';
-                        }
+            if($social_track){
+                include 'includes/TrackingSocial.php';
+                if ($this->context->controller instanceof ProductController && $social_track_json)
+                {
+                    $product = $this->context->controller->getProduct();
+                    if($product instanceof Product){
+                        include 'includes/TrackingLdJson.php';
                     }
                 }
-                return $te;
-			}
+            }
+
+            return $te;
 		}
 
 		return false;
@@ -1820,6 +1822,7 @@ class SmartMarketingPs extends Module
 			$client = $res['client_id'];
             $social_track = $res['social_track'];
             $social_track_id = $res['social_track_id'];
+            $te = '';
             
 			if($client && $track && $list_id) {
 
@@ -1851,13 +1854,6 @@ class SmartMarketingPs extends Module
 
                 $this->removeCart();
                 include 'includes/te.php';
-
-                $this->assign(
-                    array(
-                        'te' => $te,
-                        'activate' => 1
-                    )
-                );
 			}
             if($social_track){
                 include 'includes/TrackingSocial.php';
@@ -1866,6 +1862,13 @@ class SmartMarketingPs extends Module
                     include 'includes/TrackingLdJson.php';
                 }
             }
+
+            $this->assign(
+                array(
+                    'te' => $te,
+                    'activate' => 1
+                )
+            );
 
             $this->context->cookie->__set('order', 1);
             $this->context->cookie->write();
