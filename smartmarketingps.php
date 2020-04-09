@@ -1356,7 +1356,7 @@ class SmartMarketingPs extends Module
     private function getEuPagoData($order)
     {
         $module = Module::getInstanceByName('eupago_multibanco');
-        $result = $module->GenerateReference($order);
+        $result = $module->GenerateReference((int)$order->id, $order->total_paid);
 
         $entity = '';
         $ref = '';
@@ -1757,18 +1757,18 @@ class SmartMarketingPs extends Module
 				$this->removeCart();
                 include 'includes/te.php';
 
-			}
-            if($social_track){
-                include 'includes/TrackingSocial.php';
-                if ($this->context->controller instanceof ProductController && $social_track_json)
-                {
-                    $product = $this->context->controller->getProduct();
-                    if($product instanceof Product){
-                        include 'includes/TrackingLdJson.php';
+                if($social_track){
+                    include 'includes/TrackingSocial.php';
+                    if ($this->context->controller instanceof ProductController && $social_track_json)
+                    {
+                        $product = $this->context->controller->getProduct();
+                        if($product instanceof Product){
+                            include 'includes/TrackingLdJson.php';
+                        }
                     }
                 }
-            }
-            return $te;
+                return $te;
+			}
 		}
 
 		return false;
@@ -1851,6 +1851,13 @@ class SmartMarketingPs extends Module
 
                 $this->removeCart();
                 include 'includes/te.php';
+
+                $this->assign(
+                    array(
+                        'te' => $te,
+                        'activate' => 1
+                    )
+                );
 			}
             if($social_track){
                 include 'includes/TrackingSocial.php';
@@ -1859,13 +1866,6 @@ class SmartMarketingPs extends Module
                     include 'includes/TrackingLdJson.php';
                 }
             }
-            
-            $this->assign(
-                array(
-                    'te' => $te,
-                    'activate' => 1
-                )
-            );
 
             $this->context->cookie->__set('order', 1);
             $this->context->cookie->write();
