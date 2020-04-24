@@ -125,12 +125,12 @@ class ApiV3 extends EgoiRestApi
 
         $data = array(
             'account_id' => $accountData['general_info']['client_id'],
-            'domain' => _PS_BASE_URL_,
-            'catalog' => []
+            'domain' => _PS_BASE_URL_ . __PS_BASE_URI__,
+            'catalogs' => []
         );
 
         for($i = 0; $i < count($catalogs); $i++)
-            $data['catalog'][] = $catalogs[$i]['catalog_id'];  
+            $data['catalogs'][] = $catalogs[$i]['catalog_id'];  
 
         $url = "https://egoiapp2.com/ads/" . $method . 'Pixel?' . http_build_query($data);
 

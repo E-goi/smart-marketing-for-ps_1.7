@@ -146,7 +146,9 @@ $_MODULE['<{smartmarketingps}prestashop>sync_45a314b66aead219143995a24011ca60'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_f1c516c629bb3db70bfb9fb2c07b2995'] = 'Activar Track&Engage';
 $_MODULE['<{smartmarketingps}prestashop>sync_8b0d34db7b2a9c1089cc7ab4f9a1066f'] = 'Elige \"Sí\" si te gustaría que E-goi envíe mensajes y automatize acciones basándose en lo que hacen los clientes en tu tienda PrestaShop.';
 $_MODULE['<{smartmarketingps}prestashop>sync_0d381177b4015bd69155abdae8b4e07c'] = 'Activar Remarketing';
-$_MODULE['<{smartmarketingps}prestashop>sync_c3ebb97862962ffba1a124fbe51a2d37'] = 'Elige \"Sí\" si te gustaría mostrar anuncios a los visitantes de tu web a través de E-goi Ads.';
+$_MODULE['<{smartmarketingps}prestashop>sync_4782a5edcaf93ab0d8feb044ecd71377'] = 'Elige \"Sí\" si gustaría dirigirse a la audiencia de su sitio web utilizando E-goi Ads. ';
+$_MODULE['<{smartmarketingps}prestashop>sync_a9c2e93ca85d8089c5fa45db44ea1e17'] = 'https://helpdesk.e-goi.com/950720-Crear-campa%C3%B1a-de-remarketing-en-E-goi-Ads';
+$_MODULE['<{smartmarketingps}prestashop>sync_d59048f21fd887ad520398ce677be586'] = 'Aprende más';
 $_MODULE['<{smartmarketingps}prestashop>sync_d65b5fd86baab166a8b3d9c8db446deb'] = 'Activar Microdatos de Productos';
 $_MODULE['<{smartmarketingps}prestashop>sync_dec55817eea8aa3505d0199060b0df69'] = 'Elige \"Sí\" si te gustaría mejorar el SEO de tus productos y crearte anuncios de productos dinámicos.';
 $_MODULE['<{smartmarketingps}prestashop>sync_589ca61b9e09ea327436789703d138d2'] = 'Sincronizar clientes existentes';

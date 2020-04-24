@@ -113,7 +113,7 @@
 							<label for="social_track1">{l s='No' mod='smartmarketingps'}</label>
 							<a class="slide-button btn"></a>
 						</span>
-						<p class="help">{l s='Select "yes" if you would like to target your website audience using E-goi Ads.' mod='smartmarketingps'}</p>
+						<p class="help">{l s='Select "yes" if you would like to target your website audience using E-goi Ads. ' mod='smartmarketingps'}<a target="_blank" href="{l s='https://helpdesk.e-goi.com/185705-Creating-E-goi-remarketing-Ads' mod='smartmarketingps'}">{l s='Learn more' mod='smartmarketingps'}</a></p>
 					</td>
 				</tr>
 				<tr id="egoi_track_json" {if $social_track eq '0' or $social_track eq ''} style="display:none" {/if}>
