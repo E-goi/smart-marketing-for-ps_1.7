@@ -99,7 +99,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.5.5';
+	    $this->version = '1.5.6';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -915,14 +915,22 @@ class SmartMarketingPs extends Module
 
         $desc = filter_var($product->description_short, FILTER_SANITIZE_STRING);
 
-        $price = round(Tools::convertPrice($product->base_price, $currency), 2);
-        $salePrice = Tools::convertPrice($product->price, $currency);
+        $price = $product->getPrice(true);
+        //change this to real sale price for your store
+        $salePrice = $product->getPrice(true);
 
         if ($price == $salePrice) {
             $salePrice = 0;
         }
 
-        $url = $link->getProductLink($product, null, null, null, $lang, null) . '&SubmitCurrency=1&id_currency=' . $currency;
+        $url = $link->getProductLink($product, null, null, null, $lang, null);
+        if (strpos($url, '?') !== false) {
+            $concatChar = '&';
+        } else {
+            $concatChar = '?';
+        }
+
+        $url = $link->getProductLink($product, null, null, null, $lang, null) . $concatChar . 'SubmitCurrency=1&id_currency=' . $currency;
 
         $img = $product->getCover($product->id);
         $ssl = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
