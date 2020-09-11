@@ -1,10 +1,4 @@
-# Project has moved to github
-
-Please follow [smart-marketing-for-ps_1.7](https://github.com/E-goi/smart-marketing-for-ps_1.7)
-
----
-
-# Egoi Email Marketing for Prestashop 1.7.X (V.1.5.5)
+# Egoi Email Marketing for Prestashop 1.7.X (V.1.6.0)
 
 Keep your contacts sync with E-goi and increase your sales! Easily design email marketing or SMS campaigns, create the segmentation you want for your contacts or build intuitive automation processes for all channels available on E-goi.
 
@@ -31,6 +25,15 @@ Upload to deploy server
 
 ### Changelog
 ```
+
+-- V.1.6.0
+   -- Added push notifications
+
+-- V.1.5.6
+   -- Bumped readme file
+   -- Bumped plugin version
+   -- Temporary fix on price and sale price
+
 -- V.1.5.5
    -- Add readme file
    -- Add Changelog to readme file
