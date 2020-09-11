@@ -110,6 +110,36 @@ class ApiV3 extends EgoiRestApi
     }
 
     /**
+     * Returns all web push sites
+     *
+     * @param $listId
+     *
+     * @return mixed
+     */
+    public function getWebPushSites($listId)
+    {
+        $url = '/webpush/sites';
+
+        if ($listId) {
+            $url .= '?' . http_build_query(array($listId));
+        }
+
+        return $this->call('GET', $url);
+    }
+
+    /**
+     * Creates a web push site
+     *
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function createWebPushSite($data)
+    {
+        return $this->call('POST', '/webpush/sites', $data);
+    }
+
+    /**
      * Asks for a social track ID
      *
      * @return string social_track_id

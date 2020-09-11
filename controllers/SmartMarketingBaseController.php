@@ -140,6 +140,16 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 		$this->confirmations = array($message);
 	}
 
+    /**
+     * Display a closable Error
+     *
+     * @param  string $message
+     */
+    protected function displayError($message)
+    {
+        $this->errors = array($message);
+    }
+
 	/**
 	 * Display a closable Warning
 	 * 

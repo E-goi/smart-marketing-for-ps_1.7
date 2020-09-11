@@ -235,6 +235,14 @@
     outline: none !important;
 }
 
+.no-border {
+    border-bottom: 0 !important;
+}
+
+.wp-row {
+    margin-top: 6px;
+}
+
 .loader {
    border: 2px solid #f3f3f3;
    border-radius: 50%;
