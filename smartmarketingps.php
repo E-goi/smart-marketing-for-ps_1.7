@@ -26,6 +26,9 @@ class SmartMarketingPs extends Module
     const SMS_MESSAGES_DEFAULT_LANG_CONFIGURATION = 'sms_messages_default_lang';
     const SMS_REMINDERS_DEFAULT_LANG_CONFIGURATION = 'sms_reminders_default_lang';
 
+    const CONFIGURED_WEB_PUSH = 'egoi_web_push_config';
+    const WEB_PUSH_APP_CODE = 'egoi_web_push_app_code';
+
     const CUSTOM_INFO_DELIMITER = '%';
     const CUSTOM_INFO_ORDER_REFERENCE = self::CUSTOM_INFO_DELIMITER . 'order_reference' . self::CUSTOM_INFO_DELIMITER;
     const CUSTOM_INFO_ORDER_STATUS = self::CUSTOM_INFO_DELIMITER . 'order_status' . self::CUSTOM_INFO_DELIMITER;
@@ -99,7 +102,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.5.6';
+	    $this->version = '1.6.0';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -448,10 +451,11 @@ class SmartMarketingPs extends Module
 			'Sync' => $this->l('Sync Contacts'),
 			'Forms' => $this->l('Forms'),
             'SmsNotifications' => $this->l('SMS Notifications'),
-            'Products' => $this->l('Products')
+            'Products' => $this->l('Products'),
+            'PushNotifications' => $this->l('PushNotifications')
 		);
 
-		foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ', 'SMSNOTIFICATIONS_READ', 'PRODUCTS_READ') as $val) {
+		foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ', 'SMSNOTIFICATIONS_READ', 'PRODUCTS_READ', 'PUSHNOTIFICATIONS_READ') as $val) {
 			$result = Db::getInstance()->getValue("SELECT slug FROM "._DB_PREFIX_."authorization_role WHERE slug = 'ROLE_MOD_TAB_".$val."'");
 
 			if (isset($result) && ($result)) {
@@ -555,8 +559,8 @@ class SmartMarketingPs extends Module
 
    		// remove menus
    		Db::getInstance()->delete('tab', "module = '$this->name'");
-   		Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='Forms' or name='SMS Notifications'");
-        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Conta' or name='Sincronizar contactos' or name='Formulários' or name='Notificações SMS'");
+   		Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='Forms' or name='SMS Notifications' or name='Push Notifications'");
+        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Conta' or name='Sincronizar contactos' or name='Formulários' or name='Notificações SMS' or name='Notificações Push'");
 
    		// remove API Key in cache
    		Configuration::deleteByName('smart_api_key');
@@ -914,9 +918,7 @@ class SmartMarketingPs extends Module
         $link = new Link();
 
         $desc = filter_var($product->description_short, FILTER_SANITIZE_STRING);
-
         $price = $product->getPrice(true);
-        //change this to real sale price for your store
         $salePrice = $product->getPrice(true);
 
         if ($price == $salePrice) {
@@ -1656,15 +1658,20 @@ class SmartMarketingPs extends Module
    	 */
    	public function hookDisplayTop($params)
    	{
+        $webPush = null;
+        $appCode = Configuration::get(static::WEB_PUSH_APP_CODE);
+        include_once 'includes/webPush.php';
+
    		// check if the customer did any Order
 		if(isset($this->context->cookie->order) && ($this->context->cookie->order)) {
 			$this->context->cookie->__unset('order');
 		}else{
-			// assign t&e vars
+			// assign tpl vars
 			$this->assign(
 			    array(
 		          	'te' => $this->te(),
-		          	'activate' => 1
+		          	'activate' => 1,
+                    'wp'=> $webPush
 		      	)
 		  	);
 
@@ -1674,7 +1681,7 @@ class SmartMarketingPs extends Module
 			}
 		}
 
-		return $this->display(__FILE__, 'ecommerce/te.tpl');
+		return $this->display(__FILE__, 'ecommerce/front-scripts.tpl');
 	}
 
 	/**
