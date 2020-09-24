@@ -2,7 +2,7 @@
 
 include_once dirname(__FILE__).'/../SmartMarketingBaseController.php';
 
-class WebPushController extends SmartMarketingBaseController
+class PushNotificationsController extends SmartMarketingBaseController
 {
 
     /**
@@ -11,7 +11,7 @@ class WebPushController extends SmartMarketingBaseController
     protected $apiv3;
 
     /**
-     * WebPushController constructor.
+     * PushNotificationsController constructor.
      */
     public function __construct()
     {
