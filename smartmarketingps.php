@@ -1222,7 +1222,7 @@ class SmartMarketingPs extends Module
     private static function isPaymentIfthenPay($orderState)
     {
         $orderState = (array)$orderState;
-        if ($orderState['template'] == 'multibanco') {
+        if ($orderState['module_name'] == 'ifthenpay' && stripos($orderState['name'], "Multibanco") !== false) {
             return true;
         }
 
