@@ -181,7 +181,8 @@ class SmartMarketingPs extends Module
                     'actionObjectProductDeleteAfter',
 	  		        'displayHome',
 	  		        'displayTop',
-	  		        'displayFooter'
+	  		        'displayFooter',
+                    'egoiDisplayTE',
                 )
             ))
 	    	return false;
@@ -1652,6 +1653,34 @@ class SmartMarketingPs extends Module
         return true;
     }
 
+    /**
+     * Return Scripts TPL
+     *
+     * @param array $params
+     * @return mixed
+     */
+    public function egoiScriptsTPL($params){
+        $webPush = null;
+        $appCode = Configuration::get(static::WEB_PUSH_APP_CODE);
+        include_once 'includes/webPush.php';
+
+        $this->assign(
+            array(
+                'te' => $this->te(),
+                'activate' => 1,
+                'wp'=> $webPush
+            )
+        );
+
+        // check if this block is activated
+        if($this->processBlockOptions('header')) {
+            return $this->display(__FILE__, 'smartmarketingps.tpl');
+        }
+
+
+        return $this->display(__FILE__, 'ecommerce/front-scripts.tpl');
+    }
+
 	/**
    	 * Hook for display content in Top Page
    	 *
@@ -1660,31 +1689,19 @@ class SmartMarketingPs extends Module
    	 */
    	public function hookDisplayTop($params)
    	{
-        $webPush = null;
-        $appCode = Configuration::get(static::WEB_PUSH_APP_CODE);
-        include_once 'includes/webPush.php';
-
-   		// check if the customer did any Order
-		if(isset($this->context->cookie->order) && ($this->context->cookie->order)) {
-			$this->context->cookie->__unset('order');
-		}else{
-			// assign tpl vars
-			$this->assign(
-			    array(
-		          	'te' => $this->te(),
-		          	'activate' => 1,
-                    'wp'=> $webPush
-		      	)
-		  	);
-
-			// check if this block is activated
-			if($this->processBlockOptions('header')) {
-				return $this->display(__FILE__, 'smartmarketingps.tpl');
-			}
-		}
-
-		return $this->display(__FILE__, 'ecommerce/front-scripts.tpl');
+        return $this->egoiScriptsTPL($params);
 	}
+
+    /**
+     * Hook for display TE sccript, use if theme doesn't call hookDisplayTop naturaly
+     *
+     * @param array $params
+     * @return mixed
+     */
+    public function hookEgoiDisplayTE($params)
+    {
+        return $this->egoiScriptsTPL($params);
+    }
 
 	/**
 	 * Hook for display content in Bottom Page
