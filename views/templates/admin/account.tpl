@@ -34,8 +34,8 @@
 				<tr>
 					<td>{if isset($clientData['CLIENTE_ID'])} {$clientData['CLIENTE_ID']|escape:'htmlall':'UTF-8'} {/if}</td>
 					<td>{if $clientData['COMPANY_NAME'] != "E-goi"} {$clientData['COMPANY_NAME']|escape:'htmlall':'UTF-8'} {else} - {/if}</td>
-					<td>-</td>
-					<td>{if isset($clientData['DATE_REGISTRATION'])} {$clientData['DATE_REGISTRATION']|escape:'htmlall':'UTF-8'} {/if}</td>
+					<td>{if isset($clientData['CONTRACT'])} {$clientData['CONTRACT']|escape:'htmlall':'UTF-8'} {/if}</td>
+					<td>{if isset($clientData['SIGNUP_DATE'])} {$clientData['SIGNUP_DATE']|escape:'htmlall':'UTF-8'} {/if}</td>
 					<td>
 						<a href="{$redirect|escape:'htmlall':'UTF-8'}" class="btn btn-primary" style="font-size:13px;text-transform:none;">
 							{l s='Change E-goi API Key' mod='smartmarketingps'} <span class="icon-edit"></span>
