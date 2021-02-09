@@ -7,77 +7,80 @@
  *  @license   LICENSE.txt
  */
 
+
+$sub = empty($customer)?'':"_egoiaq.push(['setSubscriber', \"$customer\"]);";
 $te = "<script type='text/javascript'>
 		var _egoiaq = _egoiaq || [];
 		var u=((\"https:\" == document.location.protocol) ? \"https://te.e-goi.com/\" : \"http://te.e-goi.com/\");
 		_egoiaq.push(['setClientId', \"$client\"]);
 		_egoiaq.push(['setListId', \"$list_id\"]);
-		_egoiaq.push(['setSubscriber', \"$customer\"]);
-		_egoiaq.push(['setTrackerUrl', u+'collect']);\n";
-		
+		$sub
+		_egoiaq.push(['setTrackerUrl', u+'collect']);
+        _egoiaq.push(['trackPageView']);\n";
 		$sum_price = 0;
 
-if(!empty($products)){
-    foreach($products as $key => $product){
+if(isset($order) && !empty($order_total)){
 
-        $product_id = $product['id_product'];
-        $product_name = htmlentities($product['name']);
-        $product_cat = '-';
-        $product_price = (float)$product['price_wt'];
-        $product_quantity = $product['quantity'];
+    if(!empty($products) && is_array($products)){
 
-        $sum_price += (float)round(($product_price * $product_quantity), 2);
+        foreach($products as $key => $product){
+            $product_id = $product['id_product'];
+            $product_name = htmlentities($product['product_name']);
+            $product_cat = empty($product['id_category_default'])?'-':$product['id_category_default'];
+            $product_price = (float)$product['product_price_wt'];
+            $product_quantity = $product['product_quantity'];
 
-        $te .= "_egoiaq.push(['addEcommerceItem',
+            $te .= "_egoiaq.push(['addEcommerceItem',
         \"$product_id\",
         \"$product_name\",
         \"$product_cat\",
-        $product_price,
+        parseFloat($product_price).toFixed(2),
         $product_quantity]);\n";
+        }
+
     }
-
-}else if ($cart_zero == 1) {
-    $id = 0;
-    $name = '';
-    $cat = '';
-    $price = 0;
-    $qty = 0;
-    $sum_price = 0;
-
-    $te .= "_egoiaq.push(['addEcommerceItem',
-        \"$id\",
-        \"$name\",
-        \"$cat\",
-        $price,
-        $qty]);\n";
-
-    $te .= "_egoiaq.push(['trackEcommerceCartUpdate',
-            0\n
-        ]);\n";
-}
-
-if(isset($order)){
-    $order_total = (float)round($sum_price, 2);
 
     $te .= "_egoiaq.push(['trackEcommerceOrder',
     \"$order_id\",
-    \"$order_total\",
-    \"$order_subtotal\",
-    $order_tax,
-    $order_shipping,
+    parseFloat(\"$order_total\").toFixed(2),
+    parseFloat(\"$order_subtotal\").toFixed(2),
+    parseFloat(\"$order_tax\").toFixed(2),
+    parseFloat(\"$order_shipping\").toFixed(2),
     $order_discount]);\n";
 
 }else{
 
-    if($sum_price){
+    $sum_price = 0;
+
+    if(!empty($products) && is_array($products)){
+
+        foreach($products as $key => $product){
+
+            $product_id = $product['id_product'];
+            $product_name = htmlentities($product['name']);
+            $product_cat = empty($product['id_category_default'])?'-':$product['id_category_default'];
+            $product_price = (float)$product['price'];
+            $product_quantity = $product['cart_quantity'];
+
+            $sum_price += (float)round(($product_price * $product_quantity), 2);
+
+            $te .= "_egoiaq.push(['addEcommerceItem',
+            \"$product_id\",
+            \"$product_name\",
+            \"$product_cat\",
+            parseFloat($product_price).toFixed(2),
+            $product_quantity]);\n";
+        }
+
+    }
 
         $te .= "_egoiaq.push(['trackEcommerceCartUpdate',
         $sum_price\n
         ]);\n";
-    }
+
 }
 		
-    $te .= "_egoiaq.push(['trackPageView']);
+    $te .= "
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.type='text/javascript';
     g.defer=true;
