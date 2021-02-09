@@ -140,6 +140,25 @@ class ApiV3 extends EgoiRestApi
     }
 
     /**
+     * Creates a TE domain
+     *
+     * @param $domain
+     * @param $list
+     *
+     * @return mixed
+     */
+    public function activateTrackingEngage($domain, $list){
+        $domain = str_replace('http://', '',
+            str_replace('https://', '', $domain)
+        );
+
+        return $this->call('POST', '/my-account/actions/enable-te', [
+            'domain'      => $domain,
+            'list'        =>  $list
+        ]);
+    }
+
+    /**
      * Asks for a social track ID
      *
      * @return string social_track_id

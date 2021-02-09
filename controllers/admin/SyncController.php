@@ -386,6 +386,9 @@ class SyncController extends SmartMarketingBaseController
         $list_id            = $res['list_id'];
         $newsletter_sync    = $res['newsletter_sync'];
 
+        if(!empty($res['track']) && $res['track'] == "1"){
+            $this->apiv3->activateTrackingEngage(_PS_BASE_URL_ ,$list_id);
+        }
 
         // main sync is activated
         if(!$sync) {exit;}
