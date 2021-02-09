@@ -137,7 +137,7 @@ class SmartMarketingPs extends Module
 		}
 	    $this->validateApiKey();
 
-		if(Tools::getIsset('id_cart') && (Tools::getValue('id_order')) && (Tools::getValue('key'))) {
+		if( (Tools::getValue('id_order')) && (Tools::getValue('key'))) {
 			$this->teOrder();
 		}
 
@@ -1757,20 +1757,16 @@ class SmartMarketingPs extends Module
 				}
 
 				// set customer email var to use in t&e
-				$customer = $this->context->cookie->email;
+				$customer = $this->context->cookie->__isset('egoi_uid')
+                    ? $this->context->cookie->email
+                    : $this->context->cookie->__get('egoi_uidegoi_uid');
 
-				$cart_id = $this->getCartId($this->getCustomerId());
+				$cart_id = $this->context->cookie->id_cart;//$this->getCartId($this->getCustomerId());
 				$cart = new Cart($cart_id);
+
 				$products = $cart->getProducts();
 
-				$cart_zero = 0;
-				if ($cart_id) {
-					if (empty($products)) {
-						$cart_zero = 1;
-					}
-				}
-
-				$this->removeCart();
+				//$this->removeCart();
                 include 'includes/te.php';
 			}
 
@@ -1850,24 +1846,18 @@ class SmartMarketingPs extends Module
                 }
 
 				$order = $this->getOrderDetails(Tools::getValue('id_order'));
+
 				$order_id = $order['reference'];
-				$order_total = number_format($order['total_paid'], 0);
-				$order_subtotal = number_format($order['total_paid_tax_excl'], 0);
-				$order_tax = number_format($order['total_shipping'], 1);
-				$order_shipping = number_format($order['total_wrapping'], 1);
-				$order_discount = $order['total_discounts'];
+				$order_total = number_format($order['total_paid'], 2);
+				$order_subtotal = number_format($order['total_paid_tax_excl'], 2);
+				$order_tax = number_format($order['total_shipping'], 2);
+				$order_shipping = number_format($order['total_wrapping'], 2);
+				$order_discount = empty($order['total_discounts'])?false:number_format($order['total_discounts'],2);
 
                 $orderObj = new Order(Tools::getValue('id_order'));
                 $products = $orderObj->getProducts();
 
-                foreach ($products as $key => &$product) {
-                    $product['name'] = htmlentities($product['product_name']);
-                    $product['price_wt'] = $product['product_price_wt'];
-                }
-
-                $cart_zero = 0;
-
-                $this->removeCart();
+                //$this->removeCart();
                 include 'includes/te.php';
 			}
             if($social_track){
@@ -2035,7 +2025,7 @@ class SmartMarketingPs extends Module
 	private function getOrderDetails($orderId)
 	{
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)
-					->getRow("SELECT * FROM "._DB_PREFIX_."orders WHERE id_cart='".(int)$orderId."' OR id_order='".(int)$orderId."'");
+					->getRow("SELECT * FROM "._DB_PREFIX_."orders WHERE id_order='".(int)$orderId."'");
 	}
 
 	/**
