@@ -1454,7 +1454,9 @@ class SmartMarketingPs extends Module
 			}
 
 			if ($add !== false) {
-                Configuration::updateValue('egoi_contacts', array($params['object']->email => $add));
+                $this->context->cookie->__set('egoi_uid', $add);
+                $this->context->cookie->write();
+                //Configuration::updateValue('egoi_contacts', array($params['object']->email => $add));
             }
 
             $client_data = $api->getClientData();
@@ -1757,9 +1759,9 @@ class SmartMarketingPs extends Module
 				}
 
 				// set customer email var to use in t&e
-				$customer = $this->context->cookie->__isset('egoi_uid')
+				$customer = !$this->context->cookie->__isset('egoi_uid')
                     ? $this->context->cookie->email
-                    : $this->context->cookie->__get('egoi_uidegoi_uid');
+                    : $this->context->cookie->__get('egoi_uid');
 
 				$cart_id = $this->context->cookie->id_cart;//$this->getCartId($this->getCustomerId());
 				$cart = new Cart($cart_id);
@@ -1840,6 +1842,7 @@ class SmartMarketingPs extends Module
 				$cart = new Cart(Tools::getValue('id_cart'));
 
                 $contactArr = Configuration::get('egoi_contacts');
+
                 $customer = $this->context->cookie->email;
                 if (isset($contactArr[$customer])) {
                     $customer = $contactArr[$customer];
