@@ -13,3 +13,7 @@ $webPush = '<script type="text/javascript">
 	s.parentNode.insertBefore(g,s);
 	})();
 </script>';
+
+if(empty($appCode)){
+    $webPush = '';
+}
