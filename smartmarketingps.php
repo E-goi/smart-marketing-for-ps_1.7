@@ -1223,7 +1223,7 @@ class SmartMarketingPs extends Module
     private static function isPaymentIfthenPay($orderState)
     {
         $orderState = (array)$orderState;
-        if ($orderState['module_name'] == 'ifthenpay' && stripos($orderState['name'], "Multibanco") !== false) {
+        if ($orderState['template'] == 'multibanco' || ($orderState['module_name'] == 'ifthenpay' && stripos($orderState['name'], "Multibanco") !== false) ) {
             return true;
         }
 
@@ -1291,8 +1291,7 @@ class SmartMarketingPs extends Module
     private function getReminderMessage($orderStatusId, $langId)
     {
         return Db::getInstance()->getRow("SELECT message FROM "._DB_PREFIX_.
-            "egoi_sms_notif_reminder_messages WHERE order_status_id=".pSQL($orderStatusId)
-            ." AND lang_id=".pSQL($langId)
+            "egoi_sms_notif_reminder_messages WHERE lang_id=".pSQL($langId)
             ." AND active=1"
         );
     }
