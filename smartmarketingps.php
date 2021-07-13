@@ -102,7 +102,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.6.2';
+	    $this->version = '1.6.6';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -156,6 +156,7 @@ class SmartMarketingPs extends Module
         include_once dirname(__FILE__) . '/lib/SmartApi.php';
         include_once dirname(__FILE__) . '/lib/TransactionalApi.php';
         include_once dirname(__FILE__) . '/lib/ApiV3.php';
+        include_once dirname(__FILE__) . '/lib/TESDK.php';
     }
 
 	/**
@@ -183,6 +184,7 @@ class SmartMarketingPs extends Module
 	  		        'displayTop',
 	  		        'displayFooter',
                     'egoiDisplayTE',
+                    'addWebserviceResources',
                 )
             ))
 	    	return false;
@@ -440,6 +442,38 @@ class SmartMarketingPs extends Module
         );
     }
 
+    private function disableMenu(){
+        Db::getInstance()->delete('tab', "module = '$this->name'");
+        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='Forms' or name='SMS Notifications' or name='Push Notifications'");
+        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Conta' or name='Sincronizar contactos' or name='Formulários' or name='Notificações SMS' or name='Notificações Push'");
+        return true;
+    }
+
+    private function createPermissions(){
+        foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ', 'SMSNOTIFICATIONS_READ', 'PRODUCTS_READ', 'PUSHNOTIFICATIONS_READ') as $val) {
+            $id_authorization_role = Db::getInstance()->getValue("SELECT id_authorization_role FROM "._DB_PREFIX_."authorization_role WHERE slug = 'ROLE_MOD_TAB_".$val."'");
+
+            if (empty($id_authorization_role)) {
+                Db::getInstance()->insert('authorization_role',
+                    array(
+                        'slug' => 'ROLE_MOD_TAB_'.$val
+                    )
+                );
+                $id_authorization_role = Db::getInstance()->getValue("SELECT id_authorization_role FROM "._DB_PREFIX_."authorization_role WHERE slug = 'ROLE_MOD_TAB_".$val."'");
+            }
+
+            $result = Db::getInstance()->getValue("SELECT id_profile,id_authorization_role FROM "._DB_PREFIX_."access WHERE id_profile = '1' AND id_authorization_role = '".$id_authorization_role."'");
+            if (empty($result)) {
+                Db::getInstance()->insert('access',
+                    array(
+                        'id_profile' => '1',
+                        'id_authorization_role' => $id_authorization_role
+                    )
+                );
+            }
+        }
+    }
+
     /**
 	 * Create menu
 	 *
@@ -456,91 +490,68 @@ class SmartMarketingPs extends Module
             'PushNotifications' => $this->l('PushNotifications')
 		);
 
-		foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ', 'SMSNOTIFICATIONS_READ', 'PRODUCTS_READ', 'PUSHNOTIFICATIONS_READ') as $val) {
-			$result = Db::getInstance()->getValue("SELECT slug FROM "._DB_PREFIX_."authorization_role WHERE slug = 'ROLE_MOD_TAB_".$val."'");
-
-			if (isset($result) && ($result)) {
-				continue;
-			}
-
-			Db::getInstance()->insert('authorization_role',
-				array(
-	    			'slug' => 'ROLE_MOD_TAB_'.$val
-	    		)
-			);
-
-			Db::getInstance()->insert('access',
-				array(
-					'id_profile' => '1',
-	    			'id_authorization_role' => Db::getInstance()->Insert_ID()
-	    		)
-			);
-		}
+		$this->createPermissions();
 
 		// main tab
-		Db::getInstance()->insert('tab',
-			array(
-				'position' => '11',
-    			'module' => 'smartmarketingps',
-    			'class_name' => 'SmartMarketingPs',
-    			'active' => 1
-    		)
-		);
+        $result = Db::getInstance()->getValue("SELECT id_tab FROM "._DB_PREFIX_."tab WHERE position = '11' AND module = 'smartmarketingps' AND class_name = 'SmartMarketingPs'");
+		if(empty($result)){
+            Db::getInstance()->insert('tab',
+                array(
+                    'position' => '11',
+                    'module' => 'smartmarketingps',
+                    'class_name' => 'SmartMarketingPs',
+                    'active' => 1
+                )
+            );
+            $main_id = Db::getInstance()->Insert_ID();
+        }else{
+            $main_id = $result;
+        }
 
-		// main tab lang
-		$main_id = Db::getInstance()->Insert_ID();
-		Db::getInstance()->insert('tab_lang',
-			array(
-				'id_tab' => $main_id,
-    			'id_lang' => 1,
-    			'name' => 'Smart Marketing'
-    		)
-		);
+        $langs = Language::getLanguages(true, $this->context->shop->id);
+        foreach ($langs as $lang) {
+            if (empty($lang['id_lang'])) {
+                continue;
+            }
 
-		$index = 1;
-		foreach ($subtabs as $key => $val) {
-			Db::getInstance()->insert('tab',
-				array(
-					'id_parent' => $main_id,
-					'position' => $index,
-	    			'module' => 'smartmarketingps',
-	    			'class_name' => $key,
-	    			'active' => 1
-	    		)
-			);
+            // main tab lang
+            Db::getInstance()->insert('tab_lang',
+                array(
+                    'id_tab' => $main_id,
+                    'id_lang' => $lang['id_lang'],
+                    'name' => 'Smart Marketing'
+                )
+            );
+        }
 
-			// insert 2 langs for Menus
-			$tab_id = Db::getInstance()->Insert_ID();
+        $index = 1;
+        foreach ($subtabs as $key => $val) {
+            Db::getInstance()->insert('tab',
+                array(
+                    'id_parent' => $main_id,
+                    'position' => $index,
+                    'module' => 'smartmarketingps',
+                    'class_name' => $key,
+                    'active' => 1
+                )
+            );
 
-			Db::getInstance()->insert('tab_lang',
-				array(
-					'id_tab' => $tab_id,
-	    			'id_lang' => 1,
-	    			'name' => $val
-	    		)
-			);
-			Db::getInstance()->insert('tab_lang',
-				array(
-					'id_tab' => $tab_id,
-	    			'id_lang' => 2,
-	    			'name' => $val
-	    		)
-			);
+            $tab_id = Db::getInstance()->Insert_ID();
+            foreach ($langs as $lang) {
+                if (empty($lang['id_lang'])) {
+                    continue;
+                }
+                Db::getInstance()->insert('tab_lang',
+                    array(
+                        'id_tab' => $tab_id,
+                        'id_lang' => $lang['id_lang'],
+                        'name' => $val
+                    )
+                );
+            }
 
-			// get spanish lang
-			$idlang = Db::getInstance()->getValue("SELECT id_lang FROM "._DB_PREFIX_."lang WHERE iso_code='es'");
-			if (isset($idlang) && ($idlang)) {
-				Db::getInstance()->insert('tab_lang',
-					array(
-						'id_tab' => $tab_id,
-		    			'id_lang' => $idlang,
-		    			'name' => $val
-		    		)
-				);
-			}
-
-			$index++;
-		}
+            $index++;
+        }
 
 		return true;
 	}
@@ -559,9 +570,7 @@ class SmartMarketingPs extends Module
    		}
 
    		// remove menus
-   		Db::getInstance()->delete('tab', "module = '$this->name'");
-   		Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='Forms' or name='SMS Notifications' or name='Push Notifications'");
-        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Conta' or name='Sincronizar contactos' or name='Formulários' or name='Notificações SMS' or name='Notificações Push'");
+   		$this->disableMenu();
 
    		// remove API Key in cache
    		Configuration::deleteByName('smart_api_key');
@@ -601,7 +610,10 @@ class SmartMarketingPs extends Module
     */
     public function enable($force_all = false)
     {
-        return parent::enable($force_all);
+        if( !parent::enable($force_all) || !$this->createMenu() ){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -612,7 +624,10 @@ class SmartMarketingPs extends Module
     */
     public function disable($force_all = false)
     {
-        return parent::disable($force_all);
+        if (!parent::disable($force_all) || !$this->disableMenu()){
+            return false;
+        }
+        return true;
     }
 
 	/**
@@ -801,6 +816,7 @@ class SmartMarketingPs extends Module
      */
 	public function hookActionOrderStatusPostUpdate($params)
     {
+        $this->syncOrderTE($params);
         return $this->sendSmsNotification($params);
     }
 
@@ -1816,6 +1832,23 @@ class SmartMarketingPs extends Module
         return $this->egoiScriptsTPL($params);
     }
 
+    /**
+     * Hook for adding webservice ressources
+     *
+     * @param array $params
+     * @return mixed
+     */
+    public function hookAddWebserviceResources($params)
+    {
+        return [
+            'egoi' => [
+                'description' => 'Manage Product info in JSON',
+                'specific_management' => true
+            ]
+        ];
+
+    }
+
 	/**
 	 * Hook for display content in Bottom Page
 	 *
@@ -2097,11 +2130,13 @@ class SmartMarketingPs extends Module
             dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php'
         );
 
+
         // if main file not exists
+        /*
         $file = dirname(__FILE__).'/../../override/classes/webservice/WebserviceRequest.php';
         if (!file_exists($file)) {
             copy(dirname(__FILE__).'/override/classes/webservice/WebserviceRequest.php', $file);
-        }
+        }*/
 
         $this->cleanCache();
     }
@@ -2300,5 +2335,25 @@ class SmartMarketingPs extends Module
         }
     }
 
+    private function syncOrderTE($params) {
 
+        $res = $this->getClientData('track', 1);
+        if (empty($res)) {
+            return false;
+        }
+
+        $order = new Order($params['id_order']);
+        $products = $order->getProducts();
+        $customer = new Customer($order->id_customer);
+
+        $list_id = $res['list_id'];
+        $client = $res['client_id'];
+
+        $teSdk = new TESDK($client, $customer->email ,$list_id);
+        $teSdk->convertOrder([
+            'order' => $order,
+            'products' => $products
+        ]);
+
+    }
 }
