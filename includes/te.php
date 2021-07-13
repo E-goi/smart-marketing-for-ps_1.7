@@ -72,12 +72,10 @@ if(isset($order) && !empty($order_total)){
             $product_quantity]);\n";
         }
 
-    }
-
         $te .= "_egoiaq.push(['trackEcommerceCartUpdate',
         $sum_price\n
         ]);\n";
-
+    }
 }
 		
     $te .= "
