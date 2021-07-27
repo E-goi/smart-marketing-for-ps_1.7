@@ -396,7 +396,7 @@ class SyncController extends SmartMarketingBaseController
         $subs = Tools::getValue("subs");
         $store_id = Tools::getValue("store_id");
         $store_name = SmartMarketingPs::getShopsName($store_id);
-        $store_filter = 'AND id_shop="'.$store_id.'" ';
+        $store_filter = 'AND '._DB_PREFIX_.'customer.id_shop="'.$store_id.'" ';
         // get main customers
         $ts = [];
         if(!empty($store_id) && !empty($store_name)){
@@ -405,7 +405,7 @@ class SyncController extends SmartMarketingBaseController
 
         $add='';
         if(!empty($newsletter_sync) && $newsletter_sync == '1'){
-            $add = 'AND newsletter="1" ';
+            $add = 'AND '._DB_PREFIX_.'customer.newsletter="1" ';
             array_push($ts, 'newsletter');
         }
 
@@ -415,7 +415,7 @@ class SyncController extends SmartMarketingBaseController
         $count = intval($subs);
 
 
-        $sqlc = 'SELECT email, firstname, lastname, birthday, newsletter, optin, id_shop, id_lang FROM '._DB_PREFIX_.'customer WHERE active="1" '.$add.$store_filter.'LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
+        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer INNER JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer INNER JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
 
         if(empty($getcs)){
@@ -430,6 +430,7 @@ class SyncController extends SmartMarketingBaseController
         }
 
         $this->api->addSubscriberBulk($list_id, $array, $tags);
+        Configuration::updateValue(self::ADDRESS_CRON_TIME_CONFIGURATION, time());
 
 
         Db::getInstance()->update('egoi',
