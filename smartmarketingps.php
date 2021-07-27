@@ -16,6 +16,7 @@ class SmartMarketingPs extends Module
 
     const PLUGIN_KEY = 'b2d226e839b116c38f53204205c8410c';
 
+    const ADDRESS_CRON_TIME_CONFIGURATION = 'egoi_address_cron_time';
     const SMS_NOTIFICATIONS_SENDER_CONFIGURATION = 'sms_notifications_sender';
     const SMS_NOTIFICATIONS_ADMINISTRATOR_CONFIGURATION = 'sms_notifications_administrator';
     const SMS_NOTIFICATIONS_ADMINISTRATOR_PREFIX_CONFIGURATION = 'sms_notifications_administrator_prefix';
@@ -180,6 +181,8 @@ class SmartMarketingPs extends Module
 	  		        'actionObjectCategoryDeleteAfter',
 	  		        'actionObjectProductUpdateAfter',
                     'actionObjectProductDeleteAfter',
+	  		        'actionObjectAddressUpdateAfter',
+                    'actionObjectAddressAddAfter',
 	  		        'displayHome',
 	  		        'displayTop',
 	  		        'displayFooter',
@@ -775,6 +778,16 @@ class SmartMarketingPs extends Module
 		return $this->addCustomer($params);
 	}
 
+	public function hookActionObjectAddressAddAfter($params){
+        mail("tmota@e-goi.com", __FUNCTION__, var_export($params,true));
+        die(var_dump($params));
+    }
+
+    public function hookActionObjectAddressUpdateAfter($params){
+        mail("tmota@e-goi.com", __FUNCTION__, var_export($params,true));
+        die(var_dump($params));
+    }
+
 	/**
 	 * Hook for Update customer
 	 *
@@ -805,6 +818,7 @@ class SmartMarketingPs extends Module
     public function hookActionDispatcher($params)
     {
         $this->triggerReminders();
+        $this->triggerCellphoneSync();
     }
 
     /**
@@ -998,6 +1012,55 @@ class SmartMarketingPs extends Module
         }
 
         return $result;
+    }
+
+
+    /**
+     * needed because customer's cellphone is in address and this is
+     * created after user
+     */
+    private function triggerCellphoneSync(){
+
+        $timeSaved = Configuration::get(self::ADDRESS_CRON_TIME_CONFIGURATION);
+        if(empty($timeSaved)){//working after first sync
+            return;
+        }
+
+        $res = SmartMarketingPs::getClientData();
+
+        $list_id            = $res['list_id'];
+        $newsletter_sync    = $res['newsletter_sync'];
+        $store_id = Tools::getValue("store_id");
+        $store_filter = ' AND '._DB_PREFIX_.'customer.id_shop="'.$store_id.'" ';
+
+        $ts = [];
+        if(!empty($store_id) && !empty($store_name)){
+            array_push($ts, $store_name);
+        }
+
+        $add='';
+        if(!empty($newsletter_sync) && $newsletter_sync == '1'){
+            $add = ' AND '._DB_PREFIX_.'customer.newsletter="1" ';
+            array_push($ts, 'newsletter');
+        }
+
+        $tags = SmartMarketingPs::makeTagMap($ts);
+
+        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer INNER JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer INNER JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" AND '._DB_PREFIX_.'address.date_upd >= '. date('Y-m-d H:i:s', $timeSaved) .$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer';
+        $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
+
+        $array = [];
+        foreach($getcs as $row){
+            $array[] = SmartMarketingPs::mapSubscriber($row);
+        }
+
+        if(!empty($array)){
+            $api = new SmartApi();
+            $api->addSubscriberBulk($list_id, $array, $tags);
+        }
+
+        Configuration::updateValue(self::ADDRESS_CRON_TIME_CONFIGURATION, time());
+
     }
 
 
@@ -2087,6 +2150,14 @@ class SmartMarketingPs extends Module
             'status'        => 1,
             'lang'          => Language::getLanguage($row['id_lang'])['iso_code']
         ];
+
+        if(!empty($row['call_prefix']) && !empty($row['phone_mobile'])){
+            $subscriber['cellphone'] = $row['call_prefix'].'-'.$row['phone_mobile'];
+        }
+
+        if(!empty($row['call_prefix']) && !empty($row['phone'])){
+            $subscriber['telephone'] = $row['call_prefix'].'-'.$row['phone'];
+        }
         foreach ($row as $field => $value){
             $field = self::getFieldMap(0, $field);
 
