@@ -181,8 +181,6 @@ class SmartMarketingPs extends Module
 	  		        'actionObjectCategoryDeleteAfter',
 	  		        'actionObjectProductUpdateAfter',
                     'actionObjectProductDeleteAfter',
-	  		        'actionObjectAddressUpdateAfter',
-                    'actionObjectAddressAddAfter',
 	  		        'displayHome',
 	  		        'displayTop',
 	  		        'displayFooter',
@@ -777,16 +775,6 @@ class SmartMarketingPs extends Module
     {
 		return $this->addCustomer($params);
 	}
-
-	public function hookActionObjectAddressAddAfter($params){
-        mail("tmota@e-goi.com", __FUNCTION__, var_export($params,true));
-        die(var_dump($params));
-    }
-
-    public function hookActionObjectAddressUpdateAfter($params){
-        mail("tmota@e-goi.com", __FUNCTION__, var_export($params,true));
-        die(var_dump($params));
-    }
 
 	/**
 	 * Hook for Update customer
