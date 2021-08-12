@@ -19,36 +19,8 @@ $te = "<script type='text/javascript'>
         _egoiaq.push(['trackPageView']);\n";
 		$sum_price = 0;
 
-if(isset($order) && !empty($order_total)){
 
-    if(!empty($products) && is_array($products)){
-
-        foreach($products as $key => $product){
-            $product_id = $product['id_product'];
-            $product_name = htmlentities($product['product_name']);
-            $product_cat = empty($product['id_category_default'])?'-':$product['id_category_default'];
-            $product_price = (float)$product['product_price_wt'];
-            $product_quantity = $product['product_quantity'];
-
-            $te .= "_egoiaq.push(['addEcommerceItem',
-        \"$product_id\",
-        \"$product_name\",
-        \"$product_cat\",
-        parseFloat($product_price).toFixed(2),
-        $product_quantity]);\n";
-        }
-
-    }
-
-    $te .= "_egoiaq.push(['trackEcommerceOrder',
-    \"$order_id\",
-    parseFloat(\"$order_total\").toFixed(2),
-    parseFloat(\"$order_subtotal\").toFixed(2),
-    parseFloat(\"$order_tax\").toFixed(2),
-    parseFloat(\"$order_shipping\").toFixed(2),
-    $order_discount]);\n";
-
-}else{
+if(!isset($order)){
 
     $sum_price = 0;
 
