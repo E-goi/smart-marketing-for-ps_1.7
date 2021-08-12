@@ -103,7 +103,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.6.7';
+	    $this->version = '1.6.8';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -167,6 +167,9 @@ class SmartMarketingPs extends Module
 	 */
 	public function install()
 	{
+	    if(!class_exists('SoapClient') || !function_exists('curl_version')){
+	        return false;
+        }
 	  	if (!parent::install() || !$this->installDb() || !$this->createMenu()
 	  		|| !$this->registerHook(
 	  		    array(
@@ -2057,25 +2060,33 @@ class SmartMarketingPs extends Module
 
                 $contactArr = Configuration::get('egoi_contacts');
 
-                $customer = $this->context->cookie->email;
-                if (isset($contactArr[$customer])) {
-                    $customer = $contactArr[$customer];
+                if(!$this->context->cookie->__isset('egoi_uid')){
+                    $customer = $this->context->cookie->email;
+                    if (isset($contactArr[$customer])) {
+                        $customer = $contactArr[$customer];
+                    }
+                }else{
+                    $customer = $this->context->cookie->__isset('egoi_uid');
                 }
+
 
 				$order = $this->getOrderDetails(Tools::getValue('id_order'));
 
-				$order_id = $order['reference'];
-				$order_total = number_format($order['total_paid'], 2);
-				$order_subtotal = number_format($order['total_paid_tax_excl'], 2);
-				$order_tax = number_format($order['total_shipping'], 2);
-				$order_shipping = number_format($order['total_wrapping'], 2);
-				$order_discount = empty($order['total_discounts'])?false:number_format($order['total_discounts'],2);
-
                 $orderObj = new Order(Tools::getValue('id_order'));
-                $products = $orderObj->getProducts();
+                if(strpos(_PS_VERSION_, "1.7.7") !== false ) {
+                    $products = $orderObj->getProductsDetail();
+                }else{
+                    $products = $orderObj->getProducts();
+                }
 
-                //$this->removeCart();
-                include 'includes/te.php';
+                $order['products'] = $products;
+
+                if (!class_exists('TESDK')) {
+                    require_once 'includes/TESDK.php';
+                }
+
+                $sdk = new TESDK($client, $customer, $list_id);
+                $sdk->convertOrder($order);
 			}
             if($social_track){
                 include 'includes/TrackingSocial.php';
