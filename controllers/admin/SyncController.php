@@ -430,7 +430,7 @@ class SyncController extends SmartMarketingBaseController
         }
 
         $this->api->addSubscriberBulk($list_id, $array, $tags);
-        Configuration::updateValue(self::ADDRESS_CRON_TIME_CONFIGURATION, time());
+        Configuration::updateValue(SmartMarketingPs::ADDRESS_CRON_TIME_CONFIGURATION, time());
 
 
         Db::getInstance()->update('egoi',
