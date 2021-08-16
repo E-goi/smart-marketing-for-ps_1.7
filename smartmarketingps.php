@@ -16,6 +16,7 @@ class SmartMarketingPs extends Module
 
     const PLUGIN_KEY = 'b2d226e839b116c38f53204205c8410c';
 
+    const ACTION_CRON_TIME_CONFIGURATION = 'egoi_action_cron_time';
     const ADDRESS_CRON_TIME_CONFIGURATION = 'egoi_address_cron_time';
     const SMS_NOTIFICATIONS_SENDER_CONFIGURATION = 'sms_notifications_sender';
     const SMS_NOTIFICATIONS_ADMINISTRATOR_CONFIGURATION = 'sms_notifications_administrator';
@@ -103,7 +104,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.6.8';
+	    $this->version = '1.6.9';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -808,8 +809,17 @@ class SmartMarketingPs extends Module
      */
     public function hookActionDispatcher($params)
     {
+        $timeSaved = Configuration::get(self::ACTION_CRON_TIME_CONFIGURATION);
+        if (empty($timeSaved)){
+            Configuration::updateValue(self::ACTION_CRON_TIME_CONFIGURATION, time());
+            return;
+        }
+        if(time() - $timeSaved < 60){
+            return;
+        }
         $this->triggerReminders();
         $this->triggerCellphoneSync();
+        Configuration::updateValue(self::ACTION_CRON_TIME_CONFIGURATION, time());
     }
 
     /**
@@ -1022,7 +1032,12 @@ class SmartMarketingPs extends Module
         $list_id            = $res['list_id'];
         $newsletter_sync    = $res['newsletter_sync'];
         $store_id = Tools::getValue("store_id");
-        $store_filter = ' AND '._DB_PREFIX_.'customer.id_shop="'.$store_id.'" ';
+        if(!empty($store_id)){
+            $store_filter = ' AND '._DB_PREFIX_.'customer.id_shop="'.$store_id.'" ';
+        }else{
+            $store_filter = '';
+        }
+
 
         $ts = [];
         if(!empty($store_id) && !empty($store_name)){
@@ -1037,8 +1052,12 @@ class SmartMarketingPs extends Module
 
         $tags = SmartMarketingPs::makeTagMap($ts);
 
-        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer INNER JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer INNER JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" AND '._DB_PREFIX_.'address.date_upd >= '. date('Y-m-d H:i:s', $timeSaved) .$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer';
+        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer INNER JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer INNER JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" AND '._DB_PREFIX_.'address.date_upd >= "'. date('Y-m-d H:i:s', $timeSaved) .'" OR '._DB_PREFIX_.'address.date_add >= "'. date('Y-m-d H:i:s', $timeSaved) .'"'.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer';
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
+
+        if(empty($getcs)){
+            return;
+        }
 
         $array = [];
         foreach($getcs as $row){
