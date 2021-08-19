@@ -158,7 +158,7 @@ class SmartMarketingPs extends Module
         include_once dirname(__FILE__) . '/lib/SmartApi.php';
         include_once dirname(__FILE__) . '/lib/TransactionalApi.php';
         include_once dirname(__FILE__) . '/lib/ApiV3.php';
-        include_once dirname(__FILE__) . '/lib/TESDK.php';
+        include_once dirname(__FILE__) . '/includes/TESDK.php';
     }
 
 	/**
