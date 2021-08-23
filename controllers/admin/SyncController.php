@@ -111,6 +111,7 @@ class SyncController extends SmartMarketingBaseController
 				$role = $rq['role'];
                 $optin = $rq['optin'];
                 $newsletter_sync = $rq['newsletter_sync'];
+                $track_state = !empty($rq['track_state'])?$rq['track_state']:0;
 			}
 
 			if(isset($list_id) && ($list_id)) {
@@ -124,6 +125,8 @@ class SyncController extends SmartMarketingBaseController
 				$this->assign('newsletter_sync', $newsletter_sync);
 				$this->assign('social_track', $social_track);
 				$this->assign('social_track_json', $social_track_json);
+				$this->assign('states', $this->getOrderStates());
+                $this->assign('track_state', $track_state);
 
 				//map fields
 				$egoi_fields = array(
@@ -157,6 +160,10 @@ class SyncController extends SmartMarketingBaseController
 		}
 	}
 
+	private function getOrderStates(){
+        return Db::getInstance()->executeS("select "._DB_PREFIX_."order_state.id_order_state, "._DB_PREFIX_."order_state_lang.name from "._DB_PREFIX_."order_state inner join "._DB_PREFIX_."order_state_lang on "._DB_PREFIX_."order_state.id_order_state = "._DB_PREFIX_."order_state_lang.id_order_state where "._DB_PREFIX_."order_state_lang.id_lang = '".Configuration::get('PS_LANG_DEFAULT')."'");
+    }
+
 	/**
 	 * Save syncronization data
 	 * 
@@ -170,6 +177,7 @@ class SyncController extends SmartMarketingBaseController
 			$sync = Tools::getValue('enable');
 			$role = Tools::getValue('role');
 
+            $track_state = Tools::getValue('track_state', 0);
             $nsync = Tools::getValue('newsletter_sync', 0);
             $noptin = Tools::getValue('newsletter_optin', 0);
 			$track = Tools::getValue('track', 1);
@@ -196,6 +204,11 @@ class SyncController extends SmartMarketingBaseController
 					Db::getInstance()->execute($query);
 				}
 			}
+
+            if (isset($track_state)) {
+                $query = "ALTER TABLE "._DB_PREFIX_."egoi ADD COLUMN track_state INT(11) NOT NULL DEFAULT '0' AFTER `optin`";
+                Db::getInstance()->execute($query);
+            }
 			
 			$values = array(
 				'list_id' => (int)$list, 
@@ -209,7 +222,8 @@ class SyncController extends SmartMarketingBaseController
                 'total' => 0,
 				'social_track' => (int)$social_track,
 				'social_track_json' => (int)$social_track_json,
-				'social_track_id' => $res['social_track_id']
+				'social_track_id' => $res['social_track_id'],
+                'track_state' => $track_state,
 			);
 			
 			if($social_track){
