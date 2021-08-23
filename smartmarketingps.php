@@ -104,7 +104,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.6.9';
+	    $this->version = '1.6.10';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -139,9 +139,9 @@ class SmartMarketingPs extends Module
 		}
 	    $this->validateApiKey();
 
-		if( (Tools::getValue('id_order')) && (Tools::getValue('key'))) {
-			$this->teOrder();
-		}
+		//if( (Tools::getValue('id_order')) && (Tools::getValue('key'))) {
+			//$this->teOrder();
+		//}
 
         // check newsletter submissions anywhere
 		$this->checkNewsletterSubmissions();
@@ -171,33 +171,35 @@ class SmartMarketingPs extends Module
 	    if(!class_exists('SoapClient') || !function_exists('curl_version')){
 	        return false;
         }
-	  	if (!parent::install() || !$this->installDb() || !$this->createMenu()
-	  		|| !$this->registerHook(
-	  		    array(
-	  		        'cart',
-	  		        'actionCartSave',
-	  		        'actionDispatcher',
-	  		        'actionObjectCustomerAddAfter',
-                    'actionObjectCustomerUpdateAfter',
-	  		        'actionObjectCustomerDeleteAfter',
-	  		        'actionOrderStatusPostUpdate',
-	  		        'actionObjectCategoryUpdateAfter',
-	  		        'actionObjectCategoryDeleteAfter',
-	  		        'actionObjectProductUpdateAfter',
-                    'actionObjectProductDeleteAfter',
-	  		        'displayHome',
-	  		        'displayTop',
-	  		        'displayFooter',
-                    'egoiDisplayTE',
-                    'addWebserviceResources',
-                )
-            ))
+	  	if (!parent::install() || !$this->installDb() || !$this->createMenu() || !$this->registerHooksEgoi())
 	    	return false;
 
 	    // register WebService
 		$this->registerWebService();
 	  	return true;
 	}
+
+	function registerHooksEgoi(){
+        return $this->registerHook(
+            array(
+                'cart',
+                'actionCartSave',
+                'actionDispatcher',
+                'actionObjectCustomerAddAfter',
+                'actionObjectCustomerUpdateAfter',
+                'actionObjectCustomerDeleteAfter',
+                'actionOrderStatusPostUpdate',
+                'actionObjectCategoryUpdateAfter',
+                'actionObjectCategoryDeleteAfter',
+                'actionObjectProductUpdateAfter',
+                'actionObjectProductDeleteAfter',
+                'displayHome',
+                'displayTop',
+                'displayFooter',
+                'egoiDisplayTE',
+            )
+        );
+    }
 
 	/**
 	 * Install required Tables
@@ -505,7 +507,8 @@ class SmartMarketingPs extends Module
                     'position' => '11',
                     'module' => 'smartmarketingps',
                     'class_name' => 'SmartMarketingPs',
-                    'active' => 1
+                    'active' => 1,
+                    'enabled' => 1
                 )
             );
             $main_id = Db::getInstance()->Insert_ID();
@@ -531,13 +534,19 @@ class SmartMarketingPs extends Module
 
         $index = 1;
         foreach ($subtabs as $key => $val) {
+            $result = Db::getInstance()->getValue("SELECT id_tab FROM "._DB_PREFIX_."tab WHERE module = 'smartmarketingps' AND class_name = '".$key."'");
+            if(!empty($result)){
+                $index++;
+                continue;
+            }
             Db::getInstance()->insert('tab',
                 array(
                     'id_parent' => $main_id,
                     'position' => $index,
                     'module' => 'smartmarketingps',
                     'class_name' => $key,
-                    'active' => 1
+                    'active' => 1,
+                    'enabled' => 1
                 )
             );
 
@@ -615,7 +624,8 @@ class SmartMarketingPs extends Module
     */
     public function enable($force_all = false)
     {
-        if( !parent::enable($force_all) || !$this->createMenu() ){
+        $this->registerHooksEgoi();
+        if( !parent::enable($force_all) || !$this->createMenu() || !$this->installDb()){
             return false;
         }
         return true;
@@ -1659,6 +1669,11 @@ class SmartMarketingPs extends Module
 			if ($add !== false) {
                 $this->context->cookie->__set('egoi_uid', $add);
                 $this->context->cookie->write();
+
+                Db::getInstance()->insert('egoi_customer_uid', array(
+                    'uid' => $add,
+                    'email' => pSQL($params['object']->email)
+                ));
                 //Configuration::updateValue('egoi_contacts', array($params['object']->email => $add));
             }
 
@@ -2056,77 +2071,6 @@ class SmartMarketingPs extends Module
 		}
 	}
 
-	/**
-	 * Track&Engage - TrackOrder
-	 *
-	 * @return void
-	 */
-	public function teOrder()
-	{
-		$res = $this->getClientData('track', 1);
-
-		if (!empty($res)) {
-			$list_id = $res['list_id'];
-			$track = $res['track'];
-			$client = $res['client_id'];
-            $social_track = $res['social_track'];
-            $social_track_id = $res['social_track_id'];
-            $te = '';
-            
-			if($client && $track && $list_id) {
-
-				$cart = new Cart(Tools::getValue('id_cart'));
-
-                $contactArr = Configuration::get('egoi_contacts');
-
-                if(!$this->context->cookie->__isset('egoi_uid')){
-                    $customer = $this->context->cookie->email;
-                    if (isset($contactArr[$customer])) {
-                        $customer = $contactArr[$customer];
-                    }
-                }else{
-                    $customer = $this->context->cookie->__isset('egoi_uid');
-                }
-
-
-				$order = $this->getOrderDetails(Tools::getValue('id_order'));
-
-                $orderObj = new Order(Tools::getValue('id_order'));
-                if(strpos(_PS_VERSION_, "1.7.7") !== false ) {
-                    $products = $orderObj->getProductsDetail();
-                }else{
-                    $products = $orderObj->getProducts();
-                }
-
-                $order['products'] = $products;
-
-                if (!class_exists('TESDK')) {
-                    require_once 'includes/TESDK.php';
-                }
-
-                $sdk = new TESDK($client, $customer, $list_id);
-                $sdk->convertOrder($order);
-			}
-            if($social_track){
-                include 'includes/TrackingSocial.php';
-                if ($this->context->controller instanceof ProductController && $social_track_json)
-                {
-                    include 'includes/TrackingLdJson.php';
-                }
-            }
-
-            $this->assign(
-                array(
-                    'te' => $te,
-                    'activate' => 1
-                )
-            );
-
-            $this->context->cookie->__set('order', 1);
-            $this->context->cookie->write();
-		}
-	}
-
     /**
      * Get all mapped fields
      *
@@ -2427,18 +2371,26 @@ class SmartMarketingPs extends Module
     private function syncOrderTE($params) {
 
         $res = $this->getClientData('track', 1);
-        if (empty($res)) {
+        if (empty($res['track'])) {
             return false;
         }
 
         $order = new Order($params['id_order']);
         $products = $order->getProducts();
+
         $customer = new Customer($order->id_customer);
 
         $list_id = $res['list_id'];
         $client = $res['client_id'];
 
-        $teSdk = new TESDK($client, $customer->email ,$list_id);
+        if(!empty($res['track_state'])){
+            if($res['track_state'] != $params['newOrderStatus']->id){
+                return false;
+            }
+        }
+
+        $uid = Db::getInstance()->getValue('SELECT uid FROM '._DB_PREFIX_."egoi_customer_uid WHERE email='".pSQL($customer->email)."';");
+        $teSdk = new TESDK($client, empty($uid)?$customer->email:$uid ,$list_id);
         $teSdk->convertOrder([
             'order' => $order,
             'products' => $products
