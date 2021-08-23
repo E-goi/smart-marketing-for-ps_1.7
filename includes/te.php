@@ -11,7 +11,7 @@
 $sub = empty($customer)?'':"_egoiaq.push(['setSubscriber', \"$customer\"]);";
 $te = "<script type='text/javascript'>
 		var _egoiaq = _egoiaq || [];
-		var u=((\"https:\" == document.location.protocol) ? \"https://te.e-goi.com/\" : \"http://te.e-goi.com/\");
+		var u=((\"https:\" == document.location.protocol) ? \"https://egoimmerce.e-goi.com/\" : \"http://egoimmerce.e-goi.com/\");
 		_egoiaq.push(['setClientId', \"$client\"]);
 		_egoiaq.push(['setListId', \"$list_id\"]);
 		$sub
