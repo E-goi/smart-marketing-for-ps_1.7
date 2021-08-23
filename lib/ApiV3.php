@@ -154,7 +154,7 @@ class ApiV3 extends EgoiRestApi
 
         return $this->call('POST', '/my-account/actions/enable-te', [
             'domain'      => $domain,
-            'list'        =>  $list
+            'list_id'     =>  $list
         ]);
     }
 
