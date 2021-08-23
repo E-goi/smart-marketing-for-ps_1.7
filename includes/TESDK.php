@@ -7,17 +7,19 @@ class TESDK
     protected $clientId;
     protected $subscriber;
     protected $list;
+    protected $headers;
 
     public function __construct($clientId, $subscriber = null, $list = null)
     {
          $this->clientId = $clientId;
          $this->subscriber = $subscriber;
          $this->list = $list;
+         $this->headers = ['Referer: '._PS_BASE_URL_.'/'];
     }
 
     public function convertOrder($order){
 
-        if(empty($order['reference']) || empty($order['total_paid'])  || !is_array($order['products']) ){
+        if(empty($order['order']->reference) || empty($order['order']->total_paid)  || !is_array($order['products']) ){
             return false;
         }
 
@@ -31,12 +33,12 @@ class TESDK
 
         $data = [
             "idgoal" => 0,
-            "ec_id" => "{$order["reference"]}",
-            "revenue" => number_format($order['total_paid'],2),
-            "ec_st" => number_format($order["total_paid_tax_excl"],2),
-            "ec_tx" => number_format($order["total_shipping"], 2),
-            "ec_sh" => number_format($order["total_wrapping"],2),
-            "ec_dt" => number_format($order["total_discounts"], 2),
+            "ec_id" => "{$order['order']->reference}",
+            "revenue" => number_format($order['order']->total_paid,2),
+            "ec_st" => number_format($order['order']->total_paid_tax_excl,2),
+            "ec_tx" => number_format($order['order']->total_shipping, 2),
+            "ec_sh" => number_format($order['order']->total_wrapping,2),
+            "ec_dt" => number_format($order['order']->total_discounts, 2),
             "ec_items" => json_encode($ec_items),
             "clientid" => $this->clientId,
             "listid" => $this->list,
@@ -59,9 +61,29 @@ class TESDK
     }
 
     private function getMethod($url){
+
+        $headers = $this->headers;
+
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_HEADERFUNCTION,
+            function($curl, $header) use (&$headers)
+            {
+                $len = strlen($header);
+                $header = explode(':', $header, 2);
+                if (count($header) < 2) // ignore invalid headers
+                    return $len;
+
+                $name = strtolower(trim($header[0]));
+                if (!array_key_exists($name, $headers))
+                    $headers[$name] = [trim($header[1])];
+                else
+                    $headers[$name][] = trim($header[1]);
+
+                return $len;
+            }
+        );
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($curl, CURLOPT_TIMEOUT, 4);
