@@ -28,7 +28,15 @@ class SmartApi
      */
     public function __construct($apikey = false)
     {
-        $this->client = new SoapClient($this->api_url);
+        try{
+            $this->client = new SoapClient($this->api_url);
+        }catch (\Exception $e){
+            if(!class_exists('EgoiSoapFailSafe')){
+                require_once dirname(__FILE__) . '/EgoiSoapFailSafe.php';
+            }
+            $this->client = new EgoiSoapFailSafe();
+        }
+
         if ($apikey) {
             $this->apiKey = $apikey;
         }else{
