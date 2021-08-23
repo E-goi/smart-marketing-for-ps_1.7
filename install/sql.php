@@ -18,6 +18,7 @@ $sql[_DB_PREFIX_.'egoi'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi` (
 			  `role` varchar(255) NOT NULL,
 			  `newsletter_sync` int(11) NOT NULL DEFAULT \'0\',
 			  `optin` int(11) NOT NULL DEFAULT \'0\',
+			  `track_state` int(11) NOT NULL DEFAULT \'0\',
 			  `estado` int(1) NOT NULL,
 			  `social_track` int(1) DEFAULT \'0\',
 			  `social_track_json` int(1) DEFAULT \'0\',
@@ -112,4 +113,11 @@ $sql[_DB_PREFIX_.'egoi_active_catalogs'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PR
               `currency` char(3) NOT NULL,
 			  `active` int(1) NOT NULL DEFAULT \'0\',
 			  PRIMARY KEY (`catalog_id`)
+			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
+
+$sql[_DB_PREFIX_.'egoi_customer_uid'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi_customer_uid` (
+              `uid` varchar(11) NOT NULL UNIQUE,
+              `email` varchar(255) NOT NULL,
+			  PRIMARY KEY (`uid`),
+			  INDEX store_email (email)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
