@@ -67,23 +67,7 @@ class TESDK
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_HEADERFUNCTION,
-            function($curl, $header) use (&$headers)
-            {
-                $len = strlen($header);
-                $header = explode(':', $header, 2);
-                if (count($header) < 2) // ignore invalid headers
-                    return $len;
-
-                $name = strtolower(trim($header[0]));
-                if (!array_key_exists($name, $headers))
-                    $headers[$name] = [trim($header[1])];
-                else
-                    $headers[$name][] = trim($header[1]);
-
-                return $len;
-            }
-        );
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 0);
         curl_setopt($curl, CURLOPT_TIMEOUT, 4);
