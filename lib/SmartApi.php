@@ -6,6 +6,10 @@
 class SmartApi
 {
 
+    const GET_TAGS_TTL = 'egoi_tags_ttl';
+    const GET_TAGS_CONTENT = 'egoi_tags_content';
+    const DEFAULT_TTL = 300;//5 min
+
 	 /**
      * @var string
      */
@@ -349,6 +353,7 @@ class SmartApi
      */
     public function addTag($name)
     {
+        Configuration::updateValue(self::GET_TAGS_TTL, 0);//reset tags ttl if new is added
         $params = array(
             'name' => $name
         );
@@ -362,8 +367,17 @@ class SmartApi
      */
     public function getTags()
     {
-        $result = $this->client->getTags(array_merge($this->getBaseParams()));
-        return $result['TAG_LIST'];
+        $timeSaved = Configuration::get(self::GET_TAGS_TTL);
+        if (empty($timeSaved) || $timeSaved + self::DEFAULT_TTL < time()){
+            $result = $this->client->getTags(array_merge($this->getBaseParams()));
+            if(!empty($result['TAG_LIST'])){
+                Configuration::updateValue(self::GET_TAGS_TTL, time());
+                Configuration::updateValue(self::GET_TAGS_CONTENT, json_encode($result['TAG_LIST']));
+            }
+            return $result['TAG_LIST'];
+        }else{
+            return json_decode(Configuration::get(self::GET_TAGS_CONTENT), true);
+        }
     }
 
     /**
