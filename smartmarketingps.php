@@ -104,7 +104,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.6.10';
+	    $this->version = '1.6.11';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -130,8 +130,9 @@ class SmartMarketingPs extends Module
         $this->transactionalApi = new TransactionalApi();
         $this->apiv3 = new ApiV3();
 
-	    if (!Configuration::get('SMART_MARKETING')) {
-	      	$this->warning = $this->l('No name provided');
+        $warning_message = $this->l('No Apikey provided');
+	    if (!Configuration::get('smart_api_key')) {
+	      	$this->warning = $warning_message;
 	    }
 
 		if(!empty(Tools::getValue('smart_api_key'))) {
@@ -508,7 +509,6 @@ class SmartMarketingPs extends Module
                     'module' => 'smartmarketingps',
                     'class_name' => 'SmartMarketingPs',
                     'active' => 1,
-                    'enabled' => 1
                 )
             );
             $main_id = Db::getInstance()->Insert_ID();
@@ -545,8 +545,7 @@ class SmartMarketingPs extends Module
                     'position' => $index,
                     'module' => 'smartmarketingps',
                     'class_name' => $key,
-                    'active' => 1,
-                    'enabled' => 1
+                    'active' => 1
                 )
             );
 
@@ -753,6 +752,8 @@ class SmartMarketingPs extends Module
         $this->assign($this->success_msg, 'success_msg');
         $this->assign($this->error_msg, 'error_msg');
         $this->assign(Configuration::get('smart_api_key') ? false : true, 'smart_api_key_error');
+
+        $this->createMenu();
 
 	    return $this->display($this->name, 'views/templates/admin/config.tpl');
 	}
@@ -1033,7 +1034,7 @@ class SmartMarketingPs extends Module
     private function triggerCellphoneSync(){
 
         $timeSaved = Configuration::get(self::ADDRESS_CRON_TIME_CONFIGURATION);
-        if(empty($timeSaved)){//working after first sync
+        if(empty($timeSaved) || ( $timeSaved + (10 * 60) ) > time() ){//working after first sync && in 10 min intervals
             return;
         }
 
@@ -1060,14 +1061,14 @@ class SmartMarketingPs extends Module
             array_push($ts, 'newsletter');
         }
 
-        $tags = SmartMarketingPs::makeTagMap($ts);
-
         $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer INNER JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer INNER JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" AND '._DB_PREFIX_.'address.date_upd >= "'. date('Y-m-d H:i:s', $timeSaved) .'" OR '._DB_PREFIX_.'address.date_add >= "'. date('Y-m-d H:i:s', $timeSaved) .'"'.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer';
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
 
         if(empty($getcs)){
             return;
         }
+
+        $tags = SmartMarketingPs::makeTagMap($ts);
 
         $array = [];
         foreach($getcs as $row){
@@ -1076,7 +1077,15 @@ class SmartMarketingPs extends Module
 
         if(!empty($array)){
             $api = new SmartApi();
-            $api->addSubscriberBulk($list_id, $array, $tags);
+            if(count($array) == 1){
+                $array[0]['listID'] = $list_id;
+                $result = $api->editSubscriber($array[0], $tags);
+                if (isset($result['ERROR']) && ($result['ERROR'])) {
+                    $api->addSubscriber($array[0], $tags);
+                }
+            }else{
+                $api->addSubscriberBulk($list_id, $array, $tags);
+            }
         }
 
         Configuration::updateValue(self::ADDRESS_CRON_TIME_CONFIGURATION, time());

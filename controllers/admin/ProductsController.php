@@ -121,7 +121,11 @@ class ProductsController extends SmartMarketingBaseController
 
         $languages = array();
         foreach (Language::getLanguages(true, $this->context->shop->id) as $language) {
-            $languages[] = strtoupper($language['iso_code']);
+            $input = strtoupper($language['iso_code']);
+            if (in_array($language['iso_code'], ['cb', 'co'])) {
+                $input = 'ES';
+            }
+            $languages[] = $input;
         }
         $defaultLanguage = $this->context->language->iso_code;
         $this->assign('languages', $languages);
@@ -155,12 +159,12 @@ class ProductsController extends SmartMarketingBaseController
     {
         $this->checkCatalogValid($id);
 
-        $data = array();
+        $data = array('products' => []);
 
         $languages = Language::getLanguages(true, $this->context->shop->id);
         $langId = 0;
         foreach ($languages as $language) {
-            if ($language['iso_code'] === strtolower($lang)) {
+            if ($language['iso_code'] === strtolower($lang) || in_array($language['iso_code'], ['cb','co'])) {
                 $langId = $language['id_lang'];
             }
         }
