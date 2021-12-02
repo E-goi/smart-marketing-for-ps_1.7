@@ -158,6 +158,12 @@ class ApiV3 extends EgoiRestApi
         ]);
     }
 
+    public function getCellphoneSenders()
+    {
+        return $this->call('GET', '/senders/cellphone');
+    }
+
+
     /**
      * Asks for a social track ID
      *
