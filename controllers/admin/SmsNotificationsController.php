@@ -486,16 +486,19 @@ class SmsNotificationsController extends SmartMarketingBaseController
      */
     private function sendersConfig()
     {
-        $senders = $this->transactionalApi->getSmsSenders();
+        $senders = $this->apiv3->getCellphoneSenders();
+
         if (!Configuration::hasKey(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_CONFIGURATION)) {
-            Configuration::updateValue(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_CONFIGURATION, $senders[0]['senderHash']);
+            if(!empty($senders)){
+                Configuration::updateValue(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_CONFIGURATION, $senders['items'][0]['sender_id']);
+            }
         }
 
         $senderIds = array();
         $senderNames = array();
-        foreach ($senders as $sender) {
-            array_push($senderIds, $sender['senderHash']);
-            array_push($senderNames, $sender['name']);
+        foreach ($senders['items'] as $sender) {
+            array_push($senderIds, $sender['sender_id']);
+            array_push($senderNames, $sender['cellphone']);
         }
 
         $this->assign('defaultSender', Configuration::get(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_CONFIGURATION));
@@ -559,8 +562,10 @@ class SmsNotificationsController extends SmartMarketingBaseController
         $orders = new OrderState($lang);
         $orders = $orders->getOrderStates($lang);
         $smsNotifs = Db::getInstance()->executeS("SELECT * FROM "._DB_PREFIX_."egoi_sms_notif_messages");
+        
         foreach ($orders as &$order) {
             $notif = $this->arraySearch($smsNotifs, array('order_status_id', 'lang_id'), array($order['id_order_state'], $lang));
+
             $order['sms_notif'] = array();
             $order['sms_notif']['client_message'] = $this->transformEOL($notif['client_message'], true);
             $order['sms_notif']['admin_message'] = $this->transformEOL($notif['admin_message'], true);

@@ -49,11 +49,11 @@ class TransactionalApi extends EgoiRestApi
      *
      * @return array
      */
-    public function sendSms($mobile, $senderHash, $message)
+    public function sendSms($mobile, $senderId, $message)
     {
         $data = array(
             'mobile' => $mobile,
-            'senderHash' => $senderHash,
+            'senderId' => $senderId,
             'message' => $message,
             'options' => array(
                 'gsm0338' => false,

@@ -201,6 +201,11 @@ class ApiV3 extends EgoiRestApi
         return false;
     }
 
+    public function getCellphoneSenders()
+    {
+        return $this->call('GET', '/senders/cellphone');
+    }
+
     /**
      * Calls api v3
      *

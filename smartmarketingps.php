@@ -1121,8 +1121,8 @@ class SmartMarketingPs extends Module
      */
     private function sendReminder($mobile, $message, $orderId)
     {
-        $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
-        $this->transactionalApi->sendSms($mobile, $senderHash, $message);
+        $senderId = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+        $this->transactionalApi->sendSms($mobile, $senderId, $message);
         $this->deleteReminder($orderId);
     }
 
@@ -1174,7 +1174,8 @@ class SmartMarketingPs extends Module
      */
     private function sendClient($newOrderStatus, $order, $send)
     {
-        $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+
+        $senderId = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
 
         $messages = $this->getNotifMessages($newOrderStatus->id, $order->id_lang);
         $message = $this->parseMessage($messages['client_message'], $newOrderStatus, $order);
@@ -1205,7 +1206,7 @@ class SmartMarketingPs extends Module
 
             $sent[$mobile] = 1;
             if ($send) {
-                $this->transactionalApi->sendSms($mobile, $senderHash, $message);
+                $this->transactionalApi->sendSms($mobile, $senderId, $message);
             }
 
             $this->reminder($order, $newOrderStatus, $mobile);
@@ -1225,7 +1226,7 @@ class SmartMarketingPs extends Module
      */
     private function sendAdmin($newOrderStatus, $order, $admin)
     {
-        $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+        $senderId = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
 
         $messages = empty($messages) ? $this->getNotifMessages($newOrderStatus->id, $order->id_lang) : $messages;
         $message = $this->parseMessage($messages['admin_message'], $newOrderStatus, $order);
@@ -1234,7 +1235,7 @@ class SmartMarketingPs extends Module
         }
 
         $mobile = Configuration::get(self::SMS_NOTIFICATIONS_ADMINISTRATOR_PREFIX_CONFIGURATION) . '-' . $admin;
-        $this->transactionalApi->sendSms($mobile, $senderHash, $message);
+        $this->transactionalApi->sendSms($mobile, $senderId, $message);
 
         return true;
     }
@@ -1587,7 +1588,7 @@ class SmartMarketingPs extends Module
      */
     private function getEuPagoData($order)
     {
-        $module = Module::getInstanceByName('eupago_multibanco');
+        $module = Module::getInstanceByName('eupagomb');
         $result = $module->GenerateReference((int)$order->id, $order->total_paid);
 
         $entity = '';
