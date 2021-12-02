@@ -412,7 +412,7 @@ class SmsNotificationsController extends SmartMarketingBaseController
      */
     private function selectSender()
     {
-        Configuration::updateValue(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_CONFIGURATION, $_POST['egoi-transactional-sms-sender']);
+        Configuration::updateValue(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION, $_POST['egoi-transactional-sms-sender']);
     }
 
     /**
@@ -485,22 +485,26 @@ class SmsNotificationsController extends SmartMarketingBaseController
      * Senders configuration
      */
     private function sendersConfig()
-    {
-        $senders = $this->transactionalApi->getSmsSenders();
-        if (!Configuration::hasKey(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_CONFIGURATION)) {
-            Configuration::updateValue(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_CONFIGURATION, $senders[0]['senderHash']);
+    { 
+        $senders = $this->apiv3->getCellphoneSenders();
+
+        if (!Configuration::hasKey(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION)) {
+            if(!empty($senders)){
+                Configuration::updateValue(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION, $senders['items'][0]['sender_id']);
+            }
         }
 
         $senderIds = array();
         $senderNames = array();
-        foreach ($senders as $sender) {
-            array_push($senderIds, $sender['senderHash']);
-            array_push($senderNames, $sender['name']);
+        foreach ($senders['items'] as $sender) {
+            array_push($senderIds, $sender['sender_id']);
+            array_push($senderNames, $sender['cellphone']);
         }
 
-        $this->assign('defaultSender', Configuration::get(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_CONFIGURATION));
+        $this->assign('defaultSender', Configuration::get(SmartMarketingPs::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION));
         $this->assign('senderIds', $senderIds);
         $this->assign('senderNames', $senderNames);
+        
     }
 
     /**

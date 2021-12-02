@@ -49,17 +49,29 @@ class TransactionalApi extends EgoiRestApi
      *
      * @return array
      */
-    public function sendSms($mobile, $senderHash, $message)
+    public function sendSms($mobile, $senderHash, $message, $senderIdSet = false)
     {
-        $data = array(
-            'mobile' => $mobile,
-            'senderHash' => $senderHash,
-            'message' => $message,
-            'options' => array(
-                'gsm0338' => false,
-                'maxCount' => self::MAX_MESSAGES
-            )
-        );
+        if($senderIdSet){
+            $data = array(
+                'mobile' => $mobile,
+                'senderId' => $senderHash,
+                'message' => $message,
+                'options' => array(
+                    'gsm0338' => false,
+                    'maxCount' => self::MAX_MESSAGES
+                )
+            );
+        }else{
+            $data = array(
+                'mobile' => $mobile,
+                'senderHash' => $senderHash,
+                'message' => $message,
+                'options' => array(
+                    'gsm0338' => false,
+                    'maxCount' => self::MAX_MESSAGES
+                )
+            );
+        }
 
         return $this->call('POST', '/sms/send', $data);
     }

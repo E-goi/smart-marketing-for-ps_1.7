@@ -19,6 +19,7 @@ class SmartMarketingPs extends Module
     const ACTION_CRON_TIME_CONFIGURATION = 'egoi_action_cron_time';
     const ADDRESS_CRON_TIME_CONFIGURATION = 'egoi_address_cron_time';
     const SMS_NOTIFICATIONS_SENDER_CONFIGURATION = 'sms_notifications_sender';
+    const SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION = 'sms_notifications_sender_v3';
     const SMS_NOTIFICATIONS_ADMINISTRATOR_CONFIGURATION = 'sms_notifications_administrator';
     const SMS_NOTIFICATIONS_ADMINISTRATOR_PREFIX_CONFIGURATION = 'sms_notifications_administrator_prefix';
     const SMS_NOTIFICATIONS_DELIVERY_ADDRESS_CONFIGURATION = 'sms_notifications_delivery_address';
@@ -45,7 +46,7 @@ class SmartMarketingPs extends Module
     const CUSTOM_INFO_TRACKING_NUMBER = self::CUSTOM_INFO_DELIMITER . 'tracking_number' . self::CUSTOM_INFO_DELIMITER;
 
     const PAYMENT_MODULE_IFTHENPAY = 'multibanco';
-    const PAYMENT_MODULE_EUPAGO = 'eupago_multibanco';
+    const PAYMENT_MODULE_EUPAGO = 'eupagomb';
     const PAYMENT_STATUS_WAITING_MB_PAYMENT = 'waiting_mb_payment';
 
     const LIMIT_HOUR_MIN = 10;
@@ -589,6 +590,11 @@ class SmartMarketingPs extends Module
    		Configuration::deleteByName('smart_api_key');
 
         Configuration::deleteByName(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+
+        if (Configuration::hasKey(self::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION)) {
+            Configuration::deleteByName(self::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION);
+        }
+
         Configuration::deleteByName(self::SMS_NOTIFICATIONS_ADMINISTRATOR_CONFIGURATION);
 
 		// remove webservice
@@ -1121,8 +1127,14 @@ class SmartMarketingPs extends Module
      */
     private function sendReminder($mobile, $message, $orderId)
     {
-        $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
-        $this->transactionalApi->sendSms($mobile, $senderHash, $message);
+        if (Configuration::hasKey(self::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION)) {
+            $senderId = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION);
+            $this->transactionalApi->sendSms($mobile, $senderId, $message, true);
+        } else{
+            $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+            $this->transactionalApi->sendSms($mobile, $senderHash, $message);
+        }
+
         $this->deleteReminder($orderId);
     }
 
@@ -1145,7 +1157,7 @@ class SmartMarketingPs extends Module
      */
     private function sendSmsNotification($params)
     {
-        if (!Configuration::hasKey(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION)) {
+        if (!Configuration::hasKey(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION) && !Configuration::hasKey(self::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION)) {
             return false;
         }
 
@@ -1174,7 +1186,11 @@ class SmartMarketingPs extends Module
      */
     private function sendClient($newOrderStatus, $order, $send)
     {
-        $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+        if (Configuration::hasKey(self::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION)) {
+            $senderId = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION);
+        } else{
+            $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+        }
 
         $messages = $this->getNotifMessages($newOrderStatus->id, $order->id_lang);
         $message = $this->parseMessage($messages['client_message'], $newOrderStatus, $order);
@@ -1205,7 +1221,7 @@ class SmartMarketingPs extends Module
 
             $sent[$mobile] = 1;
             if ($send) {
-                $this->transactionalApi->sendSms($mobile, $senderHash, $message);
+                isset($senderId) ? $this->transactionalApi->sendSms($mobile, $senderId, $message, true) : $this->transactionalApi->sendSms($mobile, $senderHash, $message);
             }
 
             $this->reminder($order, $newOrderStatus, $mobile);
@@ -1225,7 +1241,11 @@ class SmartMarketingPs extends Module
      */
     private function sendAdmin($newOrderStatus, $order, $admin)
     {
-        $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+        if (Configuration::hasKey(self::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION)) {
+            $senderId = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_V3_CONFIGURATION);
+        } else{
+            $senderHash = Configuration::get(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
+        }
 
         $messages = empty($messages) ? $this->getNotifMessages($newOrderStatus->id, $order->id_lang) : $messages;
         $message = $this->parseMessage($messages['admin_message'], $newOrderStatus, $order);
@@ -1234,7 +1254,7 @@ class SmartMarketingPs extends Module
         }
 
         $mobile = Configuration::get(self::SMS_NOTIFICATIONS_ADMINISTRATOR_PREFIX_CONFIGURATION) . '-' . $admin;
-        $this->transactionalApi->sendSms($mobile, $senderHash, $message);
+        isset($senderId) ? $this->transactionalApi->sendSms($mobile, $senderId, $message, true) : $this->transactionalApi->sendSms($mobile, $senderHash, $message);
 
         return true;
     }
@@ -1349,6 +1369,7 @@ class SmartMarketingPs extends Module
     {
         $search = 'euPago';
         $orderState = (array)$orderState;
+
         if (substr($orderState['name'], 0, strlen($search)) === $search && $orderState['template'] == '') {
             return true;
         }
@@ -1438,7 +1459,7 @@ class SmartMarketingPs extends Module
             case 'multibanco':
                 $data = $this->getIfThenPayData($order);
                 break;
-            case 'eupago_multibanco':
+            case 'eupagomb':
                 $data = $this->getEuPagoData($order);
                 break;
             default:
@@ -1587,7 +1608,7 @@ class SmartMarketingPs extends Module
      */
     private function getEuPagoData($order)
     {
-        $module = Module::getInstanceByName('eupago_multibanco');
+        $module = Module::getInstanceByName('eupagomb');
         $result = $module->GenerateReference((int)$order->id, $order->total_paid);
 
         $entity = '';
