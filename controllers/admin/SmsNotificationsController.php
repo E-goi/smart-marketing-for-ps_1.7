@@ -565,9 +565,15 @@ class SmsNotificationsController extends SmartMarketingBaseController
         $smsNotifs = Db::getInstance()->executeS("SELECT * FROM "._DB_PREFIX_."egoi_sms_notif_messages");
         foreach ($orders as &$order) {
             $notif = $this->arraySearch($smsNotifs, array('order_status_id', 'lang_id'), array($order['id_order_state'], $lang));
-            $order['sms_notif'] = array();
-            $order['sms_notif']['client_message'] = $this->transformEOL($notif['client_message'], true);
-            $order['sms_notif']['admin_message'] = $this->transformEOL($notif['admin_message'], true);
+
+                $order['sms_notif'] = array();
+            if(!empty($notif)){
+                $order['sms_notif']['client_message'] = $this->transformEOL($notif['client_message'], true);
+                $order['sms_notif']['admin_message'] = $this->transformEOL($notif['admin_message'], true);
+            }else{
+                $order['sms_notif']['client_message'] = ' ';
+                $order['sms_notif']['admin_message'] = ' ';
+            }
         }
 
         $this->assign('orders', $orders);
@@ -592,8 +598,14 @@ class SmsNotificationsController extends SmartMarketingBaseController
 
             $notif = $this->arraySearch($smsNotifs, array('order_status_id'), array($order['id_order_state']));
             $order['sms_notif'] = array();
-            $order['sms_notif']['send_client'] = $notif['send_client'];
-            $order['sms_notif']['send_admin'] = $notif['send_admin'];
+            
+            if(!empty($notif)){
+                $order['sms_notif']['send_client'] = $notif['send_client'];
+                $order['sms_notif']['send_admin'] = $notif['send_admin'];
+            }else{
+                $order['sms_notif']['send_client'] = ' ';
+                $order['sms_notif']['send_admin'] = ' ';
+            }
         }
 
         $this->assign('orders', $orders);
