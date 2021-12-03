@@ -265,15 +265,19 @@ class SmartMarketingPs extends Module
                 $adminMessage = $template['en']['admin'];
             }
 
-            Db::getInstance()->insert(
-                'egoi_sms_notif_messages',
-                array(
-                    'order_status_id' => $orderState['id_order_state'],
-                    'lang_id' => $lang['id_lang'],
-                    'client_message' => $clientMessage,
-                    'admin_message' => $adminMessage
-                )
-            );
+            try{
+                Db::getInstance()->insert(
+                    'egoi_sms_notif_messages',
+                    array(
+                        'order_status_id' => $orderState['id_order_state'],
+                        'lang_id' => $lang['id_lang'],
+                        'client_message' => $clientMessage,
+                        'admin_message' => $adminMessage
+                    )
+                );
+            }catch(Exception $e){
+                //duplicated
+            }
         }
     }
 
