@@ -522,19 +522,24 @@ class SmartMarketingPs extends Module
         }
 
         $langs = Language::getLanguages(true, $this->context->shop->id);
-        foreach ($langs as $lang) {
-            if (empty($lang['id_lang'])) {
-                continue;
-            }
+        $tab_lang_exists = Db::getInstance()->getValue("SELECT id_tab FROM "._DB_PREFIX_."tab_lang WHERE id_tab=".$main_id);
 
-            // main tab lang
-            Db::getInstance()->insert('tab_lang',
-                array(
-                    'id_tab' => $main_id,
-                    'id_lang' => $lang['id_lang'],
-                    'name' => 'Smart Marketing'
-                )
-            );
+        if(empty($tab_lang_exists)){
+            $langs = Language::getLanguages(true, $this->context->shop->id);
+            foreach ($langs as $lang) {
+                if (empty($lang['id_lang'])) {
+                    continue;
+                }
+    
+                // main tab lang
+                Db::getInstance()->insert('tab_lang',
+                    array(
+                        'id_tab' => $main_id,
+                        'id_lang' => $lang['id_lang'],
+                        'name' => 'Smart Marketing'
+                    )
+                );
+            }
         }
 
         $index = 1;
