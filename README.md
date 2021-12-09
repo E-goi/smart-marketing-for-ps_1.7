@@ -28,7 +28,11 @@ Upload to deploy server
 
 ### Changelog
 ```
--- v.1.6.12
+-- V.1.6.13
+   -- Fixed installation errors
+   -- Minor fix on Ifthenpay sms
+
+-- V.1.6.12
    -- EuPago sms fix
    -- Senders minor fix
 
