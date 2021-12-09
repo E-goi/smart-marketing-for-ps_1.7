@@ -1395,6 +1395,7 @@ class SmartMarketingPs extends Module
      */
     private function reminder($order, $orderState, $mobile)
     {
+
         if (self::getPaymentModule($orderState)) {
             $message = $this->getReminderMessage($orderState->id, $order->id_lang)['message'];
             if (empty($message)) {
@@ -1402,6 +1403,7 @@ class SmartMarketingPs extends Module
             }
 
             $message = $this->parseMessage($message, $orderState, $order);
+            
             if (!empty($message)) {
                 Db::getInstance()->insert(
                     'egoi_sms_notif_order_reminder',
@@ -1647,7 +1649,7 @@ class SmartMarketingPs extends Module
         $data = array();
         $data['entity'] = $entity;
         $data['reference'] = $ref;
-        $data['total_cost'] = Tools::displayPrice($total, new Currency($currency), false);
+        $data['total_cost'] = $total;
 
         return $data;
     }
