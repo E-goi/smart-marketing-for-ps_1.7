@@ -32,6 +32,8 @@ class SmartMarketingPs extends Module
     const CONFIGURED_WEB_PUSH = 'egoi_web_push_config';
     const WEB_PUSH_APP_CODE = 'egoi_web_push_app_code';
 
+    const CONNECTED_SITES_CODE = 'egoi_connected_sites_code';
+
     const CUSTOM_INFO_DELIMITER = '%';
     const CUSTOM_INFO_ORDER_REFERENCE = self::CUSTOM_INFO_DELIMITER . 'order_reference' . self::CUSTOM_INFO_DELIMITER;
     const CUSTOM_INFO_ORDER_STATUS = self::CUSTOM_INFO_DELIMITER . 'order_status' . self::CUSTOM_INFO_DELIMITER;
@@ -105,7 +107,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.6.13';
+	    $this->version = '1.6.14';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -2061,7 +2063,14 @@ class SmartMarketingPs extends Module
 				$products = $cart->getProducts();
 
 				//$this->removeCart();
-                include 'includes/te.php';
+                $cs_code = Configuration::get(static::CONNECTED_SITES_CODE);
+                if(!empty($cs_code)){
+                    include 'includes/te_cs.php';
+                    $te .= $cs_code;
+                }else{//retro compatibility
+                    include 'includes/te.php';
+                }
+
 			}
 
             if($social_track){
