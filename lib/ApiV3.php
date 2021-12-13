@@ -158,6 +158,21 @@ class ApiV3 extends EgoiRestApi
         ]);
     }
 
+    public function activateConnectedSites($domain, $list){
+        $domain = !empty(parse_url($domain)['host'])?$domain:parse_url($domain)['host'];
+
+
+        return $this->call('POST', '/connectedsites', [
+            'domain'      => $domain,
+            'list_id'     =>  $list
+        ]);
+    }
+
+    public function getConnectedSite($domain){
+        $domain = !empty(parse_url($domain)['host'])?$domain:parse_url($domain)['host'];
+        return $this->call('GET', "/connectedsites/$domain");
+    }
+
     public function getCellphoneSenders()
     {
         return $this->call('GET', '/senders/cellphone');
