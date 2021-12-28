@@ -184,6 +184,16 @@ class SyncController extends SmartMarketingBaseController
 			$social_track = Tools::getValue('social_track', 0);
 			$social_track_json = $social_track == 1 ? Tools::getValue('social_track_json', 0) : 0;
 
+            if(!empty($track) && $track == "1"){
+                $code = $this->apiv3->activateConnectedSites(_PS_BASE_URL_ ,$list);
+                if(empty($code) || !is_array($code) || empty($code['code'])){
+                    $code = $this->apiv3->getConnectedSite(_PS_BASE_URL_);
+                }
+                if(!empty($code['code'])){
+                    Configuration::updateValue(SmartMarketingPs::CONNECTED_SITES_CODE, base64_encode($code['code']));
+                }
+            }
+
 			// compare client ID -> API with DB
 			$client_data = $this->api->getClientData();
 			$client = $client_data['CLIENTE_ID'];
@@ -399,17 +409,6 @@ class SyncController extends SmartMarketingBaseController
         $client_id          = $res['client_id'];
         $list_id            = $res['list_id'];
         $newsletter_sync    = $res['newsletter_sync'];
-
-        if(!empty($res['track']) && $res['track'] == "1"){
-            $code = $this->apiv3->activateConnectedSites(_PS_BASE_URL_ ,$list_id);
-            if(empty($code['code'])){
-                $code = $this->apiv3->getConnectedSite(_PS_BASE_URL_);
-            }
-            if(!empty($code['code'])){
-                Configuration::updateValue(SmartMarketingPs::CONNECTED_SITES_CODE);
-            }
-
-        }
 
         // main sync is activated
         if(!$sync) {exit;}
