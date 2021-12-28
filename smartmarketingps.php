@@ -140,6 +140,9 @@ class SmartMarketingPs extends Module
 
 		if(!empty(Tools::getValue('smart_api_key'))) {
 			$this->addClientId($_POST);
+            if(!empty($_POST['egoi_client_id'])){
+                $this->createMenu();
+            }
 		}
 	    $this->validateApiKey();
 
@@ -509,7 +512,7 @@ class SmartMarketingPs extends Module
 
 		// main tab
         $result = Db::getInstance()->getValue("SELECT id_tab FROM "._DB_PREFIX_."tab WHERE position = '11' AND module = 'smartmarketingps' AND class_name = 'SmartMarketingPs'");
-		if(empty($result)){
+        if(empty($result)){
             Db::getInstance()->insert('tab',
                 array(
                     'position' => '11',
@@ -547,32 +550,48 @@ class SmartMarketingPs extends Module
         $index = 1;
         foreach ($subtabs as $key => $val) {
             $result = Db::getInstance()->getValue("SELECT id_tab FROM "._DB_PREFIX_."tab WHERE module = 'smartmarketingps' AND class_name = '".$key."'");
-            if(!empty($result)){
-                $index++;
-                continue;
-            }
-            Db::getInstance()->insert('tab',
-                array(
-                    'id_parent' => $main_id,
-                    'position' => $index,
-                    'module' => 'smartmarketingps',
-                    'class_name' => $key,
-                    'active' => 1
-                )
-            );
-
-            $tab_id = Db::getInstance()->Insert_ID();
-            foreach ($langs as $lang) {
-                if (empty($lang['id_lang'])) {
-                    continue;
-                }
-                Db::getInstance()->insert('tab_lang',
+            if(empty($result)){
+                Db::getInstance()->insert('tab',
                     array(
-                        'id_tab' => $tab_id,
-                        'id_lang' => $lang['id_lang'],
-                        'name' => $val
+                        'id_parent' => $main_id,
+                        'position' => $index,
+                        'module' => 'smartmarketingps',
+                        'class_name' => $key,
+                        'active' => 1
                     )
                 );
+                $result = Db::getInstance()->Insert_ID();
+            }
+
+            try{
+                Db::getInstance()->update(
+                    'tab',
+                    array(
+                        'icon' => ''
+                    ),
+                    'id_tab = ' . (int)$result
+                );
+            }catch (Exception $e){
+
+            }
+
+
+            $tab_id = $result;
+            foreach ($langs as $lang) {
+
+                if (!empty($lang['id_lang'])) {
+                    $tablang = Db::getInstance()->getValue("SELECT * FROM "._DB_PREFIX_."tab_lang WHERE id_tab = '".$tab_id."' AND id_lang = '".$lang['id_lang']."' AND name = '".$val."'");
+                    if(empty($tablang)){
+                        Db::getInstance()->insert('tab_lang',
+                            array(
+                                'id_tab' => $tab_id,
+                                'id_lang' => $lang['id_lang'],
+                                'name' => $val
+                            )
+                        );
+                    }
+                }
+
             }
 
             $index++;
