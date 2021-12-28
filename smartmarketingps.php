@@ -107,7 +107,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.6.14';
+	    $this->version = '1.6.15';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -2065,6 +2065,7 @@ class SmartMarketingPs extends Module
 				//$this->removeCart();
                 $cs_code = Configuration::get(static::CONNECTED_SITES_CODE);
                 if(!empty($cs_code)){
+                    $cs_code = base64_decode($cs_code);
                     include 'includes/te_cs.php';
                     $te .= $cs_code;
                 }else{//retro compatibility
