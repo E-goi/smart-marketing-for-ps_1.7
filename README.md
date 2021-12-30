@@ -26,6 +26,13 @@ $ zip -r smart-marketing-ps.1.7.vx.x.x.zip /home/you/smartmarketingps/
 
 Upload to deploy server
 
+### Track&Engage theme hook
+If your theme is not calling the hook 'displayTop' the script injection will not work.
+For a workaround you can add this hook call to your **header.tpl**
+```
+{hook e='egoiDisplayTE'}
+```
+
 ### Changelog
 ```
 -- V.1.6.15
