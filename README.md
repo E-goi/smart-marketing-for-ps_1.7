@@ -30,6 +30,8 @@ Upload to deploy server
 ```
 -- V.1.6.15
    -- Improve Connected Sites flow
+   -- Team Permissions
+   -- New version notify
 
 -- V.1.6.14
    -- Connected Sites Integration
