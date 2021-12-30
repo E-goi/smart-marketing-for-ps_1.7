@@ -25,6 +25,8 @@ class SmartMarketingPs extends Module
     const SMS_NOTIFICATIONS_DELIVERY_ADDRESS_CONFIGURATION = 'sms_notifications_delivery_address';
     const SMS_NOTIFICATIONS_INVOICE_ADDRESS_CONFIGURATION = 'sms_notifications_invoice_address';
     const SMS_REMINDER_DEFAULT_TIME_CONFIG = 'sms_reminder_default_time_config';
+    const PLUGIN_VERSION_KEY = 'egoi_plugin_version_req';
+    const PLUGIN_VERSION_KEY_TTL = 'egoi_plugin_version_req_ttl';
 
     const SMS_MESSAGES_DEFAULT_LANG_CONFIGURATION = 'sms_messages_default_lang';
     const SMS_REMINDERS_DEFAULT_LANG_CONFIGURATION = 'sms_reminders_default_lang';
@@ -95,9 +97,16 @@ class SmartMarketingPs extends Module
     /**
      * API v3
      *
-     * @var $transactionalApi
+     * @var $apiv3
      */
     protected $apiv3;
+
+    /**
+     * Goidini api
+     *
+     * @var $goidini
+     */
+    protected $goidini;
 
 	/**
 	* Module Constructor
@@ -132,6 +141,7 @@ class SmartMarketingPs extends Module
 
         $this->transactionalApi = new TransactionalApi();
         $this->apiv3 = new ApiV3();
+        $this->goidini = new GoidiniApi();
 
         $warning_message = $this->l('No Apikey provided');
 	    if (!Configuration::get('smart_api_key')) {
@@ -152,7 +162,112 @@ class SmartMarketingPs extends Module
 
         // check newsletter submissions anywhere
 		$this->checkNewsletterSubmissions();
+        $current_context = Context::getContext();
+        if ($current_context->controller->controller_type == 'admin'){
+            $this->checkPluginVersion();
+        }
 	}
+
+    public function checkPluginVersion(){
+        $lastVersion = Configuration::get(self::PLUGIN_VERSION_KEY);
+        $lastReq = Configuration::get(self::PLUGIN_VERSION_KEY_TTL);
+
+        if (empty($lastVersion) || empty($lastReq) || (isset($lastReq) && $lastReq + 3600 < time() ))
+        {
+            $lastVersion = $this->goidini->getLatestPluginVersions();
+            Configuration::updateValue(self::PLUGIN_VERSION_KEY, $lastVersion);
+            Configuration::updateValue(self::PLUGIN_VERSION_KEY_TTL, time());
+        }
+
+        $lastVersionObj = json_decode($lastVersion, true);
+        $lastReq = Configuration::get(self::PLUGIN_VERSION_KEY_TTL);
+        if(empty($lastVersionObj) || empty($lastVersionObj['prestashop']) || (isset($lastReq) && is_numeric($lastReq) && ($lastReq + 3600) < time()) ){
+            Configuration::updateValue(self::PLUGIN_VERSION_KEY, 0);
+            return;
+        }
+
+        if(version_compare($lastVersionObj['prestashop'], $this->version, '>')) {
+            $this->createPopupAcknowledge("[E-goi] New Version (".$lastVersionObj['prestashop'].")", "The new version is ready to download, <a href=\"https://goidini.e-goi.com/resources/plugins/prestashop/smart-marketing-ps.1.7.latest.zip\" target=\"_blank\" >click here</a>!");
+        }
+
+    }
+
+    protected function createPopupAcknowledge($title, $message){
+        ?>
+
+        <style>
+            .egoi-popup-notification>h3>.egoi_close,
+            .egoi-popup-notification>p,
+            .egoi-popup-notification>h3{
+                color: white;
+            }
+
+            .egoi-popup-notification>h3>.egoi_close{
+                cursor: pointer;
+            }
+
+            .egoi-popup-notification>h3{
+                display: flex;
+                justify-content: space-between;
+                margin-top: 0;
+            }
+
+            .egoi-popup-notification>p{
+                margin-bottom: 0;
+            }
+
+
+            .egoi-popup-notification>p>a{
+                color: #2a2a2a !important;
+                font-weight: bold;
+            }
+
+            .egoi-popup-notification{
+                position: fixed;
+                top: 40px;
+                right: 10px;
+                border: 1px solid #dbe6e9;
+                border-radius: 5px;
+                -webkit-box-shadow: 0 0 4px 0 rgb(0 0 0 / 6%);
+                box-shadow: 0 0 4px 0 rgb(0 0 0 / 6%);
+                background-color: #25b9d7;
+                z-index: 9999;
+                padding: 20px;
+            }
+        </style>
+
+        <script>
+
+            window.addEventListener('load', function () {
+                (function (){
+                    if( !localStorage.getItem("closed_egoi_update") && document.getElementsByClassName("egoi-popup-notification").length > 0 ){
+                        document.getElementsByClassName("egoi-popup-notification")[0].style.display = 'block'
+                    }
+                    if( document.getElementsByClassName("egoi_close").length >0 ){
+                        document.getElementsByClassName("egoi_close")[0].onclick = () => {
+                            if( document.getElementsByClassName("egoi-popup-notification").length > 0){
+                                document.getElementsByClassName("egoi-popup-notification")[0].style.display = 'none';
+                                localStorage.setItem("closed_egoi_update", 'true');
+                            }
+                        }
+                    }
+                })();
+            });
+
+        </script>
+
+        <div class="egoi-popup-notification" style="display: none;">
+            <h3>
+                <?php echo $title; ?>
+                <a class="egoi_close" >x</a>
+            </h3>
+            <p>
+                <?php echo $message; ?>
+            </p>
+        </div>
+
+        <?php
+    }
 
 	/**
 	 * Autoload API
@@ -165,6 +280,7 @@ class SmartMarketingPs extends Module
         include_once dirname(__FILE__) . '/lib/SmartApi.php';
         include_once dirname(__FILE__) . '/lib/TransactionalApi.php';
         include_once dirname(__FILE__) . '/lib/ApiV3.php';
+        include_once dirname(__FILE__) . '/lib/GoidiniApi.php';
         include_once dirname(__FILE__) . '/includes/TESDK.php';
     }
 
@@ -468,16 +584,21 @@ class SmartMarketingPs extends Module
     }
 
     private function createPermissions(){
-        foreach (array('ACCOUNT_READ', 'SYNC_READ', 'FORMS_READ', 'SMSNOTIFICATIONS_READ', 'PRODUCTS_READ', 'PUSHNOTIFICATIONS_READ') as $val) {
-            $id_authorization_role = Db::getInstance()->getValue("SELECT id_authorization_role FROM "._DB_PREFIX_."authorization_role WHERE slug = 'ROLE_MOD_TAB_".$val."'");
 
+        foreach (array('ROLE_MOD_TAB_ACCOUNT_READ', 'ROLE_MOD_TAB_SYNC_READ', 'ROLE_MOD_TAB_FORMS_READ', 'ROLE_MOD_TAB_SMSNOTIFICATIONS_READ', 'ROLE_MOD_TAB_PRODUCTS_READ', 'ROLE_MOD_TAB_PUSHNOTIFICATIONS_READ', 'ROLE_MOD_TAB_SMARTMARKETINGPS_READ',
+                     'ROLE_MOD_TAB_ACCOUNT_CREATE', 'ROLE_MOD_TAB_SYNC_CREATE', 'ROLE_MOD_TAB_FORMS_CREATE', 'ROLE_MOD_TAB_SMSNOTIFICATIONS_CREATE', 'ROLE_MOD_TAB_PRODUCTS_CREATE', 'ROLE_MOD_TAB_PUSHNOTIFICATIONS_CREATE', 'ROLE_MOD_TAB_SMARTMARKETINGPS_CREATE',
+                     'ROLE_MOD_TAB_ACCOUNT_DELETE', 'ROLE_MOD_TAB_SYNC_DELETE', 'ROLE_MOD_TAB_FORMS_DELETE', 'ROLE_MOD_TAB_SMSNOTIFICATIONS_DELETE', 'ROLE_MOD_TAB_PRODUCTS_DELETE', 'ROLE_MOD_TAB_PUSHNOTIFICATIONS_DELETE', 'ROLE_MOD_TAB_SMARTMARKETINGPS_DELETE',
+                     'ROLE_MOD_TAB_ACCOUNT_UPDATE', 'ROLE_MOD_TAB_SYNC_UPDATE', 'ROLE_MOD_TAB_FORMS_UPDATE', 'ROLE_MOD_TAB_SMSNOTIFICATIONS_UPDATE', 'ROLE_MOD_TAB_PRODUCTS_UPDATE', 'ROLE_MOD_TAB_PUSHNOTIFICATIONS_UPDATE', 'ROLE_MOD_TAB_SMARTMARKETINGPS_UPDATE',
+                    'ROLE_MOD_MODULE_SMARTMARKETINGPS_CREATE', 'ROLE_MOD_MODULE_SMARTMARKETINGPS_CREATE', 'ROLE_MOD_MODULE_SMARTMARKETINGPS_CREATE', 'ROLE_MOD_MODULE_SMARTMARKETINGPS_CREATE'
+                 ) as $val) {
+            $id_authorization_role = Db::getInstance()->getValue("SELECT id_authorization_role FROM "._DB_PREFIX_."authorization_role WHERE slug = '".$val."'");
             if (empty($id_authorization_role)) {
                 Db::getInstance()->insert('authorization_role',
                     array(
-                        'slug' => 'ROLE_MOD_TAB_'.$val
+                        'slug' => $val
                     )
                 );
-                $id_authorization_role = Db::getInstance()->getValue("SELECT id_authorization_role FROM "._DB_PREFIX_."authorization_role WHERE slug = 'ROLE_MOD_TAB_".$val."'");
+                $id_authorization_role = Db::getInstance()->getValue("SELECT id_authorization_role FROM "._DB_PREFIX_."authorization_role WHERE slug = '".$val."'");
             }
 
             $result = Db::getInstance()->getValue("SELECT id_profile,id_authorization_role FROM "._DB_PREFIX_."access WHERE id_profile = '1' AND id_authorization_role = '".$id_authorization_role."'");
@@ -544,6 +665,18 @@ class SmartMarketingPs extends Module
                         'name' => 'Smart Marketing'
                     )
                 );
+
+                try{
+                    Db::getInstance()->update(
+                        'tab',
+                        array(
+                            'icon' => ''
+                        ),
+                        'id_tab = ' . (int)$result
+                    );
+                }catch (Exception $e){
+
+                }
             }
         }
 
