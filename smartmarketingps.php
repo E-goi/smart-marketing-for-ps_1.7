@@ -116,7 +116,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.6.15';
+	    $this->version = '1.6.16';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -578,8 +578,8 @@ class SmartMarketingPs extends Module
 
     private function disableMenu(){
         Db::getInstance()->delete('tab', "module = '$this->name'");
-        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='Forms' or name='SMS Notifications' or name='Push Notifications'");
-        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Conta' or name='Sincronizar contactos' or name='Formulários' or name='Notificações SMS' or name='Notificações Push'");
+        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='SMS Notifications' or name='Push Notifications'");
+        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Conta' or name='Sincronizar contactos' or name='Notificações SMS' or name='Notificações Push'");
         return true;
     }
 
@@ -623,7 +623,6 @@ class SmartMarketingPs extends Module
 		$subtabs = array(
 			'Account' => $this->l('Account'),
 			'Sync' => $this->l('Sync Contacts'),
-			'Forms' => $this->l('Forms'),
             'SmsNotifications' => $this->l('SMS Notifications'),
             'Products' => $this->l('Products'),
             'PushNotifications' => $this->l('PushNotifications')

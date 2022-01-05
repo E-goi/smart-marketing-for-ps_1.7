@@ -35,6 +35,10 @@ For a workaround you can add this hook call to your **header.tpl**
 
 ### Changelog
 ```
+
+-- V.1.6.16
+   -- Removed Forms tab
+
 -- V.1.6.15
    -- Improve Connected Sites flow
    -- Team Permissions
