@@ -105,9 +105,6 @@ class SyncController extends SmartMarketingBaseController
 				$list_id = $rq['list_id'];
 				$sync = $rq['sync'];
 				$track = $rq['track'];
-				$social_track = $rq['social_track'];
-				$social_track_id = $rq['social_track_id'];
-				$social_track_json = $rq['social_track_json'];
 				$role = $rq['role'];
                 $optin = $rq['optin'];
                 $newsletter_sync = $rq['newsletter_sync'];
@@ -123,8 +120,6 @@ class SyncController extends SmartMarketingBaseController
 				$this->assign('role_id', $role);
 				$this->assign('optin', $optin);
 				$this->assign('newsletter_sync', $newsletter_sync);
-				$this->assign('social_track', $social_track);
-				$this->assign('social_track_json', $social_track_json);
 				$this->assign('states', $this->getOrderStates());
                 $this->assign('track_state', $track_state);
 
@@ -181,8 +176,6 @@ class SyncController extends SmartMarketingBaseController
             $nsync = Tools::getValue('newsletter_sync', 0);
             $noptin = Tools::getValue('newsletter_optin', 0);
 			$track = Tools::getValue('track', 1);
-			$social_track = Tools::getValue('social_track', 0);
-			$social_track_json = $social_track == 1 ? Tools::getValue('social_track_json', 0) : 0;
 
 
             if(!empty($track) && $track == "1"){
@@ -201,12 +194,6 @@ class SyncController extends SmartMarketingBaseController
 
 			$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
 						->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id='.(int)$client);
-			
-			if($social_track || $social_track_json){
-				if(is_null($res['social_track'])){
-					Db::getInstance()->execute('ALTER TABLE `'._DB_PREFIX_.'egoi` ADD COLUMN `social_track` INT(1) DEFAULT 1, ADD COLUMN `social_track_json` INT(1) DEFAULT 1, ADD COLUMN `social_track_id` VARCHAR(50) DEFAULT 0;');
-				}
-			}
 
 			// temporary - alter table with new column
 			if ($nsync) {
@@ -233,23 +220,8 @@ class SyncController extends SmartMarketingBaseController
 				'optin' => (int)$noptin,
 				'estado' => 1,
                 'total' => 0,
-				'social_track' => (int)$social_track,
-				'social_track_json' => (int)$social_track_json,
-				'social_track_id' => $res['social_track_id'],
                 'track_state' => $track_state,
 			);
-			
-			if($social_track){
-				$social_track_id = $this->apiv3->updateSocialTrack('create');
-				if(!empty($social_track_id)){
-					$values['social_track_id'] = $social_track_id;
-				} else {
-					$values['social_track'] = $values['social_track_json'] = 0;
-				}
-				if(!$social_track_id){
-					$this->assign('error_message', $this->displayWarning($this->l('Something went wrong while retrieving remarketing configuration, please try again later.')));
-				}
-			}
 			
 			if(isset($res['client_id']) && ($res['client_id'])) {
 				return Db::getInstance()->update('egoi', $values, "client_id = ".(int)$client);
