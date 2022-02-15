@@ -39,6 +39,7 @@ For a workaround you can add this hook call to your **header.tpl**
 -- V.2.0.0
    -- Deprecate old forms. iframe and popup forms are now created an shown by using connected sites.
    -- Contact sync (Newsletter subscriber fix)
+   -- Deprecate Remarketing option
 
 -- V.1.6.15
    -- Improve Connected Sites flow
