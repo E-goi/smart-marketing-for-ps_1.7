@@ -1,4 +1,4 @@
-# Egoi Email Marketing for Prestashop 1.7.X (V.1.6.15)
+# Egoi Email Marketing for Prestashop 1.7.X (V.2.0.0)
 
 Keep your contacts sync with E-goi and increase your sales! Easily design email marketing or SMS campaigns, create the segmentation you want for your contacts or build intuitive automation processes for all channels available on E-goi.
 
@@ -35,6 +35,11 @@ For a workaround you can add this hook call to your **header.tpl**
 
 ### Changelog
 ```
+
+-- V.2.0.0
+   -- Deprecate old forms. iframe and popup forms are now created an shown by using connected sites.
+   -- Contact sync (Newsletter subscriber fix)
+
 -- V.1.6.15
    -- Improve Connected Sites flow
    -- Team Permissions

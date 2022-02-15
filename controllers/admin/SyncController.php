@@ -184,6 +184,7 @@ class SyncController extends SmartMarketingBaseController
 			$social_track = Tools::getValue('social_track', 0);
 			$social_track_json = $social_track == 1 ? Tools::getValue('social_track_json', 0) : 0;
 
+
             if(!empty($track) && $track == "1"){
                 $code = $this->apiv3->activateConnectedSites(_PS_BASE_URL_ ,$list);
                 if(empty($code) || !is_array($code) || empty($code['code'])){
@@ -216,8 +217,10 @@ class SyncController extends SmartMarketingBaseController
 			}
 
             if (isset($track_state)) {
-                $query = "ALTER TABLE "._DB_PREFIX_."egoi ADD COLUMN track_state INT(11) NOT NULL DEFAULT '0' AFTER `optin`";
-                Db::getInstance()->execute($query);
+				if(is_null($res['track_state'])){
+					$query = "ALTER TABLE "._DB_PREFIX_."egoi ADD COLUMN track_state INT(11) NOT NULL DEFAULT '0' AFTER `optin`";
+					Db::getInstance()->execute($query);
+				}
             }
 			
 			$values = array(
