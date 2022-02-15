@@ -59,13 +59,10 @@ class ProductsController extends SmartMarketingBaseController
                 exit;
             } elseif (!empty($_GET['createCatalog'])) {
                 $this->createCatalog();
-                $this->apiv3->updateSocialTrack('update');
             } elseif (!empty($_GET['deleteCatalog'])) {
                 $this->deleteCatalog($_GET['deleteCatalog']);
-                $this->apiv3->updateSocialTrack('update');
             } elseif (!empty($_GET['toggleSync']) && isset($_GET['value'])) {
                 $this->toggleSync($_GET['toggleSync']);
-                $this->apiv3->updateSocialTrack('update');
             } elseif (!empty($_GET['syncCatalog']) && !empty($_GET['language']) && !empty($_GET['currency'])) {
                 $this->syncCatalog($_GET['syncCatalog'], $_GET['language'], $_GET['currency'], true, $_GET['page']);
                 exit;
