@@ -9,6 +9,66 @@
 {include file='./alerts.tpl'}
 
 	<style>
+		.banner{
+			background: white;
+			position: fixed;
+			text-align: center;
+			width: 70%;
+			top: 20%;
+			left: 22vw;
+			z-index: 10000;
+			border: 1px solid #dbe6e9;
+			border-radius: 5px;
+			box-shadow: 0 0 4px 0 rgb(0 0 0 / 6%);
+		}
+
+		.btn-banner-forms{
+			position: absolute;
+			z-index: 20;
+			top: 2%;
+			left: 98%;
+			cursor: pointer;
+		}
+
+		.btn-findmore-forms{
+			bottom: 10%;
+			position: absolute;
+			font-style: normal;
+			font-weight: normal;
+			font-size: 1.5em !important;
+			padding: 1vh 4vw 1vh 4vw;
+			background: #00AEDA;
+			color: #FFFFFF !important;
+			border: 0;
+			cursor: pointer;
+		}
+
+		.connected-sites{
+			width: 100%;
+			position: relative;
+		}
+		
+		.cs-title{
+			width: 100%;
+    		text-align: center;
+			position: absolute;
+			top: 12%;
+			z-index: 100;
+			font-family: Open Sans;
+			font-size: 1.5vw;
+		}
+
+		.cs-description{
+			position: absolute;
+			width: 100%;
+    		text-align: center;
+			top: 18%;
+			z-index: 100;
+			font-family: Open Sans;
+			font-size: 30px;
+			font-size: 0.8vw;
+		}
+
 		.bootstrap .table tbody>tr>td{
 			padding: 16px 7px;
 			height: 75px;
@@ -80,9 +140,7 @@
 					<span class="label_span col-md-3"><b class="egoi-b">{l s='Select the Form Type you want' mod='smartmarketingps'}</b></span>
 					<div class="form_name_egoi" style="padding:0 14px;">
 						<select name="type" class="form_type" onchange="this.form.submit();">
-							<option value="popup" {if isset($type) and ($type eq 'popup')} selected {/if}>{l s='E-goi Form Popup' mod='smartmarketingps'}</option>
-							<option value="html" {if isset($type) and ($type eq 'html')} selected {/if}>{l s='E-goi Form HTML' mod='smartmarketingps'}</option>
-							<option value="iframe" {if isset($type) and ($type eq 'iframe')} selected {/if}>{l s='E-goi Form IFRAME' mod='smartmarketingps'}</option>
+							<option value="embedded" selected >{l s='E-goi Embbeded Form' mod='smartmarketingps'}</option>
 						</select>
 					</div>
 				</form>
@@ -115,74 +173,8 @@
 							</td>
 						</tr>
 					</table>
-
-					{if $type eq 'iframe'}
-
-						<table class="table">
-							<tr>
-								{if !$lists}
-									{l s='No lists found, are you connected to E-goi and/or have created lists?' mod='smartmarketingps'}
-								{else}
-									<td>
-										<b>{l s='Select your List' mod='smartmarketingps'}</b>
-									</td>
-									<td>
-										<select name="list_id" id="list_id" required>
-											<option value="" disabled selected>
-                                                {l s='Select List ...' mod='smartmarketingps'}
-											</option>
-											{foreach $lists as $list}
-												{if isset($list_id) and ($list_id eq $list.listnum)}
-													<option value="{$list.listnum|escape:'htmlall':'UTF-8'}" selected="selected">{$list.title|escape:'htmlall':'UTF-8'}</option>
-												{else}
-													<option value="{$list.listnum|escape:'htmlall':'UTF-8'}">{$list.title|escape:'htmlall':'UTF-8'}</option>
-												{/if}
-											{/foreach}
-										</select>
-										<div class="sync_list" style="display: none;"></div>
-										<i class="material-icons" id="sync_success" style="display: none;">beenhere</i>
-									</td>
-                                {/if}
-							</tr>
-							<tr>
-								<td>
-									<b>{l s='Select your Form' mod='smartmarketingps'}</b>
-								</td>
-								<td>
-									<select name="form" id="formid_egoi" required>
-										<option value="" disabled selected>
-											{l s='Select first your list ...' mod='smartmarketingps'}
-										</option>
-										{if isset($myforms) and ($myforms)}
-											{foreach $myforms as $form_egoi}
-												{if $form_data eq $form_egoi.url}
-													<option value="{$form_egoi.url|escape:'htmlall':'UTF-8'}" selected="selected">
-														{$form_egoi.title|escape:'htmlall':'UTF-8'}
-													</option>
-												{else}
-													<option value="{$form_egoi.url|escape:'htmlall':'UTF-8'}">{$form_egoi.title|escape:'htmlall':'UTF-8'}</option>
-												{/if}
-											{/foreach}
-										{/if}
-									</select>
-									<div id="show_preview" {if isset($list_id) and ($list_id)} {else} style="display: none; {/if}">
-										<a data-toggle="modal" class="btn" data-target="#preview">{l s='Preview' mod='smartmarketingps'}</a>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<b>{l s='Box Dimensions' mod='smartmarketingps'}</b>
-									<p class="egoi-help">{l s='Values in px' mod='smartmarketingps'}</p>
-								</td>
-								<td>
-									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="{l s='Width' mod='smartmarketingps'}" maxlength="5" name="style_width" value="{$style_width|escape:'htmlall':'UTF-8'}">
-									<input type="text" style="display:-webkit-inline-box;width:25%;" placeholder="{l s='Height' mod='smartmarketingps'}" maxlength="5" name="style_height" value="{$style_height|escape:'htmlall':'UTF-8'}">
-								</td>
-							</tr>
-						</table>
-
-					{elseif $type eq 'popup' or $type eq 'html'}
+					
+					{if $type eq 'embedded' or $type eq 'html'}
 
 						{* $editor *}
 						<div class="form-group">
@@ -253,21 +245,6 @@
 							</td>
 						</tr>
 
-						<tr {if !$block_home} style="display: none;" {/if} id="popup_form">
-							<td>
-								<b>{l s='Show in Popup?' mod='smartmarketingps'}</b>
-							</td>
-							<td>
-								<span class="switch prestashop-switch status fixed-width-lg">
-									<input type="radio" name="popup" id="popup1" value="1" {if $popup eq '1'} checked {/if}>
-									<label for="popup1">{l s='Yes' mod='smartmarketingps'}</label>
-									<input type="radio" name="popup" id="popup2" value="0" {if $popup eq '0' or $popup eq ''} checked {/if}>
-									<label for="popup2">{l s='No' mod='smartmarketingps'}</label>
-									<a class="slide-button btn"></a>
-								</span>
-							</td>
-						</tr>
-
 						<tr {if !$block_home} style="display: none;" {/if} id="once">
 							<td>
 								<b>{l s='Show only Once?' mod='smartmarketingps'}</b>
@@ -290,26 +267,21 @@
 				<input type="submit" name="save-form" id="save-form" value="1" style="display: none;">
 			</form>
 
-		{if $type eq 'iframe'}
-			{* Modal Preview *}
-			<div class="modal fade" id="preview" role="dialog">
-			    <div class="modal-dialog" style="width:730px;height:400px;">
-			     	<div class="modal-content">
-				        <div class="modal-body">
-							<div id="egoi_form_inter">
-								<iframe id="prev_iframe" src="" width="700" height="600" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>
-							</div>
-				        </div>
-				        <div class="modal-footer">
-				          <button type="button" class="btn btn-default" id="close_fields" data-dismiss="modal">{l s='Close' mod='smartmarketingps'}</button>
-				        </div>
-			      	</div>
-			    </div>
-			</div>
-		{/if}
-
 	{else}
+	{if $connectedsites eq 0}
+	<div class="banner" id="forms_banner">
 
+		<i class="icon-close btn-banner-forms" id="btn_banner_close"></i>
+		<p class="cs-title">{l s='Do you already know connected sites?' mod='smartmarketingps'}</p>
+		<p class="cs-description">{l s='Connected Site may automatically embed our various products on your site.' mod='smartmarketingps'}</p>
+		<img src="{_MODULE_DIR_}smartmarketingps/img/connected-sites_final.png" class="connected-sites">
+
+
+		<div style="width: 80%; text-align: center">
+			<a type="button" class="btn-findmore-forms" href="https://helpdesk.e-goi.com/205361-Connected-Sites-O-que-%C3%A9-e-como-usar" target="_blank">{l s='Find more' mod='smartmarketingps'}</a>
+		</div>
+	</div>
+	{/if}
 		<div class="panel">
 			<div class="egoi panel-heading">
 				<span class="icon-file-text" id="forms"></span> <span class="baseline">{l s='My Forms' mod='smartmarketingps'}</span>
@@ -359,7 +331,7 @@
 
 			<span id="del-info" style="display: none;">{l s='You are certain to remove this form?' mod='smartmarketingps'}</span>
 
-			<a id="add-form" data-href="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}&form={if isset($totalforms)}{$totalforms+1|escape:'htmlall':'UTF-8'}{else}1{/if}&type=html"></a>
+			<a id="add-form" data-href="{$smarty.server.REQUEST_URI|escape:'htmlall':'UTF-8'}&form={if isset($totalforms)}{$totalforms+1|escape:'htmlall':'UTF-8'}{else}1{/if}&type=embedded"></a>
 		</div>
 
 	{/if}

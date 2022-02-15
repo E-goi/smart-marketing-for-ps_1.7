@@ -117,4 +117,10 @@ $(document).ready(function() {
         }
     });
 
+    $('#btn_banner_close').on('click', function() {
+
+        $('#forms_banner').hide();
+
+    });
+
 });

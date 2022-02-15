@@ -133,6 +133,9 @@ class FormsController extends SmartMarketingBaseController
 			
 			$this->assign('form', $this->formId);
 			$this->assign('token', Tools::getValue('token'));
+			$cs_code = Configuration::get(SmartMarketingPs::CONNECTED_SITES_CODE);
+
+			empty($cs_code)? $this->assign('connectedsites', 0) : $this->assign('connectedsites', 1);
 
 			return $this->displayForm();
 		}
@@ -193,7 +196,7 @@ class FormsController extends SmartMarketingBaseController
 				}
 			}
 
-			if($res['form_id']) {
+			if($res && $res['form_id']) {
                 $result = Db::getInstance()->update('egoi_forms', $this->formOptions, "form_id = ".(int)$this->formId);
                 if ($result) {
                     $this->assign('success_msg', $this->displaySuccess($this->l('Form settings updated')));

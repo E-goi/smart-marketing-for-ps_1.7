@@ -116,7 +116,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '1.6.15';
+	    $this->version = '2.0.0';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -161,11 +161,12 @@ class SmartMarketingPs extends Module
 		//}
 
         // check newsletter submissions anywhere
-		$this->checkNewsletterSubmissions();
+		//$this->checkNewsletterSubmissions();
         $current_context = Context::getContext();
         if ($current_context->controller->controller_type == 'admin'){
             $this->checkPluginVersion();
         }
+
 	}
 
     public function checkPluginVersion(){
@@ -299,6 +300,8 @@ class SmartMarketingPs extends Module
 
 	    // register WebService
 		$this->registerWebService();
+
+        $this->deleteOldForms();
 	  	return true;
 	}
 
@@ -796,6 +799,12 @@ class SmartMarketingPs extends Module
         if( !parent::enable($force_all) || !$this->createMenu() || !$this->installDb()){
             return false;
         }
+        $this->deleteOldForms();
+        return true;
+    }
+
+    public function deleteOldForms(){
+        Db::getInstance()->delete('egoi_forms', "form_type = 'html' or form_type = 'popup' or form_type = 'iframe'");
         return true;
     }
 
@@ -2366,7 +2375,6 @@ class SmartMarketingPs extends Module
             dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php'
         );
 
-
         // if main file not exists
         /*
         $file = dirname(__FILE__).'/../../override/classes/webservice/WebserviceRequest.php';
@@ -2486,6 +2494,8 @@ class SmartMarketingPs extends Module
 				}
 			}
 
+            
+
 			if($res['form_type'] == 'iframe') {
 				$content = '<iframe src="http://'.$res['url'].'" width="'.$res['style_width'].'" height="'.$res['style_height'].'" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>';
 			}else{
@@ -2539,15 +2549,18 @@ class SmartMarketingPs extends Module
 		return true;
 	}
 
+    
     /**
      * @return mixed
      */
+    /*
 	private function checkNewsletterSubmissions()
     {
         if (Tools::isSubmit('submitNewsletter')) {
             if ($email = Tools::getValue('email')) {
 
                 $client = $this->getClientData();
+
                 if ($client['sync'] && $client['newsletter_sync']) {
 
                     if (Validate::isEmail($email)) {
@@ -2570,6 +2583,7 @@ class SmartMarketingPs extends Module
             return false;
         }
     }
+    */
 
     private function syncOrderTE($params) {
 
