@@ -116,7 +116,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '2.0.0';
+	    $this->version = '2.0.1';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -1138,7 +1138,8 @@ class SmartMarketingPs extends Module
 
         $link = new Link();
 
-        $desc = filter_var($product->description_short, FILTER_SANITIZE_STRING);
+        $desc = empty($product->description_short) ? filter_var(substr($product->description,0,800), FILTER_SANITIZE_STRING) : filter_var($product->description_short, FILTER_SANITIZE_STRING);
+
         $price = $product->getPrice(true);
         $salePrice = $product->getPrice(true);
 
