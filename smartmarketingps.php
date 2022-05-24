@@ -293,10 +293,14 @@ class SmartMarketingPs extends Module
 	public function install()
 	{
 	    if(!class_exists('SoapClient') || !function_exists('curl_version')){
+            $this->_errors[] = $this->l("Error: Missing SoapClient or Curl lib. Enable SoapClient or Curl lib on your server");
 	        return false;
         }
-	  	if (!parent::install() || !$this->installDb() || !$this->createMenu() || !$this->registerHooksEgoi())
-	    	return false;
+
+	  	if (!parent::install() || !$this->installDb() || !$this->createMenu() || !$this->registerHooksEgoi()){
+            $this->_errors[] = $this->l("Error: Failed to create e-goi tables.");
+            return false;
+        }	
 
 	    // register WebService
 		$this->registerWebService();
