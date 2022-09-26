@@ -138,14 +138,14 @@ class SyncController extends SmartMarketingBaseController
                     foreach($extra_fields as $key => $extra_field) {
                         $egoi_fields['extra_'.$key] = $extra_field['NAME'];
                     }
-
-                    $option = '';
-                    foreach($egoi_fields as $key => $field) {
-                        $option .= '<option value='.$key.'>'.$field.'</option>'.PHP_EOL;
-                    }
-
-                    $this->assign('select', $option);
                 }
+                
+				$option = '';
+                foreach($egoi_fields as $key => $field) {
+                    $option .= '<option value='.$key.'>'.$field.'</option>'.PHP_EOL;
+                }
+
+                $this->assign('select', $option);
 
 				$this->assign('mapped_fields', $this->getMappedFields());
 			}
