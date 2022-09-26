@@ -2306,7 +2306,7 @@ class SmartMarketingPs extends Module
     /*
      * Map subscriber to egoi map
      * */
-    public static function mapSubscriber($row){
+    public function mapSubscriber($row){
         $subscriber=[//default map
             'first_name'    => $row['firstname'],
             'email'         => $row['email'],
@@ -2324,7 +2324,7 @@ class SmartMarketingPs extends Module
             $subscriber['telephone'] = $row['call_prefix'].'-'.$row['phone'];
         }
         foreach ($row as $field => $value){
-            $field = self::getFieldMap(0, $field);
+            $field = $this->getFieldMap(0, $field);
 
             if(empty($field)){
                 continue;
