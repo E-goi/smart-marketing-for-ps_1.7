@@ -36,6 +36,10 @@ For a workaround you can add this hook call to your **header.tpl**
 ### Changelog
 ```
 
+-- V.2.0.3
+   -- Fix sync contacts field mapping
+   -- Fix php warnings
+
 -- V.2.0.2
    -- Improve exception handling and messages
 
