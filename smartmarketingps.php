@@ -2324,7 +2324,7 @@ class SmartMarketingPs extends Module
             $subscriber['telephone'] = $row['call_prefix'].'-'.$row['phone'];
         }
         foreach ($row as $field => $value){
-            $field = $this->getFieldMap(0, $field);
+            $field = SmartMarketingPs::getFieldMap(0, $field);
 
             if(empty($field)){
                 continue;
