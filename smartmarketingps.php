@@ -187,9 +187,9 @@ class SmartMarketingPs extends Module
             return;
         }
 
-        if(version_compare($lastVersionObj['prestashop'], $this->version, '>')) {
-            $this->createPopupAcknowledge("[E-goi] New Version (".$lastVersionObj['prestashop'].")", "The new version is ready to download, <a href=\"https://goidini.e-goi.com/resources/plugins/prestashop/smart-marketing-ps.1.7.latest.zip\" target=\"_blank\" >click here</a>!");
-        }
+        // if(version_compare($lastVersionObj['prestashop'], $this->version, '>')) {
+        //     $this->createPopupAcknowledge("[E-goi] New Version (".$lastVersionObj['prestashop'].")", "The new version is ready to download, <a href=\"https://goidini.e-goi.com/resources/plugins/prestashop/smart-marketing-ps.1.7.latest.zip\" target=\"_blank\" >click here</a>!");
+        // }
 
     }
 
