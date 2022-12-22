@@ -116,7 +116,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '2.0.4';
+	    $this->version = '2.0.5';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -2317,11 +2317,19 @@ class SmartMarketingPs extends Module
         ];
 
         if(!empty($row['call_prefix']) && !empty($row['phone_mobile'])){
-            $subscriber['cellphone'] = $row['call_prefix'].'-'.$row['phone_mobile'];
+            if (substr($row['phone_mobile'], 0, 1) === "+" && substr($row['phone_mobile'], 1, strlen($row['call_prefix'])) === $row['call_prefix']) { // The string starts with a + and prefix is in the number
+                $subscriber['cellphone'] = $row['call_prefix'].'-'.substr($row['phone_mobile'], strlen($row['call_prefix']) + 1);
+            } else {
+                $subscriber['cellphone'] = $row['call_prefix'].'-'.$row['phone'];
+            }
         }
 
         if(!empty($row['call_prefix']) && !empty($row['phone'])){
-            $subscriber['telephone'] = $row['call_prefix'].'-'.$row['phone'];
+            if (substr($row['phone'], 0, 1) === "+" && substr($row['phone'], 1, strlen($row['call_prefix'])) === $row['call_prefix']) { // The string starts with a + and prefix is in the number
+                $subscriber['telephone'] = $row['call_prefix'].'-'.substr($row['phone'], strlen($row['call_prefix']) + 1); 
+            } else {
+                $subscriber['telephone'] = $row['call_prefix'].'-'.$row['phone'];
+            }
         }
         foreach ($row as $field => $value){
             $field = SmartMarketingPs::getFieldMap(0, $field);
