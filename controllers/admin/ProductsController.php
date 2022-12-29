@@ -54,8 +54,13 @@ class ProductsController extends SmartMarketingBaseController
             if (!empty($_GET['countProducts'])) {
                 $productCount = (int)Db::getInstance()->getValue('SELECT COUNT(id_product) FROM '._DB_PREFIX_.'product WHERE active=1;');
                 $productCount = ceil($productCount/100);
+                
                 echo json_encode(array('lastPage' => $productCount));
-                header('Content-Type: application/json');
+
+                if (!headers_sent()) {
+                    header('Content-Type: application/json');
+                }
+
                 exit;
             } elseif (!empty($_GET['createCatalog'])) {
                 $this->createCatalog();
