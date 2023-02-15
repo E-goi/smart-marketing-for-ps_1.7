@@ -1788,6 +1788,11 @@ class SmartMarketingPs extends Module
     private function getEuPagoData($order)
     {
         $module = Module::getInstanceByName('eupagomb');
+
+        if(!$module){
+            $module = Module::getInstanceByName('eupago_multibanco');
+        }
+
         $result = $module->GenerateReference((int)$order->id, $order->total_paid);
 
         $entity = '';
