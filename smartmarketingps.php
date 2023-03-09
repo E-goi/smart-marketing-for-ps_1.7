@@ -27,6 +27,7 @@ class SmartMarketingPs extends Module
     const SMS_REMINDER_DEFAULT_TIME_CONFIG = 'sms_reminder_default_time_config';
     const PLUGIN_VERSION_KEY = 'egoi_plugin_version_req';
     const PLUGIN_VERSION_KEY_TTL = 'egoi_plugin_version_req_ttl';
+    const TRANSACTIONAL_ACTIVE = 'egoi_plugin_transactional_active';
 
     const SMS_MESSAGES_DEFAULT_LANG_CONFIGURATION = 'sms_messages_default_lang';
     const SMS_REMINDERS_DEFAULT_LANG_CONFIGURATION = 'sms_reminders_default_lang';
@@ -156,12 +157,12 @@ class SmartMarketingPs extends Module
 		}
 	    $this->validateApiKey();
 
-		//if( (Tools::getValue('id_order')) && (Tools::getValue('key'))) {
-			//$this->teOrder();
-		//}
 
-        // check newsletter submissions anywhere
-		//$this->checkNewsletterSubmissions();
+        if(!Configuration::get(self::TRANSACTIONAL_ACTIVE)) {
+            $this->transactionalApi->enableClient();
+            Configuration::updateValue(self::TRANSACTIONAL_ACTIVE, 1);
+        }
+
         $current_context = Context::getContext();
         if ($current_context->controller->controller_type == 'admin'){
             $this->checkPluginVersion();
@@ -304,7 +305,7 @@ class SmartMarketingPs extends Module
 
 	    // register WebService
 		$this->registerWebService();
-
+    
         $this->deleteOldForms();
 	  	return true;
 	}
@@ -913,6 +914,7 @@ class SmartMarketingPs extends Module
                 Configuration::updateValue('smart_api_key', ($api_key));
                 $this->transactionalApi = new TransactionalApi();
                 $this->transactionalApi->enableClient();
+                Configuration::updateValue(self::TRANSACTIONAL_ACTIVE, 1);
                 $this->success_msg = $this->displayConfirmation($this->l('API Key saved and updated'));
             }
 	    }
