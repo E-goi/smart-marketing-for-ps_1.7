@@ -36,6 +36,9 @@ For a workaround you can add this hook call to your **header.tpl**
 ### Changelog
 ```
 
+-- V.2.0.9
+   -- Enable E-goi Transactional client by default
+
 -- V.2.0.8
    -- Compatibility with EuPago Multibanco plugin
 
