@@ -168,7 +168,7 @@ $_MODULE['<{smartmarketingps}prestashop>sync_27efa92dc9957febe76771d9eded8a2f'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_c9ec0310ebd024dd198c82cf21cffe26'] = 'Sincronização ATIVADA';
 $_MODULE['<{smartmarketingps}prestashop>sync_63acc55b44c5678a583b2f3ed54c4c0f'] = 'Sincronização em curso...';
 $_MODULE['<{smartmarketingps}prestashop>sync_d6e8277f739cbbcc56e74de1fdc81652'] = 'O módulo vai sincronizar automaticamente os seus clientes PrestaShop com a lista do E-goi que escolheu.';
-$_MODULE['<{smartmarketingps}prestashop>sync_b1d92040a05b1294351da2a6593acacb'] = 'Ativar sincronização automática';
+$_MODULE['<{smartmarketingps}prestashop>sync_b1d92040a05b1294351da2a6593acacb'] = 'Ativar sincronização automática de clientes';
 $_MODULE['<{smartmarketingps}prestashop>sync_93cba07454f06a4a960172bbd6e2a435'] = 'Sim';
 $_MODULE['<{smartmarketingps}prestashop>sync_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Não';
 $_MODULE['<{smartmarketingps}prestashop>sync_53c2af1f493e0ab3b69628bcc76d81ca'] = 'Escolha \"Sim\" se quiser sincronizar todas as mudanças dos seus clientes PrestaShop com a sua lista E-goi.';
@@ -192,8 +192,8 @@ $_MODULE['<{smartmarketingps}prestashop>sync_7c0b43201656f84c4ed2487a4548ff43'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_823e2334007d702211213b0d078362d4'] = 'Atribuir campos personalizados';
 $_MODULE['<{smartmarketingps}prestashop>sync_43f8ad6b9575cc41e3823379b1f24908'] = 'Sincroniza os campos personalizados do seu PrestaShop com a sua lista no E-goi.';
 $_MODULE['<{smartmarketingps}prestashop>sync_7105a8c7eaaed1981b0dda5f44cedae8'] = 'Módulo de newsletter';
-$_MODULE['<{smartmarketingps}prestashop>sync_956f9ca4982d67128e3609316245de79'] = 'Sincronizar apenas subscritores da Newsletter';
-$_MODULE['<{smartmarketingps}prestashop>sync_eec15ab63a367a481cffaf930baa705d'] = 'Selecione \"SIM\" se desejar ativar SOMENTE a sincronização de subscritores da Newsletter a partir deste';
+$_MODULE['<{smartmarketingps}prestashop>sync_956f9ca4982d67128e3609316245de79'] = 'Ativar sincronização automática de subscritores da Newsletter';
+$_MODULE['<{smartmarketingps}prestashop>sync_eec15ab63a367a481cffaf930baa705d'] = 'Selecione \"SIM\" se desejar ativar a sincronização de subscritores da Newsletter a partir deste';
 $_MODULE['<{smartmarketingps}prestashop>sync_22884db148f0ffb0d830ba431102b0b5'] = 'módulo';
 $_MODULE['<{smartmarketingps}prestashop>sync_850b16544cb58ba475fcf8791889081f'] = 'Inscrição com double opt-in';
 $_MODULE['<{smartmarketingps}prestashop>sync_4940e96ce89f2252b9803365124f77e4'] = 'Escolha \"Sim\" se quiser que os subscritores recebam um email para confirmar a inscrição neste';

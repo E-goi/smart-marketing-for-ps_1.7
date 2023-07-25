@@ -41,6 +41,7 @@ class SyncController extends SmartMarketingBaseController
 		$this->mapFieldsEgoi();
 		$this->syncronizeEgoi();
 		$this->sincronizeList();
+		$this->sincronizeNewsletter();
         $this->countCostumersByShop();
 	}
 
@@ -342,6 +343,7 @@ class SyncController extends SmartMarketingBaseController
 	 */
 	protected function syncronizeEgoi()
 	{
+
         if(!empty(Tools::getValue('action')) && (Tools::getValue('action') == 'synchronize')) {
 
             if (!empty(Tools::getValue('list'))) {
@@ -378,15 +380,14 @@ class SyncController extends SmartMarketingBaseController
             return false;
         }
 
+        if(!empty(Tools::getValue("newsletter"))) {
+            return false;
+        }
+
         $res = SmartMarketingPs::getClientData();
 
-        $sync               = $res['sync'];
         $client_id          = $res['client_id'];
         $list_id            = $res['list_id'];
-        $newsletter_sync    = $res['newsletter_sync'];
-
-        // main sync is activated
-        if(!$sync) {exit;}
 
         $subs = Tools::getValue("subs");
         $store_id = Tools::getValue("store_id");
@@ -399,18 +400,18 @@ class SyncController extends SmartMarketingBaseController
         }
 
         $add='';
-        if(!empty($newsletter_sync) && $newsletter_sync == '1'){
-            $add = 'AND '._DB_PREFIX_.'customer.newsletter="1" ';
-            array_push($ts, 'newsletter');
-        }
 
         $tags = SmartMarketingPs::makeTagMap($ts);
 
         $buff = 1000;
         $count = intval($subs);
 
-
         $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer INNER JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer INNER JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
+
+
+        file_put_contents('/var/www/html/egoi.log', print_r([$sqlc], true), FILE_APPEND);
+
+
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
 
         if(empty($getcs)){
@@ -427,7 +428,6 @@ class SyncController extends SmartMarketingBaseController
         $this->api->addSubscriberBulk($list_id, $array, $tags);
         Configuration::updateValue(SmartMarketingPs::ADDRESS_CRON_TIME_CONFIGURATION, time());
 
-
         Db::getInstance()->update('egoi',
             array(
                 'total' => $this->api->getAllSubscribers($list_id)
@@ -437,5 +437,92 @@ class SyncController extends SmartMarketingBaseController
         echo json_encode(['imported' => $count]);
         exit;
 	}
+
+
+    /**
+     * Syncronize all subscribers to list
+     *
+     * @return bool
+     */
+    protected function sincronizeNewsletter()
+    {
+
+        // on a specific POST request
+        if(empty(Tools::getValue("token_list"))) {
+            return false;
+        }
+
+        if(empty(Tools::getValue("newsletter"))) {
+            return false;
+        }
+
+        file_put_contents('/var/www/html/egoi.log', print_r([Tools::getAllValues()], true), FILE_APPEND);
+
+
+        $res = SmartMarketingPs::getClientData();
+
+        $client_id          = $res['client_id'];
+        $list_id            = $res['list_id'];
+
+        $subs = Tools::getValue("subs");
+        $store_id = Tools::getValue("store_id");
+        $store_name = SmartMarketingPs::getShopsName($store_id);
+        // get main customers
+        $ts = ['NewsletterSubscriptions'];
+        if(!empty($store_id) && !empty($store_name)){
+            array_push($ts, $store_name);
+        }
+
+        $tag_id = $this->api->processNewTag("NewsletterSubscriptions");
+
+        $tags = SmartMarketingPs::makeTagMap($ts);
+
+        array_push($tags, $tag_id);
+
+        $buff = 1000;
+        $count = intval($subs);
+
+        $sql = 'SELECT `email`, `id_lang`
+                FROM ' . _DB_PREFIX_ . 'emailsubscription
+                WHERE `active` = 1
+                AND id_shop = ' . $store_id . ' LIMIT ' . ($count * $buff) . ', ' . $buff;
+
+
+        file_put_contents('/var/www/html/egoi.log', print_r([$tags], true), FILE_APPEND);
+        file_put_contents('/var/www/html/egoi.log', print_r([$sql], true), FILE_APPEND);
+
+
+        $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+
+        file_put_contents('/var/www/html/egoi.log', print_r([$getcs], true), FILE_APPEND);
+
+
+        if(empty($getcs)){
+            echo json_encode(['error' => 'No users!']);
+            exit;
+        }
+
+        $array = array();
+
+        foreach($getcs as $row){
+            $array[] = SmartMarketingPs::mapSubscriberNewsletter($row);
+        }
+
+        $this->api->addSubscriberBulk($list_id, $array, $tags);
+        Configuration::updateValue(SmartMarketingPs::ADDRESS_CRON_TIME_CONFIGURATION, time());
+
+
+        Db::getInstance()->update(
+            'egoi',
+            array(
+                'total' => $this->api->getAllSubscribers($list_id)
+            ),
+            "client_id = $client_id"
+        );
+
+        $count++;
+        echo json_encode(['imported' => $count]);
+        exit;
+    }
 	
 }

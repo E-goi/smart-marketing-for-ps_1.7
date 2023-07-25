@@ -323,6 +323,7 @@ class SmartMarketingPs extends Module
                 'actionObjectCategoryDeleteAfter',
                 'actionObjectProductUpdateAfter',
                 'actionObjectProductDeleteAfter',
+                'actionNewsletterRegistrationAfter',
                 'displayHome',
                 'displayTop',
                 'displayFooter',
@@ -962,6 +963,11 @@ class SmartMarketingPs extends Module
 		}
 	}
 
+    public function hookactionNewsletterRegistrationAfter($params)
+    {
+        return $this->addNewsletterCustomer($params);
+    }
+
 	/**
     * Hook for Add customer
     *
@@ -970,7 +976,7 @@ class SmartMarketingPs extends Module
     */
     public function hookActionObjectCustomerAddAfter($params)
     {
-		return $this->addCustomer($params);
+        return $this->addCustomer($params);
 	}
 
 	/**
@@ -1827,6 +1833,63 @@ class SmartMarketingPs extends Module
         return $data;
     }
 
+
+    /**
+     * @param $params
+     * @return void
+     */
+    protected function addNewsletterCustomer($params) {
+
+        $api = new SmartApi();
+
+        $fields = array(
+            'email' => $params['email'],
+            'lang' => Language::getLanguage($params['cart']->id_lang)['iso_code']
+        );
+
+        $res = $this->getClientData();
+        if($res['newsletter_sync']) {
+            $fields['listID'] = $res['list_id'];
+            $fields['validate_email'] = '0';
+
+            $options = self::getClientData();
+
+            if( !empty($options['newsletter_sync']) && $params['object']->newsletter == '0') {
+                return false;
+            }
+
+            $tag_id = $api->processNewTag("NewsletterSubscriptions");
+
+            $add = $api->addSubscriber($fields, array($tag_id));
+
+            if(isset($add['ERROR']) && ($add['ERROR'])) {
+                return false;
+            }
+
+            if ($add !== false) {
+                $this->context->cookie->__set('egoi_uid', $add);
+                $this->context->cookie->write();
+
+                Db::getInstance()->insert('egoi_customer_uid', array(
+                    'uid' => $add,
+                    'email' => pSQL($params['email'])
+                ));
+                //Configuration::updateValue('egoi_contacts', array($params['object']->email => $add));
+            }
+
+            $client_data = $api->getClientData();
+            $client = (int)$client_data['CLIENTE_ID'];
+
+            return Db::getInstance()->update('egoi',
+                                             array(
+                                                 'total' => (int)$res['total']
+                                             ), "client_id = $client");
+
+        }
+
+        return true;
+    }
+
 	/**
 	 * Add customer
 	 *
@@ -1869,11 +1932,11 @@ class SmartMarketingPs extends Module
 			$fields['listID'] = $res['list_id'];
 			$fields['validate_email'] = '0';
 
-            $options = self::getClientData();
+//            $options = self::getClientData();
 
-            if( !empty($options['newsletter_sync']) && $params['object']->newsletter == '0') {
-                return false;
-            }
+//            if( !empty($options['newsletter_sync']) && $params['object']->newsletter == '0') {
+//                return false;
+//            }
 
 			$add = $api->addSubscriber($fields);
 			if(isset($add['ERROR']) && ($add['ERROR'])) {
@@ -1896,7 +1959,7 @@ class SmartMarketingPs extends Module
 
 			return Db::getInstance()->update('egoi',
 				array(
-					'total' => (int)$res['total']
+					'total' => ((int)$res['total']) + 1
 				), "client_id = $client");
 		}
 	}
@@ -1917,9 +1980,7 @@ class SmartMarketingPs extends Module
     public static function sizeList(){
         $options = self::getClientData();
         $add = '';
-        if(!empty($options['newsletter_sync'])){
-            $add = 'AND newsletter="1"';
-        }
+
         $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" '.$add.' group by id_shop';//AND newsletter="1"
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
@@ -1967,7 +2028,11 @@ class SmartMarketingPs extends Module
 		$res = $this->getClientData();
 		if($res['sync']) {
 
-			$id = isset($params['object']->id) && ($params['object']->id) ? $params['object']->id : false;
+            if($params['object']->newsletter == '0' && !empty($res['newsletter_sync'])) {
+                return false;
+            }
+
+            $id = isset($params['object']->id) && ($params['object']->id) ? $params['object']->id : false;
 			if($id) {
 				$customer = new Customer((int)$id);
 				if (!empty($customer)) {
@@ -2001,28 +2066,12 @@ class SmartMarketingPs extends Module
 
                     $api = new SmartApi();
 
-                    $tag = '';
-                    if($params['object']->newsletter == '0') {
-                        $name = 'NO_Newsletter';
-                        $get_tags = $api->getTags();
-                        if (!empty($get_tags)) {
-                            foreach ($get_tags as $tags) {
-                                if ($tags['NAME'] == $name) {
-                                    $tag = $tags['ID'];
-                                }
-                            }
-                        }
-
-                        if (!$tag) {
-                            $add_tag = $api->addTag($name);
-                            $tag = $add_tag['ID'];
-                        }
-                    }
+                    $tags = $api->processNewTag("NO_Newsletter");
 
                     $fields['listID'] = $res['list_id'];
-                    $result = $api->editSubscriber($fields, array($tag));
+                    $result = $api->editSubscriber($fields, array($tags));
                     if (isset($result['ERROR']) && ($result['ERROR'])) {
-                        $api->addSubscriber($fields, array($tag));
+                        $api->addSubscriber($fields, array($tags));
                     }
 				}
 			}
@@ -2306,6 +2355,30 @@ class SmartMarketingPs extends Module
         }
         $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($sql);
         return $rq['egoi'];
+    }
+
+    /*
+ * Map subscriber to egoi map
+ * */
+    public function mapSubscriberNewsletter($row){
+        $subscriber=[//default map
+            'email'         => $row['email'],
+            'status'        => 1,
+            'lang'          => Language::getLanguage($row['id_lang'])['iso_code']
+        ];
+
+        foreach ($row as $field => $value){
+            $field = SmartMarketingPs::getFieldMap(0, $field);
+
+            if(empty($field)){
+                continue;
+            }
+
+            $subscriber[$field] = $value;
+        }
+
+        return $subscriber;
+
     }
 
     /*
