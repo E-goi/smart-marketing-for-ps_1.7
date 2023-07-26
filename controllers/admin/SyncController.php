@@ -406,11 +406,7 @@ class SyncController extends SmartMarketingBaseController
         $buff = 1000;
         $count = intval($subs);
 
-        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer INNER JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer INNER JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
-
-
-        file_put_contents('/var/www/html/egoi.log', print_r([$sqlc], true), FILE_APPEND);
-
+        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
 
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
 
@@ -456,9 +452,6 @@ class SyncController extends SmartMarketingBaseController
             return false;
         }
 
-        file_put_contents('/var/www/html/egoi.log', print_r([Tools::getAllValues()], true), FILE_APPEND);
-
-
         $res = SmartMarketingPs::getClientData();
 
         $client_id          = $res['client_id'];
@@ -487,15 +480,7 @@ class SyncController extends SmartMarketingBaseController
                 WHERE `active` = 1
                 AND id_shop = ' . $store_id . ' LIMIT ' . ($count * $buff) . ', ' . $buff;
 
-
-        file_put_contents('/var/www/html/egoi.log', print_r([$tags], true), FILE_APPEND);
-        file_put_contents('/var/www/html/egoi.log', print_r([$sql], true), FILE_APPEND);
-
-
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-
-        file_put_contents('/var/www/html/egoi.log', print_r([$getcs], true), FILE_APPEND);
-
 
         if(empty($getcs)){
             echo json_encode(['error' => 'No users!']);

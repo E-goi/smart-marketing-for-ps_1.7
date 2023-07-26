@@ -38,6 +38,8 @@ For a workaround you can add this hook call to your **header.tpl**
 
 -- V.2.0.9
    -- Add sync newsletter subscription to Egoi Lists
+   -- Improve syncronization flow
+   -- Add tag "NewsletterSubscriptions"
    
 -- V.2.0.8
    -- Compatibility with EuPago Multibanco plugin
