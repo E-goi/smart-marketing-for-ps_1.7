@@ -1858,9 +1858,14 @@ class SmartMarketingPs extends Module
                 return false;
             }
 
-            $tag_id = $api->processNewTag("NewsletterSubscriptions");
+            $tagName = "NewsletterSubscriptions";
+            $ts = [$tagName];
+            $tagId = $api->processNewTag($tagName);
+            $tags = SmartMarketingPs::makeTagMap($ts);
 
-            $add = $api->addSubscriber($fields, array($tag_id));
+            array_push($tags, $tagId);
+
+            $add = $api->addSubscriber($fields, $tags);
 
             if(isset($add['ERROR']) && ($add['ERROR'])) {
                 return false;
@@ -1932,13 +1937,19 @@ class SmartMarketingPs extends Module
 			$fields['listID'] = $res['list_id'];
 			$fields['validate_email'] = '0';
 
-//            $options = self::getClientData();
+            if($params['object']->newsletter == '1') {
+                $tagName = "NewsletterSubscriptions";
+            } else {
+                $tagName = "NO_Newsletter";
+            }
 
-//            if( !empty($options['newsletter_sync']) && $params['object']->newsletter == '0') {
-//                return false;
-//            }
+            $ts = [$tagName];
+            $tagId = $api->processNewTag($tagName);
+            $tags = SmartMarketingPs::makeTagMap($ts);
 
-			$add = $api->addSubscriber($fields);
+            array_push($tags, $tagId);
+
+			$add = $api->addSubscriber($fields, $tags);
 			if(isset($add['ERROR']) && ($add['ERROR'])) {
 				return false;
 			}
@@ -1991,7 +2002,6 @@ class SmartMarketingPs extends Module
      * */
     public static function makeTagMap($ts = []){
         $api = new SmartApi();
-
 
         $resp = $api->getTags();
 
@@ -2066,12 +2076,21 @@ class SmartMarketingPs extends Module
 
                     $api = new SmartApi();
 
-                    $tags = $api->processNewTag("NO_Newsletter");
+                    if($params['object']->newsletter == '1') {
+                        $tagName = "NewsletterSubscriptions";
+                    } else {
+                        $tagName = "NO_Newsletter";
+                    }
+
+                    $ts = [$tagName];
+                    $tagId = $api->processNewTag($tagName);
+                    $tags = SmartMarketingPs::makeTagMap($ts);
+                    array_push($tags, $tagId);
 
                     $fields['listID'] = $res['list_id'];
-                    $result = $api->editSubscriber($fields, array($tags));
+                    $result = $api->editSubscriber($fields, $tags);
                     if (isset($result['ERROR']) && ($result['ERROR'])) {
-                        $api->addSubscriber($fields, array($tags));
+                        $api->addSubscriber($fields, $tags);
                     }
 				}
 			}
