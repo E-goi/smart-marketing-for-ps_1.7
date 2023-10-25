@@ -8,8 +8,9 @@
  *  @package SmartMarketingPs
  */
 
-if (!defined('_PS_VERSION_'))
-  	exit;
+if (!defined('_PS_VERSION_')) {
+    exit;
+}
 
 class SmartMarketingPs extends Module
 {
@@ -108,6 +109,17 @@ class SmartMarketingPs extends Module
      */
     protected $goidini;
 
+
+    /**
+     * @var array[] $menuTab
+     */
+    protected $menuTab = [
+        'Account' => [],
+        'Sync' => [],
+        'SmsNotifications' => [],
+        'Products' => [],
+    ];
+
 	/**
 	* Module Constructor
 	*/
@@ -116,7 +128,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '2.0.9';
+	    $this->version = '3.0.0';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -148,17 +160,14 @@ class SmartMarketingPs extends Module
 	      	$this->warning = $warning_message;
 	    }
 
-		if(!empty(Tools::getValue('smart_api_key'))) {
-			$this->addClientId($_POST);
+        if(!empty(Tools::getValue('smart_api_key'))) {
+            $this->addClientId($_POST);
             if(!empty($_POST['egoi_client_id'])){
                 $this->createMenu();
             }
-		}
-	    $this->validateApiKey();
+        }
 
-		//if( (Tools::getValue('id_order')) && (Tools::getValue('key'))) {
-			//$this->teOrder();
-		//}
+        $this->validateApiKey();
 
         // check newsletter submissions anywhere
 		//$this->checkNewsletterSubmissions();
@@ -278,7 +287,6 @@ class SmartMarketingPs extends Module
 	public function autoloadApi()
 	{
         include_once dirname(__FILE__) . '/lib/EgoiRestApi.php';
-        include_once dirname(__FILE__) . '/lib/SmartApi.php';
         include_once dirname(__FILE__) . '/lib/TransactionalApi.php';
         include_once dirname(__FILE__) . '/lib/ApiV3.php';
         include_once dirname(__FILE__) . '/lib/GoidiniApi.php';
@@ -292,10 +300,6 @@ class SmartMarketingPs extends Module
 	 */
 	public function install()
 	{
-	    if(!class_exists('SoapClient') || !function_exists('curl_version')){
-            $this->_errors[] = $this->l("Error: Missing SoapClient or Curl lib. Enable SoapClient or Curl lib on your server");
-	        return false;
-        }
 
 	  	if (!parent::install() || !$this->installDb() || !$this->createMenu() || !$this->registerHooksEgoi()){
             $this->_errors[] = $this->l("Error: Failed to create e-goi tables.");
@@ -341,7 +345,7 @@ class SmartMarketingPs extends Module
 	{
 		$return = true;
 		$sql = array();
-		include dirname(__FILE__) . '/install/sql.php';
+		include dirname(__FILE__) . '/install/install.php';
 
 		foreach ($sql as $s){
 		    $return &= Db::getInstance()->execute($s);
@@ -628,114 +632,139 @@ class SmartMarketingPs extends Module
 	 */
 	private function createMenu()
 	{
-		$subtabs = array(
-			'Account' => $this->l('Account'),
-			'Sync' => $this->l('Sync Contacts'),
-			'Forms' => $this->l('Forms'),
-            'SmsNotifications' => $this->l('SMS Notifications'),
-            'Products' => $this->l('Products'),
-            'PushNotifications' => $this->l('PushNotifications')
-		);
+        $subtabs = array(
+            'Account' => [
+                'string' => $this->l('Account'),
+                'icon' => 'manage_accounts',
+            ],
+            'Sync' => [
+                'string' => $this->l('Sync Contacts'),
+                'icon' => 'account_circle',
+            ],
+            'SmsNotifications' => [
+                'string' => $this->l('SMS Notifications'),
+                'icon' => 'sms',
+            ],
+            'Products' => [
+                'string' => $this->l('Products'),
+                'icon' => 'shopping_bag',
+            ],
+        );
 
-		$this->createPermissions();
+        $this->createPermissions();
 
-		// main tab
-        $result = Db::getInstance()->getValue("SELECT id_tab FROM "._DB_PREFIX_."tab WHERE position = '11' AND module = 'smartmarketingps' AND class_name = 'SmartMarketingPs'");
-        if(empty($result)){
-            Db::getInstance()->insert('tab',
-                array(
-                    'position' => '11',
-                    'module' => 'smartmarketingps',
-                    'class_name' => 'SmartMarketingPs',
-                    'active' => 1,
-                )
+        try {
+            // main tab
+
+            $result = Db::getInstance()->getValue(
+                "SELECT id_tab FROM " . _DB_PREFIX_ . "tab WHERE position = '11' AND module = 'smartmarketingps' AND class_name = 'SmartMarketingPs'"
             );
-            $main_id = Db::getInstance()->Insert_ID();
-        }else{
-            $main_id = $result;
-        }
-
-        $langs = Language::getLanguages(true, $this->context->shop->id);
-        $tab_lang_exists = Db::getInstance()->getValue("SELECT id_tab FROM "._DB_PREFIX_."tab_lang WHERE id_tab=".$main_id);
-
-        if(empty($tab_lang_exists)){
-            $langs = Language::getLanguages(true, $this->context->shop->id);
-            foreach ($langs as $lang) {
-                if (empty($lang['id_lang'])) {
-                    continue;
-                }
-    
-                // main tab lang
-                Db::getInstance()->insert('tab_lang',
+            if (empty($result)) {
+                Db::getInstance()->insert(
+                    'tab',
                     array(
-                        'id_tab' => $main_id,
-                        'id_lang' => $lang['id_lang'],
-                        'name' => 'Smart Marketing'
+                        'position' => '11',
+                        'module' => 'smartmarketingps',
+                        'class_name' => 'SmartMarketingPs',
+                        'active' => 1,
                     )
                 );
+                $main_id = Db::getInstance()->Insert_ID();
+            } else {
+                $main_id = $result;
+            }
 
-                try{
+            $langs = Language::getLanguages(true, $this->context->shop->id);
+            $tab_lang_exists = Db::getInstance()->getValue(
+                "SELECT id_tab FROM " . _DB_PREFIX_ . "tab_lang WHERE id_tab=" . $main_id
+            );
+
+            if (empty($tab_lang_exists)) {
+                $langs = Language::getLanguages(true, $this->context->shop->id);
+                foreach ($langs as $lang) {
+                    if (empty($lang['id_lang'])) {
+                        continue;
+                    }
+
+                    // main tab lang
+                    Db::getInstance()->insert(
+                        'tab_lang',
+                        array(
+                            'id_tab' => $main_id,
+                            'id_lang' => $lang['id_lang'],
+                            'name' => 'Smart Marketing'
+                        )
+                    );
+
+                    try {
+                        Db::getInstance()->update(
+                            'tab',
+                            array(
+                                'icon' => ''
+                            ),
+                            'id_tab = ' . (int)$result
+                        );
+                    } catch (Exception $e) {
+                    }
+                }
+            }
+
+            $index = 1;
+            foreach ($subtabs as $key => $val) {
+                $result = Db::getInstance()->getValue(
+                    "SELECT id_tab FROM " . _DB_PREFIX_ . "tab WHERE module = 'smartmarketingps' AND class_name = '" . $key . "'"
+                );
+
+                if (empty($result)) {
+                    Db::getInstance()->insert(
+                        'tab',
+                        array(
+                            'id_parent' => $main_id,
+                            'position' => $index,
+                            'module' => 'smartmarketingps',
+                            'class_name' => $key,
+                            'active' => 1
+                        )
+                    );
+                    $result = Db::getInstance()->Insert_ID();
+                }
+
+                try {
                     Db::getInstance()->update(
                         'tab',
                         array(
-                            'icon' => ''
+                            'icon' => $val['icon']
                         ),
                         'id_tab = ' . (int)$result
                     );
-                }catch (Exception $e){
-
+                } catch (Exception $e) {
                 }
-            }
-        }
 
-        $index = 1;
-        foreach ($subtabs as $key => $val) {
-            $result = Db::getInstance()->getValue("SELECT id_tab FROM "._DB_PREFIX_."tab WHERE module = 'smartmarketingps' AND class_name = '".$key."'");
-            if(empty($result)){
-                Db::getInstance()->insert('tab',
-                    array(
-                        'id_parent' => $main_id,
-                        'position' => $index,
-                        'module' => 'smartmarketingps',
-                        'class_name' => $key,
-                        'active' => 1
-                    )
-                );
-                $result = Db::getInstance()->Insert_ID();
-            }
+                $tab_id = $result;
+//                Db::getInstance()->delete("tab_lang", "id_tab= '" . $tab_id . "' AND name=''");
 
-            try{
-                Db::getInstance()->update(
-                    'tab',
-                    array(
-                        'icon' => ''
-                    ),
-                    'id_tab = ' . (int)$result
-                );
-            }catch (Exception $e){
-
-            }
-
-
-            $tab_id = $result;
-            foreach ($langs as $lang) {
-
-                if (!empty($lang['id_lang'])) {
-                    $tablang = Db::getInstance()->getValue("SELECT * FROM "._DB_PREFIX_."tab_lang WHERE id_tab = '".$tab_id."' AND id_lang = '".$lang['id_lang']."' AND name = '".$val."'");
-                    if(empty($tablang)){
-                        Db::getInstance()->insert('tab_lang',
-                            array(
-                                'id_tab' => $tab_id,
-                                'id_lang' => $lang['id_lang'],
-                                'name' => $val
-                            )
+                foreach ($langs as $lang) {
+                    if (!empty($lang['id_lang'])) {
+                        $tablang = Db::getInstance()->getValue(
+                            "SELECT * FROM " . _DB_PREFIX_ . "tab_lang WHERE id_tab = '" . $tab_id . "' AND id_lang = '" . $lang['id_lang'] . "'"
                         );
+                        if (empty($tablang)) {
+                            Db::getInstance()->insert(
+                                'tab_lang',
+                                array(
+                                    'id_tab' => $tab_id,
+                                    'id_lang' => $lang['id_lang'],
+                                    'name' => $val['string']
+                                )
+                            );
+                        }
                     }
                 }
 
+                $index++;
             }
-
-            $index++;
+        } catch (Exception $e) {
+            return false;
         }
 
 		return true;
@@ -749,7 +778,7 @@ class SmartMarketingPs extends Module
     protected function uninstallDb()
 	{
 		// drop all tables from the plugin
-		include dirname(__FILE__) . '/install/sql.php';
+		include dirname(__FILE__) . '/install/uninstall.php';
     	foreach ($sql as $name => $v){
        		Db::getInstance()->execute('DROP TABLE IF EXISTS '.$name);
    		}
@@ -801,15 +830,9 @@ class SmartMarketingPs extends Module
     public function enable($force_all = false)
     {
         $this->registerHooksEgoi();
-        if( !parent::enable($force_all) || !$this->createMenu() || !$this->installDb()){
+        if( !parent::enable($force_all) || !$this->installDb() || !$this->createMenu()){
             return false;
         }
-        $this->deleteOldForms();
-        return true;
-    }
-
-    public function deleteOldForms(){
-        Db::getInstance()->delete('egoi_forms', "form_type = 'html' or form_type = 'popup' or form_type = 'iframe'");
         return true;
     }
 
@@ -903,6 +926,7 @@ class SmartMarketingPs extends Module
 	 */
 	public function getContent()
 	{
+
 	    if (Tools::isSubmit('submit_api_key')) {
 
 	    	$api_key = Tools::getValue('smart_api_key');
@@ -950,16 +974,15 @@ class SmartMarketingPs extends Module
 	{
 		if(!empty(Tools::getValue("api_key"))) {
 
-	        $api = new SmartApi(Tools::getValue("api_key"));
-	        $clientData = $api->getClientData();
+	        $clientData = $this->apiv3->getMyAccount();
 
-	        if(isset($clientData['CLIENTE_ID']) && ($clientData['CLIENTE_ID'])) {
-	        	echo json_encode($clientData);
-	        	exit;
-	        }else{
-	        	header('HTTP/1.1 403 Forbidden');
-				exit;
-	        }
+            if (!empty($clientData["general_info"]["client_id"])) {
+                echo json_encode($clientData);
+                exit;
+            } else {
+                header('HTTP/1.1 403 Forbidden');
+                exit;
+            }
 		}
 	}
 
@@ -1227,7 +1250,7 @@ class SmartMarketingPs extends Module
             return;
         }
 
-        $res = SmartMarketingPs::getClientData();
+        $res = self::getClientData();
 
         $list_id            = $res['list_id'];
         $newsletter_sync    = $res['newsletter_sync'];
@@ -1250,30 +1273,50 @@ class SmartMarketingPs extends Module
             array_push($ts, 'newsletter');
         }
 
-        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer INNER JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer INNER JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" AND '._DB_PREFIX_.'address.date_upd >= "'. date('Y-m-d H:i:s', $timeSaved) .'" OR '._DB_PREFIX_.'address.date_add >= "'. date('Y-m-d H:i:s', $timeSaved) .'"'.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer';
+        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" AND '._DB_PREFIX_.'address.date_upd >= "'. date('Y-m-d H:i:s', $timeSaved) .'" OR '._DB_PREFIX_.'address.date_add >= "'. date('Y-m-d H:i:s', $timeSaved) .'"'.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer';
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
 
         if(empty($getcs)){
             return;
         }
 
-        $tags = SmartMarketingPs::makeTagMap($ts);
-
-        $array = [];
+        $data = [];
         foreach($getcs as $row){
-            $array[] = SmartMarketingPs::mapSubscriber($row);
+            $data[] = SmartMarketingPs::mapSubscriber($row);
         }
 
-        if(!empty($array)){
-            $api = new SmartApi();
-            if(count($array) == 1){
-                $array[0]['listID'] = $list_id;
-                $result = $api->editSubscriber($array[0], $tags);
-                if (isset($result['ERROR']) && ($result['ERROR'])) {
-                    $api->addSubscriber($array[0], $tags);
+        if(!empty($data)){
+            if(count($data) == 1) {
+                $data = $data[0];
+                if(!empty($data['base']['email'])) {
+                    $uid = Db::getInstance()->getValue('SELECT uid FROM '._DB_PREFIX_."egoi_customer_uid WHERE email='".pSQL($data['base']['email'])."';");
+                    if(empty($uid)) {
+                        $uid = $this->apiv3->searchContactByEmail($data['base']['email'], $list_id);
+                        if(!empty($uid)) {
+                            Db::getInstance()->insert('egoi_customer_uid', array(
+                                'uid' => $uid,
+                                'email' => pSQL($data['base']['email'])
+                            ));
+                            $this->apiv3->patchContact($list_id, $uid, $data);
+                        } else {
+                            $contact = $this->apiv3->createContact($list_id, $data);
+                            if(!empty($contact['contact_id'])) {
+                                Db::getInstance()->insert('egoi_customer_uid', array(
+                                    'uid' => $contact['contact_id'],
+                                    'email' => pSQL($data['base']['email'])
+                                ));
+                            }
+                        }
+                    }
                 }
-            }else{
-                $api->addSubscriberBulk($list_id, $array, $tags);
+            } else {
+                $importContacts = [
+                    'mode' => 'update',
+                    'compare_field' => 'email',
+                    'contacts' => $data,
+                    'force_empty' => true,
+                ];
+                $this->apiv3->addSubscriberBulk($list_id, $importContacts);
             }
         }
 
@@ -1840,56 +1883,35 @@ class SmartMarketingPs extends Module
      */
     protected function addNewsletterCustomer($params) {
 
-        $api = new SmartApi();
-
         $fields = array(
-            'email' => $params['email'],
-            'lang' => Language::getLanguage($params['cart']->id_lang)['iso_code']
+            'email' => $params['email']
         );
 
-        $res = $this->getClientData();
-        if($res['newsletter_sync']) {
-            $fields['listID'] = $res['list_id'];
-            $fields['validate_email'] = '0';
+        $options = self::getClientData();
 
-            $options = self::getClientData();
+        if(!empty($options['newsletter_sync'])) {
 
-            if( !empty($options['newsletter_sync']) && $params['object']->newsletter == '0') {
-                return false;
-            }
+            $data = SmartMarketingPs::mapSubscriber($fields);
 
-            $tagName = "NewsletterSubscriptions";
-            $ts = [$tagName];
-            $tagId = $api->processNewTag($tagName);
-            $tags = SmartMarketingPs::makeTagMap($ts);
-
-            array_push($tags, $tagId);
-
-            $add = $api->addSubscriber($fields, $tags);
-
-            if(isset($add['ERROR']) && ($add['ERROR'])) {
-                return false;
-            }
-
-            if ($add !== false) {
-                $this->context->cookie->__set('egoi_uid', $add);
+            $contact = $this->apiv3->createContact($options['list_id'], $data);
+            if(!empty($contact['contact_id'])) {
+                $this->context->cookie->__set('egoi_uid', $contact['contact_id']);
                 $this->context->cookie->write();
-
                 Db::getInstance()->insert('egoi_customer_uid', array(
-                    'uid' => $add,
+                    'uid' => $contact['contact_id'],
                     'email' => pSQL($params['email'])
                 ));
-                //Configuration::updateValue('egoi_contacts', array($params['object']->email => $add));
             }
 
-            $client_data = $api->getClientData();
-            $client = (int)$client_data['CLIENTE_ID'];
+            $client = $options['client_id'];
 
-            return Db::getInstance()->update('egoi',
-                                             array(
-                                                 'total' => (int)$res['total']
-                                             ), "client_id = $client");
-
+            return Db::getInstance()->update(
+                'egoi',
+                array(
+                    'total' => (int)$options['total'] + 1
+                ),
+                "client_id = $client"
+            );
         }
 
         return true;
@@ -1903,76 +1925,46 @@ class SmartMarketingPs extends Module
 	 */
 	protected function addCustomer($params)
 	{
-		$api = new SmartApi();
 
-		$fields = array(
-			'email' => $params['object']->email,
-            'lang' => Language::getLanguage($params['object']->id_lang)['iso_code']
-		);
-		foreach ($params['object'] as $key => $value) {
-			$row = $this->getFieldMap(0, $key);
-			if($row) {
-				$fields[$row] = $value;
-			}
-		}
+        $params = json_decode(json_encode ( $params ) , true);
 
-		if (count($fields) <= 1) {
-			// default fields to be passed to E-goi in case the fields are not mapped
-			$fields = array_merge($fields,
-				array(
-					'first_name' => $params['object']->firstname,
-					'last_name' => $params['object']->lastname,
-					'birth_date' => $params['object']->birthday
-				)
-			);
-		}
+        if(empty($params)) {
+            return false;
+        }
 
-        $res = $this->getClientData();
-		if($res['sync']) {
+        $params = $params['object'];
+
+        $options = self::getClientData();
+
+        if($options['sync']) {
             // check if is a role defined
-            if (!$this->getRole($params['object']->id, $res['role'])) {
+            if (!$this->getRole($params['id'], $options['role'])) {
                 return false;
             }
 
-			$fields['listID'] = $res['list_id'];
-			$fields['validate_email'] = '0';
+            $data = SmartMarketingPs::mapSubscriber($params);
 
-            if($params['object']->newsletter == '1') {
-                $tagName = "NewsletterSubscriptions";
-            } else {
-                $tagName = "NO_Newsletter";
-            }
-
-            $ts = [$tagName];
-            $tagId = $api->processNewTag($tagName);
-            $tags = SmartMarketingPs::makeTagMap($ts);
-
-            array_push($tags, $tagId);
-
-			$add = $api->addSubscriber($fields, $tags);
-			if(isset($add['ERROR']) && ($add['ERROR'])) {
-				return false;
-			}
-
-			if ($add !== false) {
-                $this->context->cookie->__set('egoi_uid', $add);
+            $contact = $this->apiv3->createContact($options['list_id'], $data);
+            if(!empty($contact['contact_id'])) {
+                $this->context->cookie->__set('egoi_uid', $contact['contact_id']);
                 $this->context->cookie->write();
-
                 Db::getInstance()->insert('egoi_customer_uid', array(
-                    'uid' => $add,
-                    'email' => pSQL($params['object']->email)
+                    'uid' => $contact['contact_id'],
+                    'email' => pSQL($params['email'])
                 ));
-                //Configuration::updateValue('egoi_contacts', array($params['object']->email => $add));
             }
 
-            $client_data = $api->getClientData();
-            $client = (int)$client_data['CLIENTE_ID'];
+            $client = $options['client_id'];
 
-			return Db::getInstance()->update('egoi',
-				array(
-					'total' => ((int)$res['total']) + 1
-				), "client_id = $client");
-		}
+            return Db::getInstance()->update(
+                'egoi',
+                array(
+                    'total' => (int)$options['total'] + 1
+                ),
+                "client_id = $client"
+            );
+        }
+        return true;
 	}
 
     public static function getShopsName($id){
@@ -1989,43 +1981,11 @@ class SmartMarketingPs extends Module
      * Count size of list by store
      * */
     public static function sizeList(){
-        $options = self::getClientData();
-        $add = '';
 
-        $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" '.$add.' group by id_shop';//AND newsletter="1"
+        $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" group by id_shop';//AND newsletter="1"
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
-
-    /*
-     * gets tag number from name (creates if they dont exist)
-     * */
-    public static function makeTagMap($ts = []){
-        $api = new SmartApi();
-
-        $resp = $api->getTags();
-
-        $mapped_ids = [];
-
-        foreach ($resp as $tag){
-            for($i = 0;$i<count($ts);$i++){
-                if(strcasecmp($tag['NAME'], $ts[$i]) == 0){
-                    unset($ts[$i]);
-                    array_push($mapped_ids, $tag['ID']);
-                }
-            }
-        }
-
-        foreach ($ts as $tagName){
-            $resp = $api->addTag($tagName);
-            if(isset($resp['ID'])){
-                array_push($mapped_ids, $resp['ID']);
-            }
-        }
-
-        return $mapped_ids;
-    }
-
 
     /**
 	 * Update customer
@@ -2035,66 +1995,47 @@ class SmartMarketingPs extends Module
 	 */
 	protected function updateCustomer($params)
 	{
-		$res = $this->getClientData();
-		if($res['sync']) {
+        $params = json_decode(json_encode ( $params ) , true);
 
-            if($params['object']->newsletter == '0' && !empty($res['newsletter_sync'])) {
+        if(empty($params)) {
+            return false;
+        }
+        $params = $params['object'];
+
+        $options = self::getClientData();
+
+        if ($options['sync'] && !empty($params['id'])) {
+            // check if is a role defined
+            if (!$this->getRole($params['id'], $options['role'])) {
                 return false;
             }
 
-            $id = isset($params['object']->id) && ($params['object']->id) ? $params['object']->id : false;
-			if($id) {
-				$customer = new Customer((int)$id);
-				if (!empty($customer)) {
-				    // check if is a role defined
-                    if (!$this->getRole($customer->id, $res['role'])) {
-				        return false;
+            $uid = Db::getInstance()->getValue('SELECT uid FROM '._DB_PREFIX_."egoi_customer_uid WHERE email='".pSQL($params['email'])."';");
+            if(empty($uid)) {
+                $uid = $this->apiv3->searchContactByEmail($params['email'], $options['list_id']);
+                if(!empty($uid)) {
+                    Db::getInstance()->insert('egoi_customer_uid', array(
+                        'uid' => $uid,
+                        'email' => pSQL($params['email'])
+                    ));
+                    $data = SmartMarketingPs::mapSubscriber($params);
+                    $this->apiv3->patchContact($options['list_id'], $uid, $data);
+                } else {
+                    $data = SmartMarketingPs::mapSubscriber($params);
+                    $contact = $this->apiv3->createContact($options['list_id'], $data);
+                    if(!empty($contact['contact_id'])) {
+                        Db::getInstance()->insert('egoi_customer_uid', array(
+                            'uid' => $contact['contact_id'],
+                            'email' => pSQL($data['base']['email'])
+                        ));
                     }
-
-					$fields = array(
-						'email' => $customer->email,
-                        'lang' => Language::getLanguage($params['object']->id_lang)['iso_code']
-					);
-					foreach ($customer as $key => $value) {
-						$row = $this->getFieldMap(0, $key);
-
-						if($row){
-							$fields[$row] = $value;
-						}
-					}
-
-					if (count($fields) <= 1) {
-						// default fields to be passed to E-goi in case the fields are not mapped
-						$fields = array_merge($fields,
-							array(
-								'first_name' => $customer->firstname,
-								'last_name' => $customer->lastname,
-								'birth_date' => $customer->birthday
-							)
-						);
-					}
-
-                    $api = new SmartApi();
-
-                    if($params['object']->newsletter == '1') {
-                        $tagName = "NewsletterSubscriptions";
-                    } else {
-                        $tagName = "NO_Newsletter";
-                    }
-
-                    $ts = [$tagName];
-                    $tagId = $api->processNewTag($tagName);
-                    $tags = SmartMarketingPs::makeTagMap($ts);
-                    array_push($tags, $tagId);
-
-                    $fields['listID'] = $res['list_id'];
-                    $result = $api->editSubscriber($fields, $tags);
-                    if (isset($result['ERROR']) && ($result['ERROR'])) {
-                        $api->addSubscriber($fields, $tags);
-                    }
-				}
-			}
-		}
+                }
+            } else {
+                $data = SmartMarketingPs::mapSubscriber($params);
+                $this->apiv3->patchContact($options['list_id'], $uid, $data);
+            }
+        }
+        return true;
 	}
 
 	/**
@@ -2105,32 +2046,54 @@ class SmartMarketingPs extends Module
 	 */
 	protected function deleteCustomer($params)
 	{
-		$res = $this->getClientData();
-		if($res['sync']) {
+        $params = json_decode(json_encode ( $params ) , true);
 
-			$api = new SmartApi();
+        if(empty($params)) {
+            return false;
+        }
+        $params = $params['object'];
 
-			$email = isset($params['object']->email) && ($params['object']->email) ? $params['object']->email : false;
-			if ($email) {
-                // check if is a role defined
-                if (!$this->getRole($params['object']->id, $res['role'])) {
-                    return false;
+        $options = self::getClientData();
+        $client = $options['client_id'];
+
+        if ($options['sync']) {
+            // check if is a role defined
+            if (!$this->getRole($params['id'], $options['role'])) {
+                return false;
+            }
+
+            $uid = Db::getInstance()->getValue('SELECT uid FROM '._DB_PREFIX_."egoi_customer_uid WHERE email='".pSQL($params['email'])."';");
+            if(empty($uid)) {
+                $uid = $this->apiv3->searchContactByEmail($params['email'], $options['list_id']);
+                if(!empty($uid)) {
+                    $data[] = [
+                        'contact_id' => $uid,
+                        'unsubscription_method' => 'manual',
+                        'unsubscription_reason' => 'other',
+                        'unsubscription_observation' => 'Prestashop Customer delete'
+
+                    ];
+                    $this->apiv3->unsubscribeContact($options['list_id'], $data);
                 }
+            } else {
+                $data[] = [
+                    'contact_id' => $uid,
+                    'unsubscription_method' => 'manual',
+                    'unsubscription_reason' => 'other',
+                    'unsubscription_observation' => 'Prestashop Customer delete'
 
-				$rm = $api->removeSubscriber($res['list_id'], $email);
-				if(isset($rm['ERROR']) && ($rm['ERROR'])) {
-					return false;
-				}
-
-				$client_data = $api->getClientData();
-				$client = (int)$client_data['CLIENTE_ID'];
-
-				return Db::getInstance()->update('egoi',
-                    array(
-                        'total' => (int)($res['total']-1)
-                    ), "client_id = $client");
-			}
-		}
+                ];
+                $this->apiv3->unsubscribeContact($options['list_id'], $data);
+            }
+            return Db::getInstance()->update(
+                'egoi',
+                array(
+                    'total' => (int)($options['total'] - 1)
+                ),
+                "client_id = $client"
+            );
+        }
+        return true;
 	}
 
     /**
@@ -2175,7 +2138,6 @@ class SmartMarketingPs extends Module
         if($this->processBlockOptions('header')) {
             return $this->display(__FILE__, 'smartmarketingps.tpl');
         }
-
 
         return $this->display(__FILE__, 'ecommerce/front-scripts.tpl');
     }
@@ -2276,7 +2238,7 @@ class SmartMarketingPs extends Module
 	 */
 	public function te()
 	{
-		$res = $this->getClientData('track', 1);
+		$res = self::getClientData('track', 1);
 		if (!empty($res)) {
 			$list_id = $res['list_id'];
 			$client = $res['client_id'];
@@ -2298,7 +2260,6 @@ class SmartMarketingPs extends Module
 
 				$products = $cart->getProducts();
 
-				//$this->removeCart();
                 $cs_code = Configuration::get(static::CONNECTED_SITES_CODE);
                 if(!empty($cs_code)){
                     $cs_code = base64_decode($cs_code);
@@ -2325,7 +2286,7 @@ class SmartMarketingPs extends Module
 	{
 	 	$json = isset($params['json']) && is_array($params['json']) ? json_decode($params['json']['id']) : $params['cookie']->id_cart;
 
-	 	$res = $this->getClientData('track', 1);
+	 	$res = self::getClientData('track', 1);
 		if (!empty($res)) {
 			$list_id = $res['list_id'];
 			$track = $res['track'];
@@ -2365,7 +2326,7 @@ class SmartMarketingPs extends Module
      * @param $field
      * @return string
      */
-    public function getFieldMap($name = false, $field = false)
+    public static function getFieldMap($name = false, $field = false)
     {
         if ($field) {
             $sql = "SELECT * FROM " . _DB_PREFIX_ . "egoi_map_fields WHERE ps='" . pSQL($field) . "'";
@@ -2377,71 +2338,61 @@ class SmartMarketingPs extends Module
     }
 
     /*
- * Map subscriber to egoi map
- * */
-    public function mapSubscriberNewsletter($row){
-        $subscriber=[//default map
-            'email'         => $row['email'],
-            'status'        => 1,
-            'lang'          => Language::getLanguage($row['id_lang'])['iso_code']
-        ];
-
-        foreach ($row as $field => $value){
-            $field = SmartMarketingPs::getFieldMap(0, $field);
-
-            if(empty($field)){
-                continue;
-            }
-
-            $subscriber[$field] = $value;
-        }
-
-        return $subscriber;
-
-    }
-
-    /*
      * Map subscriber to egoi map
      * */
-    public function mapSubscriber($row){
-        $subscriber=[//default map
-            'first_name'    => $row['firstname'],
-            'email'         => $row['email'],
-            'last_name'     => $row['lastname'],
-            'birth_date'    => isset($row['birthdate'])?$row['birthdate']:$row['birthday'],
-            'status'        => 1,
-            'lang'          => Language::getLanguage($row['id_lang'])['iso_code']
+    public static function mapSubscriber($data)
+    {
+        $subscriber = [
+            'base' => [
+                'status' => 'active',
+                'first_name' => !empty($data['firstname']) ? $data['firstname'] : '',
+                'last_name' => !empty($data['lastname']) ? $data['lastname'] : '',
+                'birth_date' => isset($data['birthdate']) ? $data['birthdate'] : '',
+                'cellphone' => '',
+                'phone' => '',
+                'email' => $data['email'],
+                'language' => !empty($data['id_lang']) ? Language::getLanguage($data['id_lang'])['iso_code'] : '',
+            ],
+            'extra' => []
         ];
 
-        if(!empty($row['call_prefix']) && !empty($row['phone_mobile'])){
-            if (substr($row['phone_mobile'], 0, 1) === "+" && substr($row['phone_mobile'], 1, strlen($row['call_prefix'])) === $row['call_prefix']) { // The string starts with a + and prefix is in the number
-                $subscriber['cellphone'] = $row['call_prefix'].'-'.substr($row['phone_mobile'], strlen($row['call_prefix']) + 1);
-            } else {
-                $subscriber['cellphone'] = $row['call_prefix'].'-'.$row['phone'];
-            }
+        if (!empty($data['call_prefix']) && !empty($data['phone_mobile'])) {
+            $subscriber['base']['cellphone'] = self::parsePhoneNumber($data['call_prefix'], $data['phone_mobile']);
         }
 
-        if(!empty($row['call_prefix']) && !empty($row['phone'])){
-            if (substr($row['phone'], 0, 1) === "+" && substr($row['phone'], 1, strlen($row['call_prefix'])) === $row['call_prefix']) { // The string starts with a + and prefix is in the number
-                $subscriber['telephone'] = $row['call_prefix'].'-'.substr($row['phone'], strlen($row['call_prefix']) + 1); 
-            } else {
-                $subscriber['telephone'] = $row['call_prefix'].'-'.$row['phone'];
-            }
+        if (!empty($data['call_prefix']) && !empty($data['phone'])) {
+            $subscriber['base']['phone'] = self::parsePhoneNumber($data['call_prefix'], $data['phone']);
         }
-        foreach ($row as $field => $value){
-            $field = SmartMarketingPs::getFieldMap(0, $field);
+
+        foreach ($data as $field => $value){
+            $field = SmartMarketingPs::getFieldMap(null, $field);
 
             if(empty($field)){
                 continue;
             }
 
-            $subscriber[$field] = $value;
+            if(strpos($field, 'extra') !== false) {
+                $subscriber['extra'] = [
+                    [
+                        'field_id' => (int) str_replace('extra_', '', $field),
+                        'value' => $value
+                    ]
+                ];
+            } else {
+                if($field == 'telephone') {
+                    $field = 'phone'; //
+                }
+
+                if($field == 'phone' || $field == 'cellphone') {
+                    $value = self::parsePhoneNumber($data['call_prefix'], $value);
+                }
+
+                $subscriber['base'][$field] = $value;
+            }
         }
 
         return $subscriber;
-
     }
-
 
     /**
 	 * Get Client Data from DB
@@ -2470,13 +2421,6 @@ class SmartMarketingPs extends Module
             dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php',
             dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php'
         );
-
-        // if main file not exists
-        /*
-        $file = dirname(__FILE__).'/../../override/classes/webservice/WebserviceRequest.php';
-        if (!file_exists($file)) {
-            copy(dirname(__FILE__).'/override/classes/webservice/WebserviceRequest.php', $file);
-        }*/
 
         $this->cleanCache();
     }
@@ -2590,8 +2534,6 @@ class SmartMarketingPs extends Module
 				}
 			}
 
-            
-
 			if($res['form_type'] == 'iframe') {
 				$content = '<iframe src="http://'.$res['url'].'" width="'.$res['style_width'].'" height="'.$res['style_height'].'" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>';
 			}else{
@@ -2645,45 +2587,10 @@ class SmartMarketingPs extends Module
 		return true;
 	}
 
-    
-    /**
-     * @return mixed
-     */
-    /*
-	private function checkNewsletterSubmissions()
-    {
-        if (Tools::isSubmit('submitNewsletter')) {
-            if ($email = Tools::getValue('email')) {
-
-                $client = $this->getClientData();
-
-                if ($client['sync'] && $client['newsletter_sync']) {
-
-                    if (Validate::isEmail($email)) {
-
-                    	$api = new SmartApi;
-                    	$tag_id = $api->processNewTag("NewsletterSubscriptions");
-
-                        return $api
-                            ->addSubscriber(
-                                array(
-                                    'listID' => $client['list_id'],
-                                    'email' => $email,
-                                    'status' => $client['optin'] ? 0 : 1,
-                                    'tags' => array($tag_id)
-                                )
-                            );
-                    }
-                }
-            }
-            return false;
-        }
-    }
-    */
 
     private function syncOrderTE($params) {
 
-        $res = $this->getClientData('track', 1);
+        $res = self::getClientData('track', 1);
         if (empty($res['track'])) {
             return false;
         }
@@ -2710,4 +2617,24 @@ class SmartMarketingPs extends Module
         ]);
 
     }
+
+    /**
+     * @param $prefix
+     * @param $number
+     * @return string
+     */
+    protected static function parsePhoneNumber($prefix = '', $number = '')
+    {
+        if (substr($number, 0, 1) === "+" && substr($number, 1, strlen($prefix)) === $prefix) { // The string starts with a + and prefix is in the number
+            return $prefix . '-' . substr($number, strlen($prefix) + 1);
+        } else {
+            if(strpos($number, $prefix) === 0) { // se o numero ja tiver indicativo
+                return $number;
+            }
+            return $prefix . '-' . $number;
+        }
+        return '';
+    }
+
+
 }

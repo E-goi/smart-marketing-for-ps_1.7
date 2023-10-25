@@ -31,7 +31,7 @@ $(document).ready(function() {
     		resp = JSON.parse(data);
     		egoi = resp[0];
     		jm = resp[1];
-    		$('#egoi_sinc_users_ps').hide();
+    		$('#egoi_sync_users_ps').hide();
     		$('#sync').html(sub_egoi+': <span class="help"><b>'+egoi+'</b></span><p>'+sub_ps+': <span class="help"><b>'+jm+'</b></span><p>');
     	}
     });
@@ -261,6 +261,9 @@ $(document).ready(function() {
 			    		$("#error_map").hide();
 			    	}else{
 			    		$("#error_map").show();
+                        window.setTimeout(function(){
+                            $("#error_map").fadeOut(400);
+                        }, 4000);
 			    	}
 			    	$ps.val('');
 			    	$egoi.val('');
@@ -271,6 +274,9 @@ $(document).ready(function() {
 			    error:function(status){
 			    	if(status){
 				    	$("#error_map").show();
+                        window.setTimeout(function(){
+                            $("#error_map").fadeOut(400);
+                        }, 4000);
 				    	$('#load_map').hide();
 				    }
 			    }

@@ -31,6 +31,11 @@ abstract class SmartMarketingBaseController extends ModuleAdminController
 	 */
 	protected $api;
 
+    /**
+     * @var object ApiV3
+     */
+    protected $apiv3;
+
 	/**
 	 * By default check if is a configuration page
 	 * 

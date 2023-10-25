@@ -22,6 +22,132 @@ class ApiV3 extends EgoiRestApi
     }
 
     /**
+     * Returns all lists
+     *
+     * @return mixed
+     */
+    public function getLists()
+    {
+        return $this->call('GET', '/lists');
+    }
+
+    /**
+     * Creates a list
+     *
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function createList($data)
+    {
+        return $this->call('POST', '/lists', $data);
+    }
+
+    /**
+     * Gets all Fields
+     *
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function getAllFields($listId)
+    {
+        return $this->call('GET', '/lists/' . $listId . '/fields');
+    }
+
+    /**
+     * Gets all Fields
+     *
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function getContactsNum($listId)
+    {
+        return $this->call('GET', '/lists/' . $listId . '/contacts', ['limit' => 1]);
+    }
+
+    /**
+     * @param $email
+     * @param $listId
+     * @return mixed|void
+     */
+    public function searchContactByEmail($email, $listId)
+    {
+        $contacts = $this->call('GET', '/contacts/search', ['type' => 'email', 'contact' => $email]);
+        if (!empty($contacts['items'])) {
+            foreach ($contacts['items'] as $contact) {
+                if ($contact['list_id'] == $listId) {
+                    return $contact['contact_id'];
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $listId
+     * @param $contactId
+     * @param $data
+     * @return int|mixed
+     */
+    public function patchContact($listId, $contactId, $data)
+    {
+        return $this->call('PATCH', '/lists/' . $listId . '/contacts/' . $contactId, $data);
+    }
+
+    /**
+     * @param $listId
+     * @param $data
+     * @return int|mixed
+     */
+    public function createContact($listId, $data)
+    {
+        return $this->call('POST', '/lists/' . $listId . '/contacts', $data);
+    }
+
+    /**
+     * @param $listId
+     * @param $data
+     * @return int|mixed
+     */
+    public function unsubscribeContact($listId, $data)
+    {
+        return $this->call('POST', '/lists/' . $listId . '/contacts/actions/unsubscribe', $data);
+    }
+
+    /**
+     * Imports products to a catalog
+     *
+     * @param $id
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function addSubscriberBulk($listId, $data)
+    {
+        return $this->call('POST', '/lists/' . $listId . '/contacts/actions/import-bulk', $data);
+    }
+
+    /**
+     * Gets all extra Fields
+     *
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function getAllExtraFields($listId)
+    {
+        $allFields = $this->getAllFields($listId);
+        $extraFields = [];
+        foreach ($allFields as $field) {
+            if ($field['type'] == 'extra') {
+                $extraFields[] = $field;
+            }
+        }
+        return $extraFields;
+    }
+
+    /**
      * Returns all catalogs
      *
      * @return mixed
@@ -209,6 +335,7 @@ class ApiV3 extends EgoiRestApi
                 break;
             case 'DELETE':
                 curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+                break;
             default:
         }
 

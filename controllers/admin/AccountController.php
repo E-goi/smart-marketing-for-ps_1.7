@@ -20,15 +20,14 @@ class AccountController extends SmartMarketingBaseController
 	{
 		parent::__construct();
 
-		// instantiate API
-		$this->activateApi();
-
 		$this->bootstrap = true;
 		$this->cfg = 0;
 		
 		$this->meta_title = $this->l('My Account').' - '.$this->module->displayName;
-		if (!$this->module->active)
-			Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
+		if (!$this->module->active) {
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
+        }
+        $this->apiv3 = new ApiV3();
 	}
 
 	/**
@@ -68,10 +67,8 @@ class AccountController extends SmartMarketingBaseController
 	public function initContent()
 	{
 		parent::initContent();
-
-		if ($this->isValid()) {
-			
-			if($data = $this->api->getClientData()) {
+        if ($this->isValid()) {
+            if($data = $this->apiv3->getMyAccount()) {
 				$this->assign('clientData', $data);
 			} else {
 				$this->assign('clientData', false);
@@ -93,8 +90,8 @@ class AccountController extends SmartMarketingBaseController
 		if(!empty($_POST)){
 			$msg = $this->postList();
 		}
-		
-		$this->assign('lists', $this->api->getLists() ?: false);
+
+		$this->assign('lists', $this->apiv3->getLists() ?: false);
 
 		if($msg) {
 			if(is_numeric($msg)){
@@ -116,9 +113,7 @@ class AccountController extends SmartMarketingBaseController
 	{
 		if (!empty(Tools::getValue('add-list'))) {
 			$name = trim(Tools::getValue('egoi_ps_title'));
-			$lang = Tools::getValue('egoi_ps_lang', 'en');
-
-			$result = $this->api->createList($name, $lang);
+            $result = $this->apiv3->createList(["internal_name" => $name, "public_name" => $name]);
             if (isset($result['ERROR'])) {
                 $this->assign('error_msg', $this->displayWarning(
                     $this->l('Error on creating this list') . $result['ERROR']));
