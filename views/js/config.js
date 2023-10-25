@@ -36,13 +36,13 @@ $(document).ready(function($) {
 			        api_key: api_key
 			    }),
 			    success:function(data, status) {
-			        
+			        debugger
 			        $(".sync_api_key").hide();
 			        if(status == '403'){
 			        	$("#apikey_submit").prop('disabled', true).hide();
 			        	$("#error").prop('style', 'display:inline-block');
 			        }else{
-			        	$('#egoi_client_id').val(data.CLIENTE_ID);
+			        	$('#egoi_client_id').val(data.general_info.client_id);
 			        	$("#apikey_submit").prop('disabled', false).show();
 			        	$('#error').hide();
 			        }

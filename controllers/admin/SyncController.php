@@ -27,23 +27,22 @@ class SyncController extends SmartMarketingBaseController
 		parent::__construct();
 
 		// instantiate API
-		$this->activateApi();
         $this->apiv3 = new ApiV3();
 
 		$this->bootstrap = true;
 		$this->cfg = 0;
 		$this->meta_title = $this->l('E-goi Sync Contacts').' - '.$this->module->displayName;
 		
-		if (!$this->module->active)
-			Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
-		
-		$this->retrieveRoles();
-		$this->mapFieldsEgoi();
+		if (!$this->module->active) {
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
+        }
+        $this->retrieveRoles();
+        $this->mapFieldsEgoi();
 		$this->syncronizeEgoi();
 		$this->sincronizeList();
-		$this->sincronizeNewsletter();
+        $this->sincronizeNewsletter();
         $this->countCostumersByShop();
-	}
+    }
 
 	/**
 	 * Inject Dependencies
@@ -90,14 +89,13 @@ class SyncController extends SmartMarketingBaseController
 	public function initContent()
 	{
 		parent::initContent();
-
 		if ($this->isValid()) {
 
 			if(!empty($_POST)) {
 				$this->saveSync();
 			}
 
-			$this->assign('lists', $this->api->getLists());
+			$this->assign('lists', $this->apiv3->getLists());
 
 			$rq = Db::getInstance(_PS_USE_SQL_SLAVE_)
 					->getRow('SELECT * FROM '._DB_PREFIX_.'egoi where client_id!="" order by egoi_id DESC');
@@ -114,7 +112,7 @@ class SyncController extends SmartMarketingBaseController
 
 			if(isset($list_id) && ($list_id)) {
 				
-				$this->assign('subscribers', $this->api->getSubscribersFromListId($list_id));
+				$this->assign('subscribers', $this->getEgoiSubscribers($list_id));
 				$this->assign('list_id', $list_id);
 				$this->assign('sync', $sync);
 				$this->assign('track', $track);
@@ -128,16 +126,16 @@ class SyncController extends SmartMarketingBaseController
 				$egoi_fields = array(
 					'first_name' => 'First name',
 					'last_name' => 'Last name',
-					'surname' => 'Surname',
 					'cellphone' => 'Mobile',
 					'telephone' => 'Telephone',
 					'birth_date' => 'Birth Date'
 				);
 
-                $extra_fields = $this->api->getExtraFields($list_id);
-                if (!empty($extra_fields)) {
-                    foreach($extra_fields as $key => $extra_field) {
-                        $egoi_fields['extra_'.$key] = $extra_field['NAME'];
+                $allExtraFields = $this->apiv3->getAllExtraFields($list_id);
+
+                if (!empty($allExtraFields)) {
+                    foreach($allExtraFields as $extra_field) {
+                        $egoi_fields['extra_'.$extra_field['field_id']] = $extra_field['name'] . ' (ID: ' . $extra_field['field_id'] . ' // Format: ' .$extra_field['format'].')';
                     }
                 }
                 
@@ -167,6 +165,8 @@ class SyncController extends SmartMarketingBaseController
 	 */
 	protected function saveSync() 
 	{
+
+
 		if(!empty(Tools::getValue('action_add'))) {
 
 			$list = Tools::getValue('list');
@@ -178,7 +178,6 @@ class SyncController extends SmartMarketingBaseController
             $noptin = Tools::getValue('newsletter_optin', 0);
 			$track = Tools::getValue('track', 1);
 
-
             if(!empty($track) && $track == "1"){
                 $code = $this->apiv3->activateConnectedSites(_PS_BASE_URL_ ,$list);
                 if(empty($code) || !is_array($code) || empty($code['code'])){
@@ -189,29 +188,29 @@ class SyncController extends SmartMarketingBaseController
                 }
             }
 
-			// compare client ID -> API with DB
-			$client_data = $this->api->getClientData();
-			$client = $client_data['CLIENTE_ID'];
+            // compare client ID -> API with DB
+            $client_data = $this->apiv3->getMyAccount();
+            $client = $client_data['general_info']['client_id'];
 
-			$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
+            $res = Db::getInstance(_PS_USE_SQL_SLAVE_)
 						->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id='.(int)$client);
 
-			// temporary - alter table with new column
-			if ($nsync) {
-				if (is_null($res['newsletter_sync'])) {
-					$query = "ALTER TABLE "._DB_PREFIX_."egoi ADD COLUMN newsletter_sync INT(11) NOT NULL DEFAULT '0' AFTER `optin`";
-					Db::getInstance()->execute($query);
-				}
-			}
+            // temporary - alter table with new column
+            if ($nsync) {
+                if (is_null($res['newsletter_sync'])) {
+                    $query = "ALTER TABLE "._DB_PREFIX_."egoi ADD COLUMN newsletter_sync INT(11) NOT NULL DEFAULT '0' AFTER `optin`";
+                    Db::getInstance()->execute($query);
+                }
+            }
 
             if (isset($track_state)) {
-				if(is_null($res['track_state'])){
-					$query = "ALTER TABLE "._DB_PREFIX_."egoi ADD COLUMN track_state INT(11) NOT NULL DEFAULT '0' AFTER `optin`";
-					Db::getInstance()->execute($query);
-				}
+                if(is_null($res['track_state'])){
+                    $query = "ALTER TABLE "._DB_PREFIX_."egoi ADD COLUMN track_state INT(11) NOT NULL DEFAULT '0' AFTER `optin`";
+                    Db::getInstance()->execute($query);
+                }
             }
-			
-			$values = array(
+
+            $values = array(
 				'list_id' => (int)$list, 
 				'client_id' => (int)$client,
 				'sync' => (int)$sync,
@@ -295,22 +294,18 @@ class SyncController extends SmartMarketingBaseController
 						'ps_name' => $ps_name,
 						'egoi' => $egoi,
 						'egoi_name' => $egoi_name,
-						'status' => (int)$status
+						'status' => $status
 					));
-
-		         	Db::getInstance(_PS_USE_SQL_SLAVE_)
-		         				->getRow("SELECT * FROM "._DB_PREFIX_."egoi_map_fields order by id DESC");
-
-	         		$this->assign('post_id', Db::getInstance()->Insert_ID());
-	         		$this->assign('ps_name', $ps_name);
+                    $this->assign('post_id', Db::getInstance()->Insert_ID());
+                    $this->assign('ps_name', $ps_name);
 	         		$this->assign('egoi_name', $egoi_name);
 
 	         		echo $this->context->smarty->display($this->_path.'/views/templates/admin/fields.tpl');
 		        }
 				exit;
 
-			}else if($id) {
-				Db::getInstance()->delete('egoi_map_fields', 'id = '.(int)$id);
+			} elseif($id) {
+				Db::getInstance()->delete('egoi_map_fields', 'id = ' . $id);
 				exit;
 			}
 		}
@@ -324,16 +319,8 @@ class SyncController extends SmartMarketingBaseController
 	 */
 	protected function getEgoiSubscribers($listID)
 	{
-		$count = 0;
-		$result = $this->api->getLists();
-
-		foreach ($result as $value) {
-			if($value['listnum'] == $listID) {
-				$count = $value['subs_activos'];
-			}
-		}
-
-	    return $count;
+        $result = $this->apiv3->getContactsNum($listID);
+	    return !empty($result['total_items']) ? $result['total_items'] : 0;
 	}
 
 	/**
@@ -386,7 +373,6 @@ class SyncController extends SmartMarketingBaseController
 
         $res = SmartMarketingPs::getClientData();
 
-        $client_id          = $res['client_id'];
         $list_id            = $res['list_id'];
 
         $subs = Tools::getValue("subs");
@@ -401,12 +387,10 @@ class SyncController extends SmartMarketingBaseController
 
         $add='';
 
-        $tags = SmartMarketingPs::makeTagMap($ts);
-
         $buff = 1000;
         $count = intval($subs);
 
-        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer INNER JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer INNER JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
+        $sqlc = 'SELECT email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, newsletter, optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
 
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
 
@@ -415,19 +399,19 @@ class SyncController extends SmartMarketingBaseController
             exit;
         }
 
-        $array = array();
+        $importContacts = [
+            'mode' => 'update',
+            'compare_field' => 'email',
+            'contacts' => [],
+            'force_empty' => true,
+        ];
 
         foreach($getcs as $row){
-            $array[] = SmartMarketingPs::mapSubscriber($row);
+            $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row);
         }
 
-        $this->api->addSubscriberBulk($list_id, $array, $tags);
+        $this->apiv3->addSubscriberBulk($list_id, $importContacts);
         Configuration::updateValue(SmartMarketingPs::ADDRESS_CRON_TIME_CONFIGURATION, time());
-
-        Db::getInstance()->update('egoi',
-            array(
-                'total' => $this->api->getAllSubscribers($list_id)
-            ), "client_id = $client_id");
 
         $count++;
         echo json_encode(['imported' => $count]);
@@ -461,16 +445,10 @@ class SyncController extends SmartMarketingBaseController
         $store_id = Tools::getValue("store_id");
         $store_name = SmartMarketingPs::getShopsName($store_id);
         // get main customers
-        $ts = ['NewsletterSubscriptions'];
+        $ts = [];
         if(!empty($store_id) && !empty($store_name)){
             array_push($ts, $store_name);
         }
-
-        $tag_id = $this->api->processNewTag("NewsletterSubscriptions");
-
-        $tags = SmartMarketingPs::makeTagMap($ts);
-
-        array_push($tags, $tag_id);
 
         $buff = 1000;
         $count = intval($subs);
@@ -487,20 +465,25 @@ class SyncController extends SmartMarketingBaseController
             exit;
         }
 
-        $array = array();
+        $importContacts = [
+            'mode' => 'update',
+            'compare_field' => 'email',
+            'contacts' => [],
+            'force_empty' => true,
+        ];
 
         foreach($getcs as $row){
-            $array[] = SmartMarketingPs::mapSubscriberNewsletter($row);
+            $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row);
         }
 
-        $this->api->addSubscriberBulk($list_id, $array, $tags);
-        Configuration::updateValue(SmartMarketingPs::ADDRESS_CRON_TIME_CONFIGURATION, time());
+        $this->apiv3->addSubscriberBulk($list_id, $importContacts);
 
+        Configuration::updateValue(SmartMarketingPs::ADDRESS_CRON_TIME_CONFIGURATION, time());
 
         Db::getInstance()->update(
             'egoi',
             array(
-                'total' => $this->api->getAllSubscribers($list_id)
+                'total' => $this->getEgoiSubscribers($list_id)
             ),
             "client_id = $client_id"
         );

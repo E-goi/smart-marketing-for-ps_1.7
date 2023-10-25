@@ -188,6 +188,7 @@ class ProductsController extends SmartMarketingBaseController
         if ($page != 0) {
             $page = ($page - 1) * 100;
         }
+
         $products = Product::getProducts($langId, $page, 100, 'id_product', 'DESC', false, true);
         foreach ($products as $product) {
             $data['products'][] = SmartMarketingPs::mapProduct($product, $langId, $currencyId);

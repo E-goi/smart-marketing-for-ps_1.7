@@ -21,8 +21,8 @@
                 <p style="padding-top: 20px;"></p>
                 <div id="sync">
                     <span id="valid_sync"></span>
-                    <p id="egoi_sinc_users_ps"></p>
-                    <div class="egoi_sinc_users">
+                    <p id="egoi_sync_users_ps"></p>
+                    <div class="egoi_sync_users">
                         {l s='Loading Subscribers Information...' mod='smartmarketingps'}
                     </div>
                 </div>
@@ -34,7 +34,7 @@
 			<tr valign="top">
 				<th class="egoi-td" scope="row">{l s='Sync customers with this list' mod='smartmarketingps'}</th>
 				<td>
-					{if !$lists}
+					{if !$lists.items}
 						{l s='No lists found, are you connected to E-goi and/or have created lists?' mod='smartmarketingps'}
 					{else}
 						<select name="list" id="egoi_lists">
@@ -42,11 +42,11 @@
 								{l s='Select a list..' mod='smartmarketingps'}
 							</option>
 
-							{foreach $lists as $list}
-								{if isset($list_id) and ($list_id eq $list.listnum)}
-									<option value="{$list.listnum|escape:'htmlall':'UTF-8'}" selected="selected">{$list.title|escape:'htmlall':'UTF-8'}</option>
+							{foreach $lists.items as $list}
+								{if isset($list_id) and ($list_id eq $list.list_id)}
+									<option value="{$list.list_id|escape:'htmlall':'UTF-8'}" selected="selected">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
 								{else}
-									<option value="{$list.listnum|escape:'htmlall':'UTF-8'}">{$list.title|escape:'htmlall':'UTF-8'}</option>
+									<option value="{$list.list_id|escape:'htmlall':'UTF-8'}">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
 								{/if}
 
 							{/foreach}

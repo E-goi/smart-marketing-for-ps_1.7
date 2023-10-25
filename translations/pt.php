@@ -125,7 +125,7 @@ $_MODULE['<{smartmarketingps}prestashop>forms_155cce2d7dd751acd7fc6a56e81b5e6c']
 $_MODULE['<{smartmarketingps}prestashop>sync_528a93013b04d581c067f39e6c73ca9a'] = 'Os meus contatos';
 $_MODULE['<{smartmarketingps}prestashop>sync_a2a2502ce2af7371eb0905fa590ba318'] = 'Contatos no E-goi (ativos)';
 $_MODULE['<{smartmarketingps}prestashop>sync_27efa92dc9957febe76771d9eded8a2f'] = 'Clientes no Prestashop';
-$_MODULE['<{smartmarketingps}prestashop>sync_c9ec0310ebd024dd198c82cf21cffe26'] = 'Sincronização ATIVADA';
+$_MODULE['<{smartmarketingps}prestashop>sync_c9ec0310ebd024dd198c82cf21cffe26'] = 'Sincronização automática ATIVADA';
 $_MODULE['<{smartmarketingps}prestashop>sync_63acc55b44c5678a583b2f3ed54c4c0f'] = 'Sincronização em curso...';
 $_MODULE['<{smartmarketingps}prestashop>sync_d6e8277f739cbbcc56e74de1fdc81652'] = 'O módulo vai sincronizar automaticamente os seus clientes PrestaShop com a lista do E-goi que escolheu.';
 $_MODULE['<{smartmarketingps}prestashop>sync_dd4926dee0920e3221ec6effbf2487fd'] = 'Sincronizar clientes com esta lista';
@@ -147,7 +147,7 @@ $_MODULE['<{smartmarketingps}prestashop>sync_823e2334007d702211213b0d078362d4'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_43f8ad6b9575cc41e3823379b1f24908'] = 'Sincroniza os campos personalizados do seu PrestaShop com a sua lista no E-goi.';
 $_MODULE['<{smartmarketingps}prestashop>sync_7105a8c7eaaed1981b0dda5f44cedae8'] = 'Módulo de newsletter';
 $_MODULE['<{smartmarketingps}prestashop>sync_956f9ca4982d67128e3609316245de79'] = 'Ativar sincronização automática de subscritores da Newsletter';
-$_MODULE['<{smartmarketingps}prestashop>sync_eec15ab63a367a481cffaf930baa705d'] = 'Selecione \"SIM\" se desejar ativar a sincronização de subscritores da Newsletter a partir deste';
+$_MODULE['<{smartmarketingps}prestashop>sync_eec15ab63a367a481cffaf930baa705d'] = 'Selecione \"SIM\" se desejar ativar a sincronização automática de subscritores da Newsletter a partir deste';
 $_MODULE['<{smartmarketingps}prestashop>sync_22884db148f0ffb0d830ba431102b0b5'] = 'módulo';
 $_MODULE['<{smartmarketingps}prestashop>sync_fa87b4415e0afff4d79ea5f06a03faef'] = 'Sincronizar subscritores de newsletters existentes';
 $_MODULE['<{smartmarketingps}prestashop>sync_b2480b0b733052a313df6baa62ee3e16'] = 'Sincronizar subscritores da newsletter';
