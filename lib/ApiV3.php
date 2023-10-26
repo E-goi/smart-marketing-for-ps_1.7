@@ -11,6 +11,17 @@ class ApiV3 extends EgoiRestApi
      */
     const API_URL = 'https://api.egoiapp.com';
 
+
+    public function setApiKey($apikey)
+    {
+        $this->apiKey = $apikey;
+    }
+
+    public function getApiKey()
+    {
+        return $this->apiKey = $this->apiKey ?: Configuration::get('smart_api_key');
+    }
+
     /**
      * Returns user account information
      *
