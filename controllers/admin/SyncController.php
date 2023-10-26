@@ -406,8 +406,10 @@ class SyncController extends SmartMarketingBaseController
             'force_empty' => true,
         ];
 
+        $allFields = $this->getMappedFields();
+
         foreach($getcs as $row){
-            $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row);
+            $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row, $allFields ? $allFields : []);
         }
 
         $this->apiv3->addSubscriberBulk($list_id, $importContacts);
@@ -472,8 +474,10 @@ class SyncController extends SmartMarketingBaseController
             'force_empty' => true,
         ];
 
+        $allFields = $this->getMappedFields();
+
         foreach($getcs as $row){
-            $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row);
+            $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row, $allFields ? $allFields : []);
         }
 
         $this->apiv3->addSubscriberBulk($list_id, $importContacts);

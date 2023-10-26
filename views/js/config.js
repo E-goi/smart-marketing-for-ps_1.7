@@ -36,7 +36,6 @@ $(document).ready(function($) {
 			        api_key: api_key
 			    }),
 			    success:function(data, status) {
-			        debugger
 			        $(".sync_api_key").hide();
 			        if(status == '403'){
 			        	$("#apikey_submit").prop('disabled', true).hide();

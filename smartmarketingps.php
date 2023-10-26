@@ -309,7 +309,6 @@ class SmartMarketingPs extends Module
 	    // register WebService
 		$this->registerWebService();
 
-        $this->deleteOldForms();
 	  	return true;
 	}
 
@@ -974,7 +973,8 @@ class SmartMarketingPs extends Module
 	{
 		if(!empty(Tools::getValue("api_key"))) {
 
-	        $clientData = $this->apiv3->getMyAccount();
+            $this->apiv3->setApiKey(Tools::getValue("api_key"));
+            $clientData = $this->apiv3->getMyAccount();
 
             if (!empty($clientData["general_info"]["client_id"])) {
                 echo json_encode($clientData);
@@ -1281,8 +1281,10 @@ class SmartMarketingPs extends Module
         }
 
         $data = [];
+        $allFields = $this->getMappedFields();
+
         foreach($getcs as $row){
-            $data[] = SmartMarketingPs::mapSubscriber($row);
+            $data[] = SmartMarketingPs::mapSubscriber($row, $allFields);
         }
 
         if(!empty($data)){
@@ -1890,8 +1892,8 @@ class SmartMarketingPs extends Module
         $options = self::getClientData();
 
         if(!empty($options['newsletter_sync'])) {
-
-            $data = SmartMarketingPs::mapSubscriber($fields);
+            $allFields = $this->getMappedFields();
+            $data = SmartMarketingPs::mapSubscriber($fields, $allFields);
 
             $contact = $this->apiv3->createContact($options['list_id'], $data);
             if(!empty($contact['contact_id'])) {
@@ -1941,8 +1943,8 @@ class SmartMarketingPs extends Module
             if (!$this->getRole($params['id'], $options['role'])) {
                 return false;
             }
-
-            $data = SmartMarketingPs::mapSubscriber($params);
+            $allFields = $this->getMappedFields();
+            $data = SmartMarketingPs::mapSubscriber($params, $allFields);
 
             $contact = $this->apiv3->createContact($options['list_id'], $data);
             if(!empty($contact['contact_id'])) {
@@ -2018,10 +2020,13 @@ class SmartMarketingPs extends Module
                         'uid' => $uid,
                         'email' => pSQL($params['email'])
                     ));
-                    $data = SmartMarketingPs::mapSubscriber($params);
+
+                    $allFields = $this->getMappedFields();
+                    $data = SmartMarketingPs::mapSubscriber($params, $allFields);
                     $this->apiv3->patchContact($options['list_id'], $uid, $data);
                 } else {
-                    $data = SmartMarketingPs::mapSubscriber($params);
+                    $allFields = $this->getMappedFields();
+                    $data = SmartMarketingPs::mapSubscriber($params, $allFields);
                     $contact = $this->apiv3->createContact($options['list_id'], $data);
                     if(!empty($contact['contact_id'])) {
                         Db::getInstance()->insert('egoi_customer_uid', array(
@@ -2031,7 +2036,8 @@ class SmartMarketingPs extends Module
                     }
                 }
             } else {
-                $data = SmartMarketingPs::mapSubscriber($params);
+                $allFields = $this->getMappedFields();
+                $data = SmartMarketingPs::mapSubscriber($params, $allFields);
                 $this->apiv3->patchContact($options['list_id'], $uid, $data);
             }
         }
@@ -2340,7 +2346,7 @@ class SmartMarketingPs extends Module
     /*
      * Map subscriber to egoi map
      * */
-    public static function mapSubscriber($data)
+    public static function mapSubscriber($data, $fields = [])
     {
         $subscriber = [
             'base' => [
@@ -2364,30 +2370,37 @@ class SmartMarketingPs extends Module
             $subscriber['base']['phone'] = self::parsePhoneNumber($data['call_prefix'], $data['phone']);
         }
 
-        foreach ($data as $field => $value){
-            $field = SmartMarketingPs::getFieldMap(null, $field);
+        if(!empty($fields)) {
+            foreach ($data as $field => $value){
+                $key = array_search($field, array_column($fields, 'ps'));
 
-            if(empty($field)){
-                continue;
-            }
-
-            if(strpos($field, 'extra') !== false) {
-                $subscriber['extra'] = [
-                    [
-                        'field_id' => (int) str_replace('extra_', '', $field),
-                        'value' => $value
-                    ]
-                ];
-            } else {
-                if($field == 'telephone') {
-                    $field = 'phone'; //
+                if($key === false){
+                    continue;
                 }
 
-                if($field == 'phone' || $field == 'cellphone') {
-                    $value = self::parsePhoneNumber($data['call_prefix'], $value);
+                $field = $fields[$key]['egoi'];
+                if(empty($field)){
+                    continue;
                 }
 
-                $subscriber['base'][$field] = $value;
+                if(strpos($field, 'extra') !== false) {
+                    $subscriber['extra'] = [
+                        [
+                            'field_id' => (int) str_replace('extra_', '', $field),
+                            'value' => $value
+                        ]
+                    ];
+                } else {
+                    if($field == 'telephone') {
+                        $field = 'phone'; //
+                    }
+
+                    if($field == 'phone' || $field == 'cellphone') {
+                        $value = self::parsePhoneNumber($data['call_prefix'], $value);
+                    }
+
+                    $subscriber['base'][$field] = $value;
+                }
             }
         }
 
