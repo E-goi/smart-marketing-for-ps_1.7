@@ -39,9 +39,14 @@ For a workaround you can add this hook call to your **header.tpl**
 -- V.3.0.0
    -- Add support to Prestashop 1.7.X / 8.X.X
    -- Remove all requests to E-goi deprecated API V2 
-   -- Add full suport to E-goi API V3
+   -- Add suport to E-goi API V3
    -- Removed deprecated menu options
-   -- Add default icons to menu options
+   -- Removed deprecated forms
+   -- Removed deprecated remarketing
+   -- Add composer support
+   -- Add new E-goi API V3
+   -- Bumped plugin version until 8.1.2
+   -- Performance improvements
 
 -- V.2.0.9
    -- Add sync newsletter subscription to Egoi Lists
