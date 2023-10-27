@@ -95,10 +95,20 @@ class SyncController extends SmartMarketingBaseController
 				$this->saveSync();
 			}
 
-			$this->assign('lists', $this->apiv3->getLists());
+            $cache_id = 'getLists::'.$this->apiv3->getApiKey();
+            if (!Cache::isStored($cache_id)) {
+                $lists = $this->apiv3->getLists();
+                Cache::store($cache_id, $lists);
+            }
+			$this->assign('lists', Cache::retrieve($cache_id));
 
-			$rq = Db::getInstance(_PS_USE_SQL_SLAVE_)
-					->getRow('SELECT * FROM '._DB_PREFIX_.'egoi where client_id!="" order by egoi_id DESC');
+            $cache_id = 'SELECT * FROM '._DB_PREFIX_.'egoi where client_id!="" order by egoi_id DESC';
+            if (!Cache::isStored($cache_id)) {
+                $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)
+                    ->getRow('SELECT * FROM '._DB_PREFIX_.'egoi where client_id!="" order by egoi_id DESC');
+                Cache::store($cache_id, $rq);
+            }
+            $rq = Cache::retrieve($cache_id);
 
 			if(!empty($rq)) {
 				$list_id = $rq['list_id'];
@@ -111,8 +121,14 @@ class SyncController extends SmartMarketingBaseController
 			}
 
 			if(isset($list_id) && ($list_id)) {
-				
-				$this->assign('subscribers', $this->getEgoiSubscribers($list_id));
+
+                $cache_id = 'getEgoiSubscribers::'.$this->apiv3->getApiKey().'::'.(int)$list_id;
+                if (!Cache::isStored($cache_id)) {
+                    $subscribers = $this->getEgoiSubscribers($list_id);
+                    Cache::store($cache_id, $subscribers);
+                }
+
+				$this->assign('subscribers', Cache::retrieve($cache_id));
 				$this->assign('list_id', $list_id);
 				$this->assign('sync', $sync);
 				$this->assign('track', $track);
@@ -165,8 +181,6 @@ class SyncController extends SmartMarketingBaseController
 	 */
 	protected function saveSync() 
 	{
-
-
 		if(!empty(Tools::getValue('action_add'))) {
 
 			$list = Tools::getValue('list');
@@ -189,11 +203,22 @@ class SyncController extends SmartMarketingBaseController
             }
 
             // compare client ID -> API with DB
-            $client_data = $this->apiv3->getMyAccount();
-            $client = $client_data['general_info']['client_id'];
+            $cache_id = 'getMyAccount::'.$this->apiv3->getApiKey();
+            if (!Cache::isStored($cache_id)) {
+                $clientData = $this->apiv3->getMyAccount();
+                Cache::store($cache_id, $clientData);
+            }
 
-            $res = Db::getInstance(_PS_USE_SQL_SLAVE_)
-						->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id='.(int)$client);
+            $clientData = Cache::retrieve($cache_id);
+            $client = $clientData['general_info']['client_id'];
+
+            $cache_id = 'QUERY::SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id='.(int)$client;
+            if (!Cache::isStored($cache_id)) {
+                $res = Db::getInstance(_PS_USE_SQL_SLAVE_)
+                    ->getRow('SELECT * FROM '._DB_PREFIX_.'egoi WHERE client_id='.(int)$client);
+                Cache::store($cache_id, $res);
+            }
+            $res = Cache::retrieve($cache_id);
 
             // temporary - alter table with new column
             if ($nsync) {
@@ -338,7 +363,14 @@ class SyncController extends SmartMarketingBaseController
                 $exec = Db::getInstance(_PS_USE_SQL_SLAVE_)
                             ->getRow('SELECT COUNT(*) AS CT FROM '._DB_PREFIX_.'customer WHERE active="1"');
 
-                $total[] = $this->getEgoiSubscribers(Tools::getValue('list'));
+                $list_id = Tools::getValue('list');
+                $cache_id = 'getEgoiSubscribers::'.$this->apiv3->getApiKey().'::'.(int)$list_id;
+                if (!Cache::isStored($cache_id)) {
+                    $subscribers = $this->getEgoiSubscribers($list_id);
+                    Cache::store($cache_id, $subscribers);
+                }
+
+                $total[] = Cache::retrieve($cache_id);
                 $total[] = $exec['CT'];
 
                 echo json_encode($total);
@@ -484,10 +516,16 @@ class SyncController extends SmartMarketingBaseController
 
         Configuration::updateValue(SmartMarketingPs::ADDRESS_CRON_TIME_CONFIGURATION, time());
 
-        Db::getInstance()->update(
+        $cache_id = 'getEgoiSubscribers::'.$this->apiv3->getApiKey().'::'.(int)$list_id;
+        if (!Cache::isStored($cache_id)) {
+            $subscribers = $this->getEgoiSubscribers($list_id);
+            Cache::store($cache_id, $subscribers);
+        }
+
+        Db::getInstanceDb::getInstance()->update(
             'egoi',
             array(
-                'total' => $this->getEgoiSubscribers($list_id)
+                'total' => Cache::retrieve($cache_id)
             ),
             "client_id = $client_id"
         );

@@ -154,8 +154,8 @@ $_MODULE['<{smartmarketingps}prestashop>sync_b2480b0b733052a313df6baa62ee3e16'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_e59a246ebd3917320f8735a943488e05'] = 'Sync already existing Newsletter Subscribers to E-goi List';
 $_MODULE['<{smartmarketingps}prestashop>sync_850b16544cb58ba475fcf8791889081f'] = 'Double opt-in subscription';
 $_MODULE['<{smartmarketingps}prestashop>sync_4940e96ce89f2252b9803365124f77e4'] = 'Choose \"yes\" if you want subscribers to be sent a confirmation email when signing up using this';
-$_MODULE['<{smartmarketingps}prestashop>sync_c2dcb3140549de36ecb6cd782af22525'] = 'Ativar Connected Sites';
-$_MODULE['<{smartmarketingps}prestashop>sync_2142177c20150362e5802491563c0cbb'] = 'Com o Connected Sites ativo vai conseguir ter ativo o Track&Engage bem como inserir formulários e pop-ups.';
+$_MODULE['<{smartmarketingps}prestashop>sync_c2dcb3140549de36ecb6cd782af22525'] = 'Activate Connected Sites';
+$_MODULE['<{smartmarketingps}prestashop>sync_2142177c20150362e5802491563c0cbb'] = 'With Connected Sites active you\'ll be able to have Track&Engage active as well as insert forms and pop-ups.';
 $_MODULE['<{smartmarketingps}prestashop>sync_27d35b6de39229e301d28b5670f503d9'] = 'Track&Engage order conversion state';
 $_MODULE['<{smartmarketingps}prestashop>sync_9cefdab2dac4085372f963c848bdb588'] = 'Select a state...';
 $_MODULE['<{smartmarketingps}prestashop>sync_c93e55ff03b4d260821da2e22df49f5a'] = 'On new order';
@@ -232,9 +232,9 @@ $_MODULE['<{smartmarketingps}prestashop>accountcontroller_30816a65cf880c128ee2c0
 $_MODULE['<{smartmarketingps}prestashop>accountcontroller_17b5a54602752bc4807f1d0aa6bd1e94'] = 'List \"';
 $_MODULE['<{smartmarketingps}prestashop>accountcontroller_49d39ee4f87d24f17e161021f2df8811'] = '\" successfully created';
 $_MODULE['<{smartmarketingps}prestashop>pushnotificationscontroller_97a36501975968cea04e226e39dacb55'] = 'WebPush	';
-$_MODULE['<{smartmarketingps}prestashop>pushnotificationscontroller_1a14ba31c663277458d667253a855c6e'] = 'Ir para o E-goi';
-$_MODULE['<{smartmarketingps}prestashop>pushnotificationscontroller_52afbaf8cec0713eec7b7115ac1cc1dc'] = 'Esse nome já existe na conta E-goi!';
-$_MODULE['<{smartmarketingps}prestashop>pushnotificationscontroller_f24a0236a32568e62fcbd759f7e0c5b3'] = 'Configurações Guardadas';
+$_MODULE['<{smartmarketingps}prestashop>pushnotificationscontroller_1a14ba31c663277458d667253a855c6e'] = 'Go to E-goi';
+$_MODULE['<{smartmarketingps}prestashop>pushnotificationscontroller_52afbaf8cec0713eec7b7115ac1cc1dc'] = 'That name already exists in the E-goi account!';
+$_MODULE['<{smartmarketingps}prestashop>pushnotificationscontroller_f24a0236a32568e62fcbd759f7e0c5b3'] = 'Saved settings';
 $_MODULE['<{smartmarketingps}prestashop>productscontroller_068f80c7519d0528fb08e82137a72131'] = 'Products';
 $_MODULE['<{smartmarketingps}prestashop>productscontroller_1a14ba31c663277458d667253a855c6e'] = 'Go to E-goi';
 $_MODULE['<{smartmarketingps}prestashop>productscontroller_79c0665a32ebc8f1c83876a0aa018891'] = '$( \'#save-form\' ).click();';
