@@ -109,16 +109,57 @@ class SmartMarketingPs extends Module
      */
     protected $goidini;
 
-
     /**
      * @var array[] $menuTab
      */
-    protected $menuTab = [
-        'Account' => [],
-        'Sync' => [],
-        'SmsNotifications' => [],
-        'Products' => [],
+    public $menus = [
+        [
+            'is_root' => true,
+            'name' => 'Smart Marketing',
+            'class_name' => 'SmartMarketingPs',
+            'visible' => true,
+            'parent_class_name' => '',
+            'icon' => '',
+            'position' => 1,
+        ],
+        [
+            'is_root' => false,
+            'name' => 'Account',
+            'class_name' => 'Account',
+            'visible' => true,
+            'parent_class_name' => 'SmartMarketingPs',
+            'icon' => 'smartmarketingpsaccount.png',
+            'position' => 0,
+        ],
+        [
+            'is_root' => false,
+            'name' => 'Sync Contacts',
+            'class_name' => 'Sync',
+            'visible' => false,
+            'parent_class_name' => 'SmartMarketingPs',
+            'icon' => 'smartmarketingpsync.png',
+            'position' => 0,
+        ],
+        [
+            'is_root' => false,
+            'name' => 'SMS Notifications',
+            'class_name' => 'SmsNotifications',
+            'visible' => false,
+            'parent_class_name' => 'SmartMarketingPs',
+            'icon' => 'smartmarketingsmsnotifications.png',
+            'position' => 0,
+        ],
+        [
+            'is_root' => false,
+            'name' => 'Products',
+            'class_name' => 'Products',
+            'visible' => false,
+            'parent_class_name' => 'SmartMarketingPs',
+            'icon' => 'smartmarketingproducts.png',
+            'position' => 0,
+        ],
     ];
+
 
 	/**
 	* Module Constructor
@@ -149,7 +190,7 @@ class SmartMarketingPs extends Module
 	   	// on uninstall
 	    $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
-        spl_autoload_register(array($this, 'autoloadApi'));
+        require_once $this->getLocalPath() . 'vendor/autoload.php';
 
         $this->transactionalApi = new TransactionalApi();
         $this->apiv3 = new ApiV3();
@@ -160,11 +201,9 @@ class SmartMarketingPs extends Module
 	      	$this->warning = $warning_message;
 	    }
 
-        if(!empty(Tools::getValue('smart_api_key'))) {
+        if(!empty(Tools::getValue('smart_api_key')) && !empty($_POST['egoi_client_id'])) {
             $this->addClientId($_POST);
-            if(!empty($_POST['egoi_client_id'])){
-                $this->createMenu();
-            }
+            $this->enableMenus();
         }
 
         $this->validateApiKey();
@@ -279,19 +318,6 @@ class SmartMarketingPs extends Module
         <?php
     }
 
-	/**
-	 * Autoload API
-	 *
-	 * @return void
-	 */
-	public function autoloadApi()
-	{
-        include_once dirname(__FILE__) . '/lib/EgoiRestApi.php';
-        include_once dirname(__FILE__) . '/lib/TransactionalApi.php';
-        include_once dirname(__FILE__) . '/lib/ApiV3.php';
-        include_once dirname(__FILE__) . '/lib/GoidiniApi.php';
-        include_once dirname(__FILE__) . '/includes/TESDK.php';
-    }
 
 	/**
 	 * Install App
@@ -353,7 +379,6 @@ class SmartMarketingPs extends Module
 		if ($return) {
 		    $this->mapOrderStateTemplates();
         }
-
 		return $return;
     }
 
@@ -587,22 +612,55 @@ class SmartMarketingPs extends Module
         );
     }
 
-    private function disableMenu(){
-        Db::getInstance()->delete('tab', "module = '$this->name'");
-        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Account' or name='Sync Contacts' or name='Forms' or name='SMS Notifications' or name='Push Notifications'");
-        Db::getInstance()->delete('tab_lang', "name = 'Smart Marketing' or name='Conta' or name='Sincronizar contactos' or name='Formulários' or name='Notificações SMS' or name='Notificações Push'");
+    private function removeMenu()
+    {
+        foreach ($this->menus as $menu) {
+            $id_tab = (int)Tab::getIdFromClassName($menu['class_name']);
+
+            if ($id_tab) {
+                $tab = new Tab($id_tab);
+                $tab->delete();
+            }
+        }
         return true;
     }
 
     private function createPermissions(){
 
-        foreach (array('ROLE_MOD_TAB_ACCOUNT_READ', 'ROLE_MOD_TAB_SYNC_READ', 'ROLE_MOD_TAB_FORMS_READ', 'ROLE_MOD_TAB_SMSNOTIFICATIONS_READ', 'ROLE_MOD_TAB_PRODUCTS_READ', 'ROLE_MOD_TAB_PUSHNOTIFICATIONS_READ', 'ROLE_MOD_TAB_SMARTMARKETINGPS_READ',
-                     'ROLE_MOD_TAB_ACCOUNT_CREATE', 'ROLE_MOD_TAB_SYNC_CREATE', 'ROLE_MOD_TAB_FORMS_CREATE', 'ROLE_MOD_TAB_SMSNOTIFICATIONS_CREATE', 'ROLE_MOD_TAB_PRODUCTS_CREATE', 'ROLE_MOD_TAB_PUSHNOTIFICATIONS_CREATE', 'ROLE_MOD_TAB_SMARTMARKETINGPS_CREATE',
-                     'ROLE_MOD_TAB_ACCOUNT_DELETE', 'ROLE_MOD_TAB_SYNC_DELETE', 'ROLE_MOD_TAB_FORMS_DELETE', 'ROLE_MOD_TAB_SMSNOTIFICATIONS_DELETE', 'ROLE_MOD_TAB_PRODUCTS_DELETE', 'ROLE_MOD_TAB_PUSHNOTIFICATIONS_DELETE', 'ROLE_MOD_TAB_SMARTMARKETINGPS_DELETE',
-                     'ROLE_MOD_TAB_ACCOUNT_UPDATE', 'ROLE_MOD_TAB_SYNC_UPDATE', 'ROLE_MOD_TAB_FORMS_UPDATE', 'ROLE_MOD_TAB_SMSNOTIFICATIONS_UPDATE', 'ROLE_MOD_TAB_PRODUCTS_UPDATE', 'ROLE_MOD_TAB_PUSHNOTIFICATIONS_UPDATE', 'ROLE_MOD_TAB_SMARTMARKETINGPS_UPDATE',
-                    'ROLE_MOD_MODULE_SMARTMARKETINGPS_CREATE', 'ROLE_MOD_MODULE_SMARTMARKETINGPS_CREATE', 'ROLE_MOD_MODULE_SMARTMARKETINGPS_CREATE', 'ROLE_MOD_MODULE_SMARTMARKETINGPS_CREATE'
-                 ) as $val) {
+        $roles = array(
+            'ROLE_MOD_TAB_ACCOUNT_READ',
+            'ROLE_MOD_TAB_SYNC_READ',
+            'ROLE_MOD_TAB_FORMS_READ',
+            'ROLE_MOD_TAB_SMSNOTIFICATIONS_READ',
+            'ROLE_MOD_TAB_PRODUCTS_READ',
+            'ROLE_MOD_TAB_PUSHNOTIFICATIONS_READ',
+            'ROLE_MOD_TAB_SMARTMARKETINGPS_READ',
+            'ROLE_MOD_TAB_ACCOUNT_CREATE',
+            'ROLE_MOD_TAB_SYNC_CREATE',
+            'ROLE_MOD_TAB_FORMS_CREATE',
+            'ROLE_MOD_TAB_SMSNOTIFICATIONS_CREATE',
+            'ROLE_MOD_TAB_PRODUCTS_CREATE',
+            'ROLE_MOD_TAB_PUSHNOTIFICATIONS_CREATE',
+            'ROLE_MOD_TAB_SMARTMARKETINGPS_CREATE',
+            'ROLE_MOD_TAB_ACCOUNT_DELETE',
+            'ROLE_MOD_TAB_SYNC_DELETE',
+            'ROLE_MOD_TAB_FORMS_DELETE',
+            'ROLE_MOD_TAB_SMSNOTIFICATIONS_DELETE',
+            'ROLE_MOD_TAB_PRODUCTS_DELETE',
+            'ROLE_MOD_TAB_PUSHNOTIFICATIONS_DELETE',
+            'ROLE_MOD_TAB_SMARTMARKETINGPS_DELETE',
+            'ROLE_MOD_TAB_ACCOUNT_UPDATE',
+            'ROLE_MOD_TAB_SYNC_UPDATE',
+            'ROLE_MOD_TAB_FORMS_UPDATE',
+            'ROLE_MOD_TAB_SMSNOTIFICATIONS_UPDATE',
+            'ROLE_MOD_TAB_PRODUCTS_UPDATE',
+            'ROLE_MOD_TAB_PUSHNOTIFICATIONS_UPDATE',
+            'ROLE_MOD_TAB_SMARTMARKETINGPS_UPDATE'
+        );
+
+        foreach ($roles as $val) {
             $id_authorization_role = Db::getInstance()->getValue("SELECT id_authorization_role FROM "._DB_PREFIX_."authorization_role WHERE slug = '".$val."'");
+
             if (empty($id_authorization_role)) {
                 Db::getInstance()->insert('authorization_role',
                     array(
@@ -624,6 +682,36 @@ class SmartMarketingPs extends Module
         }
     }
 
+    private function enableMenus()
+    {
+        foreach ($this->menus as $menu) {
+            if($menu['visible'] === false) {
+                $id_tab = (int)Tab::getIdFromClassName($menu['class_name']);
+
+                if ($id_tab) {
+                    $tab = new Tab($id_tab);
+                    $tab->active = true;
+                    $tab->save();
+                }
+            }
+        }
+    }
+
+    private function disableMenus()
+    {
+        foreach ($this->menus as $menu) {
+            if($menu['visible'] === false) {
+                $id_tab = (int)Tab::getIdFromClassName($menu['class_name']);
+
+                if ($id_tab) {
+                    $tab = new Tab($id_tab);
+                    $tab->active = $menu['position'];
+                    $tab->save();
+                }
+            }
+        }
+    }
+
     /**
 	 * Create menu
 	 *
@@ -631,143 +719,54 @@ class SmartMarketingPs extends Module
 	 */
 	private function createMenu()
 	{
-        $subtabs = array(
-            'Account' => [
-                'string' => $this->l('Account'),
-                'icon' => 'manage_accounts',
-            ],
-            'Sync' => [
-                'string' => $this->l('Sync Contacts'),
-                'icon' => 'account_circle',
-            ],
-            'SmsNotifications' => [
-                'string' => $this->l('SMS Notifications'),
-                'icon' => 'sms',
-            ],
-            'Products' => [
-                'string' => $this->l('Products'),
-                'icon' => 'shopping_bag',
-            ],
-        );
-
         $this->createPermissions();
-
-        try {
-            // main tab
-
-            $result = Db::getInstance()->getValue(
-                "SELECT id_tab FROM " . _DB_PREFIX_ . "tab WHERE position = '11' AND module = 'smartmarketingps' AND class_name = 'SmartMarketingPs'"
-            );
-            if (empty($result)) {
-                Db::getInstance()->insert(
-                    'tab',
-                    array(
-                        'position' => '11',
-                        'module' => 'smartmarketingps',
-                        'class_name' => 'SmartMarketingPs',
-                        'active' => 1,
-                    )
-                );
-                $main_id = Db::getInstance()->Insert_ID();
-            } else {
-                $main_id = $result;
-            }
-
-            $langs = Language::getLanguages(true, $this->context->shop->id);
-            $tab_lang_exists = Db::getInstance()->getValue(
-                "SELECT id_tab FROM " . _DB_PREFIX_ . "tab_lang WHERE id_tab=" . $main_id
-            );
-
-            if (empty($tab_lang_exists)) {
-                $langs = Language::getLanguages(true, $this->context->shop->id);
-                foreach ($langs as $lang) {
-                    if (empty($lang['id_lang'])) {
-                        continue;
-                    }
-
-                    // main tab lang
-                    Db::getInstance()->insert(
-                        'tab_lang',
-                        array(
-                            'id_tab' => $main_id,
-                            'id_lang' => $lang['id_lang'],
-                            'name' => 'Smart Marketing'
-                        )
-                    );
-
-                    try {
-                        Db::getInstance()->update(
-                            'tab',
-                            array(
-                                'icon' => ''
-                            ),
-                            'id_tab = ' . (int)$result
-                        );
-                    } catch (Exception $e) {
-                    }
-                }
-            }
-
-            $index = 1;
-            foreach ($subtabs as $key => $val) {
-                $result = Db::getInstance()->getValue(
-                    "SELECT id_tab FROM " . _DB_PREFIX_ . "tab WHERE module = 'smartmarketingps' AND class_name = '" . $key . "'"
-                );
-
-                if (empty($result)) {
-                    Db::getInstance()->insert(
-                        'tab',
-                        array(
-                            'id_parent' => $main_id,
-                            'position' => $index,
-                            'module' => 'smartmarketingps',
-                            'class_name' => $key,
-                            'active' => 1
-                        )
-                    );
-                    $result = Db::getInstance()->Insert_ID();
-                }
-
-                try {
-                    Db::getInstance()->update(
-                        'tab',
-                        array(
-                            'icon' => $val['icon']
-                        ),
-                        'id_tab = ' . (int)$result
-                    );
-                } catch (Exception $e) {
-                }
-
-                $tab_id = $result;
-//                Db::getInstance()->delete("tab_lang", "id_tab= '" . $tab_id . "' AND name=''");
-
-                foreach ($langs as $lang) {
-                    if (!empty($lang['id_lang'])) {
-                        $tablang = Db::getInstance()->getValue(
-                            "SELECT * FROM " . _DB_PREFIX_ . "tab_lang WHERE id_tab = '" . $tab_id . "' AND id_lang = '" . $lang['id_lang'] . "'"
-                        );
-                        if (empty($tablang)) {
-                            Db::getInstance()->insert(
-                                'tab_lang',
-                                array(
-                                    'id_tab' => $tab_id,
-                                    'id_lang' => $lang['id_lang'],
-                                    'name' => $val['string']
-                                )
-                            );
-                        }
-                    }
-                }
-
-                $index++;
-            }
-        } catch (Exception $e) {
-            return false;
+        foreach ($this->menus as $menu) {
+            $this->addTab($menu['class_name'], $menu['name'], $menu['parent_class_name'], $menu['icon'], $menu['visible'], $menu['position']);
         }
-
 		return true;
 	}
+
+    /**
+     * @param $class_name
+     * @param $tab_name
+     * @param $parent
+     * @param $icon
+     * @param bool $visible
+     * @param int $position
+     * @return bool
+     */
+    private function addTab($class_name, $tab_name, $parent, $icon, $visible = true, $position = 0)
+    {
+
+        $tab = new Tab();
+        $tab->class_name = $class_name;
+        $tab->id_parent = Tab::getIdFromClassName($parent);
+
+        $tab->position = $position;
+        $tab->module = $this->name;
+        $tab->active = $visible;
+
+        foreach (Language::getLanguages() as $lang) {
+            $tab->name[$lang['id_lang']] = $this->l($tab_name);
+        }
+
+        if ($tab->add()) {
+            if (!empty($icon)) {
+                $this->copyIcon($class_name, $icon);
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private function copyIcon($class_name, $icon)
+    {
+        $source = _PS_MODULE_DIR_ . $this->name . '/views/img/' . $icon;
+        $destination = _PS_IMG_DIR_ . 't/' . $class_name . '.png';
+
+        @copy($source, $destination);
+    }
 
     /**
      * Uninstall required tables
@@ -783,7 +782,7 @@ class SmartMarketingPs extends Module
    		}
 
    		// remove menus
-   		$this->disableMenu();
+   		$this->removeMenu();
 
    		// remove API Key in cache
    		Configuration::deleteByName('smart_api_key');
@@ -820,34 +819,34 @@ class SmartMarketingPs extends Module
 	  	return true;
 	}
 
-	/**
-    * Enable module.
-    *
-    * @return $force_all
-    * @param bool
-    */
-    public function enable($force_all = false)
-    {
-        $this->registerHooksEgoi();
-        if( !parent::enable($force_all) || !$this->installDb() || !$this->createMenu()){
-            return false;
-        }
-        return true;
-    }
+//	/**
+//    * Enable module.
+//    *
+//    * @return $force_all
+//    * @param bool
+//    */
+//    public function enable($force_all = false)
+//    {
+//        $this->registerHooksEgoi();
+//        if( !parent::enable($force_all) || !$this->installDb() || !$this->createMenu()){
+//            return false;
+//        }
+//        return true;
+//    }
 
-    /**
-    * Disable module.
-    *
-    * @return $force_all
-    * @param bool
-    */
-    public function disable($force_all = false)
-    {
-        if (!parent::disable($force_all) || !$this->disableMenu()){
-            return false;
-        }
-        return true;
-    }
+//    /**
+//    * Disable module.
+//    *
+//    * @return $force_all
+//    * @param bool
+//    */
+//    public function disable($force_all = false)
+//    {
+//        if (!parent::disable($force_all) || !$this->disableMenu()){
+//            return false;
+//        }
+//        return true;
+//    }
 
 	/**
 	 * Register WebService Overrides
@@ -890,7 +889,6 @@ class SmartMarketingPs extends Module
 			$this->installSmartOverrides();
 			return true;
 		}
-
 		return false;
 	}
 
@@ -959,8 +957,6 @@ class SmartMarketingPs extends Module
         $this->assign($this->error_msg, 'error_msg');
         $this->assign(Configuration::get('smart_api_key') ? false : true, 'smart_api_key_error');
 
-        $this->createMenu();
-
 	    return $this->display($this->name, 'views/templates/admin/config.tpl');
 	}
 
@@ -972,9 +968,15 @@ class SmartMarketingPs extends Module
 	public function validateApiKey()
 	{
 		if(!empty(Tools::getValue("api_key"))) {
-
             $this->apiv3->setApiKey(Tools::getValue("api_key"));
-            $clientData = $this->apiv3->getMyAccount();
+            $cache_id = 'getMyAccount::'.$this->apiv3->getApiKey();
+
+            if (!Cache::isStored($cache_id)) {
+                $clientData = $this->apiv3->getMyAccount();
+                Cache::store($cache_id, $clientData);
+            }
+
+            $clientData = Cache::retrieve($cache_id);
 
             if (!empty($clientData["general_info"]["client_id"])) {
                 echo json_encode($clientData);
@@ -1971,9 +1973,17 @@ class SmartMarketingPs extends Module
 
     public static function getShopsName($id){
         try{
-            $sql = 'SELECT * FROM '._DB_PREFIX_.'shop where id_shop = '.$id;
-            $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
-            return empty($rq[0]['name'])?false:$rq[0]['name'];
+
+            $query = 'SELECT * FROM '._DB_PREFIX_.'shop where id_shop = '.$id;
+            if (!Cache::isStored($query)) {
+                $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+                if(empty($result[0]['name'])) {
+                    return false;
+                }
+                Cache::store($query, $result[0]['name']);
+            }
+            return Cache::retrieve($query);
+
         }catch (Exception $e){
             return false;
         }
@@ -2416,11 +2426,16 @@ class SmartMarketingPs extends Module
 	 */
 	public static function getClientData($field = false, $val = false)
 	{
-		$instance = Db::getInstance(_PS_USE_SQL_SLAVE_);
+        $query = "SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' order by egoi_id DESC";
 		if ($field && $val) {
-			$instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' and $field='$val' order by egoi_id DESC");
+            $query = "SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' and $field='$val' order by egoi_id DESC";
 		}
-		return $instance->getRow("SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' order by egoi_id DESC");
+        if (!Cache::isStored($query)) {
+            $return = Db::getInstance(_PS_USE_SQL_SLAVE_)
+                ->getRow($query);
+            Cache::store($query, $return);
+        }
+        return Cache::retrieve($query);
 	}
 
 	/**
@@ -2430,7 +2445,7 @@ class SmartMarketingPs extends Module
      */
     private function installSmartOverrides()
     {
-        copy(
+        @copy(
             dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php',
             dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php'
         );
@@ -2445,7 +2460,7 @@ class SmartMarketingPs extends Module
      */
     private function uninstallSmartOverrides()
     {
-        unlink(dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
+        @unlink(dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
         $this->cleanCache();
     }
 
