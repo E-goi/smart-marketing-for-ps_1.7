@@ -51,6 +51,25 @@ $(document).ready(function() {
             }),
             success:function(data, status) {
                 var json = JSON.parse(data);
+
+                if (json.hasOwnProperty("error")) {
+
+                    btn_sync.prop('disabled', false);
+                    $('.sync_customers').hide();
+                    $('#sync_success').hide();
+                    $('#progressbarSync').hide();
+                    totalPages = 0;
+                    currentPage = 0;
+                    pagesStores = [];
+
+                    $('#sync_nousers').show();
+                    window.setTimeout(function(){
+                        $("#sync_nousers").fadeOut(400);
+                    }, 6000);
+
+                    return false;
+                }
+
                 currentPage++;
 
                 $('#progressbarValues').attr("aria-valuenow",currentPage);
@@ -113,6 +132,24 @@ $(document).ready(function() {
             }),
             success:function(data, status) {
                 var json = JSON.parse(data);
+
+                if (json.hasOwnProperty("error")) {
+                    btn_sync.prop('disabled', false);
+                    $('.sync_customers2').hide();
+                    $('#sync_success2').hide();
+                    $('#progressbarSync2').hide();
+
+                    $('#sync_nousers2').show();
+                    window.setTimeout(function(){
+                        $("#sync_nousers2").fadeOut(400);
+                    }, 6000);
+
+                    totalPages = 0;
+                    currentPage = 0;
+                    pagesStores = [];
+                    return false;
+                }
+
                 currentPage++;
 
                 $('#progressbarValues2').attr("aria-valuenow",currentPage);
@@ -190,7 +227,6 @@ $(document).ready(function() {
     });
 
     btn_sync.on('click', function() {
-
 		$('.sync_customers').show();
         $('#sync_success').hide();
 		btn_sync.prop('disabled', true);
@@ -203,7 +239,6 @@ $(document).ready(function() {
             success:function(data, status) {
                 var json = JSON.parse(data);
                 json = pagesStores = calcPages(json);
-
                 $('#progressbarSync').show();
                 $('#progressbarValues').attr("aria-valuemax", totalPages);
                 $('#progressbarValues').width("0%");
