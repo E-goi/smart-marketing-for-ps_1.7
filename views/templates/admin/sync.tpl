@@ -101,6 +101,7 @@
 							</button>
 							<div class="sync_customers" style="display: none;"></div>
 							<i class="material-icons" id="sync_success" style="display: none;">beenhere</i>
+							<i class="material-icons" id="sync_nousers" style="display: none;">no_accounts</i>
 							<span id="spanprogress" style="width: 200px; height: 20px;">
 								<div id="progressbarSync" class="progress" style="display: none;margin: 0;">
 									<div id="progressbarValues" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 0px;width:0%">
@@ -160,6 +161,7 @@
 							</button>
 							<div class="sync_customers2" style="display: none;"></div>
 							<i class="material-icons" id="sync_success2" style="display: none;">beenhere</i>
+							<i class="material-icons" id="sync_nousers2" style="display: none;">no_accounts</i>
 							<span id="spanprogress2" style="width: 200px; height: 20px;">
 								<div id="progressbarSync2" class="progress" style="display: none;margin: 0;">
 									<div id="progressbarValues2" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 0px;width:0%">

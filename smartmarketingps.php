@@ -326,7 +326,6 @@ class SmartMarketingPs extends Module
 	 */
 	public function install()
 	{
-
 	  	if (!parent::install() || !$this->installDb() || !$this->createMenu() || !$this->registerHooksEgoi()){
             $this->_errors[] = $this->l("Error: Failed to create e-goi tables.");
             return false;

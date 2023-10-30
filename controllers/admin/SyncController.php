@@ -522,7 +522,7 @@ class SyncController extends SmartMarketingBaseController
             Cache::store($cache_id, $subscribers);
         }
 
-        Db::getInstanceDb::getInstance()->update(
+        Db::getInstance()->update(
             'egoi',
             array(
                 'total' => Cache::retrieve($cache_id)
