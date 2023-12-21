@@ -169,7 +169,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '3.0.0';
+	    $this->version = '3.0.1';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -797,9 +797,6 @@ class SmartMarketingPs extends Module
 		// remove webservice
 		$this->uninstallWebService();
 
-		// remove overrides
-		$this->uninstallSmartOverrides();
-
    		// remove custom override file
    		@unlink(dirname(__FILE__).$this->custom_override);
     	return true;
@@ -817,35 +814,6 @@ class SmartMarketingPs extends Module
 
 	  	return true;
 	}
-
-//	/**
-//    * Enable module.
-//    *
-//    * @return $force_all
-//    * @param bool
-//    */
-//    public function enable($force_all = false)
-//    {
-//        $this->registerHooksEgoi();
-//        if( !parent::enable($force_all) || !$this->installDb() || !$this->createMenu()){
-//            return false;
-//        }
-//        return true;
-//    }
-
-//    /**
-//    * Disable module.
-//    *
-//    * @return $force_all
-//    * @param bool
-//    */
-//    public function disable($force_all = false)
-//    {
-//        if (!parent::disable($force_all) || !$this->disableMenu()){
-//            return false;
-//        }
-//        return true;
-//    }
 
 	/**
 	 * Register WebService Overrides
@@ -884,8 +852,6 @@ class SmartMarketingPs extends Module
 				)
 			);
 
-			// install custom overrides
-			$this->installSmartOverrides();
 			return true;
 		}
 		return false;
@@ -2437,31 +2403,6 @@ class SmartMarketingPs extends Module
         return Cache::retrieve($query);
 	}
 
-	/**
-     * Process Overrides
-     *
-     * @return void
-     */
-    private function installSmartOverrides()
-    {
-        @copy(
-            dirname(__FILE__).'/override/classes/webservice/WebserviceSpecificManagementEgoi.php',
-            dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php'
-        );
-
-        $this->cleanCache();
-    }
-
-    /**
-     * Remove overrides
-     *
-     * @return void
-     */
-    private function uninstallSmartOverrides()
-    {
-        @unlink(dirname(__FILE__).'/../../override/classes/webservice/WebserviceSpecificManagementEgoi.php');
-        $this->cleanCache();
-    }
 
     /**
      * Clean Index class from cache for Dev && Production
