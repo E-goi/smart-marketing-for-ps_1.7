@@ -29,7 +29,7 @@ Upload to deploy server
 If your theme is not calling the hook 'displayTop' the script injection will not work.
 For a workaround you can add this hook call to your **header.tpl**
 ```
-{hook e='egoiDisplayTE'}
+{hook h='egoiDisplayTE'}
 ```
 
 ### Changelog
