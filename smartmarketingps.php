@@ -169,7 +169,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '3.0.1';
+	    $this->version = '3.0.2';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -211,8 +211,12 @@ class SmartMarketingPs extends Module
         // check newsletter submissions anywhere
 		//$this->checkNewsletterSubmissions();
         $current_context = Context::getContext();
-        if ($current_context->controller->controller_type == 'admin'){
-            $this->checkPluginVersion();
+        try {
+            if ($current_context->controller->controller_type == 'admin'){
+                $this->checkPluginVersion();
+            }
+        } catch (Exception $e) {
+            // do nothing
         }
 
 	}

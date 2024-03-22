@@ -409,6 +409,13 @@ class SyncController extends SmartMarketingBaseController
 
         $subs = Tools::getValue("subs");
         $store_id = Tools::getValue("store_id");
+        if(empty($store_id)) {
+            try {
+                $store_id = (int)Context::getContext()->shop->id;
+            } catch (Exception $e) {
+                $store_id = 1;
+            }
+        }
         $store_name = SmartMarketingPs::getShopsName($store_id);
         $store_filter = 'AND '._DB_PREFIX_.'customer.id_shop="'.$store_id.'" ';
         // get main customers
@@ -477,6 +484,13 @@ class SyncController extends SmartMarketingBaseController
 
         $subs = Tools::getValue("subs");
         $store_id = Tools::getValue("store_id");
+        if(empty($store_id)) {
+            try {
+                $store_id = (int)Context::getContext()->shop->id;
+            } catch (Exception $e) {
+                $store_id = 1;
+            }
+        }
         $store_name = SmartMarketingPs::getShopsName($store_id);
         // get main customers
         $ts = [];
