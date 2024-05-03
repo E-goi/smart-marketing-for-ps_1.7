@@ -206,6 +206,7 @@ $(document).ready(function() {
             type: 'POST',
             data:({
                 size: 1,
+                newsletter: true //Indicates that it is a request related to the newsletter
             }),
             success:function(data, status) {
                 var json = JSON.parse(data);
