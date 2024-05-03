@@ -210,14 +210,28 @@ class SmartMarketingPs extends Module
 
         // check newsletter submissions anywhere
 		//$this->checkNewsletterSubmissions();
+
         $current_context = Context::getContext();
         try {
-            if ($current_context->controller->controller_type == 'admin'){
+            // Checks that the controller object is defined and that its controller_type property is 'admin'
+            if (isset($current_context->controller) && $current_context->controller->controller_type == 'admin') {
                 $this->checkPluginVersion();
             }
         } catch (Exception $e) {
-            // do nothing
+            // If there is an error, it does nothing
         }
+        
+        // check newsletter submissions anywhere
+        //$this->checkNewsletterSubmissions();
+        
+        // Verifica se o contexto atual é do controlador admin antes de chamar checkPluginVersion
+        $current_context = Context::getContext();
+        if ($current_context && $current_context->controller && $current_context->controller->controller_type == 'admin') {
+            $this->checkPluginVersion();
+            
+        }
+
+        
 
 	}
 
