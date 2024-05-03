@@ -1961,9 +1961,16 @@ class SmartMarketingPs extends Module
     /*
      * Count size of list by store
      * */
-    public static function sizeList(){
+    public static function sizeList($newsletter = false){
 
-        $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" group by id_shop';//AND newsletter="1"
+        // if it comes from synchronize newsletter, set it to true
+        if($newsletter == true){
+            $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'emailsubscription WHERE active="1" group by id_shop';//AND newsletter="1"
+        }
+        else{
+            $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" group by id_shop';//AND newsletter="1"
+
+        }
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }
