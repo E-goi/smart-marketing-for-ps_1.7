@@ -1165,7 +1165,8 @@ class SmartMarketingPs extends Module
         $imageUrl = $ssl . $link->getImageLink(isset($product->link_rewrite) ? $product->link_rewrite : $product->name, (int)$img['id_image'], 'home_default');
 
         $categories = static::buildBreadcrumbs($product->getCategories(), $lang);
-
+        
+        
         $relatedProducts = array();
 
         $acessories = Product::getAccessoriesLight($lang, $product->id);
@@ -1192,18 +1193,21 @@ class SmartMarketingPs extends Module
 
     private static function buildBreadcrumbs($categories, $lang)
     {
+
         $categoryCount = count($categories);
+
         $result = array();
         for ($i = 0; $i < $categoryCount; $i++) {
             $category = new Category($categories[$i], $lang);
             $breadcrumb = $category->name;
 
-            while ($category->id_parent !== '1' && $category->id_parent !== '0') {
+            while ($category->id_parent !== 1 && $category->id_parent !== 0) {
                 $category = new Category($category->id_parent, $lang);
                 $breadcrumb = $category->name . '>' . $breadcrumb;
             }
 
             $result[] = $breadcrumb;
+
         }
 
         return $result;
