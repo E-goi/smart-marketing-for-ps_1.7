@@ -169,7 +169,7 @@ class SmartMarketingPs extends Module
 		// Module metadata
 		$this->name = 'smartmarketingps';
 	    $this->tab = 'advertising_marketing';
-	    $this->version = '3.0.2';
+	    $this->version = '3.0.3';
 	    $this->author = 'E-goi';
 	    $this->need_instance = 1;
 	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -210,14 +210,28 @@ class SmartMarketingPs extends Module
 
         // check newsletter submissions anywhere
 		//$this->checkNewsletterSubmissions();
+
         $current_context = Context::getContext();
         try {
-            if ($current_context->controller->controller_type == 'admin'){
+            // Checks that the controller object is defined and that its controller_type property is 'admin'
+            if (isset($current_context->controller) && $current_context->controller->controller_type == 'admin') {
                 $this->checkPluginVersion();
             }
         } catch (Exception $e) {
-            // do nothing
+            // If there is an error, it does nothing
         }
+        
+        // check newsletter submissions anywhere
+        //$this->checkNewsletterSubmissions();
+        
+        // Verifica se o contexto atual é do controlador admin antes de chamar checkPluginVersion
+        $current_context = Context::getContext();
+        if ($current_context && $current_context->controller && $current_context->controller->controller_type == 'admin') {
+            $this->checkPluginVersion();
+            
+        }
+
+        
 
 	}
 
@@ -1965,9 +1979,16 @@ class SmartMarketingPs extends Module
     /*
      * Count size of list by store
      * */
-    public static function sizeList(){
+    public static function sizeList($newsletter = false){
 
-        $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" group by id_shop';//AND newsletter="1"
+        // if it comes from synchronize newsletter, set it to true
+        if($newsletter == true){
+            $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'emailsubscription WHERE active="1" group by id_shop';//AND newsletter="1"
+        }
+        else{
+            $sql = 'SELECT COUNT(*) as total, id_shop FROM '._DB_PREFIX_.'customer WHERE active="1" group by id_shop';//AND newsletter="1"
+
+        }
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
     }

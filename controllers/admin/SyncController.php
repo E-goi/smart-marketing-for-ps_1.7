@@ -36,12 +36,14 @@ class SyncController extends SmartMarketingBaseController
 		if (!$this->module->active) {
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
         }
+        $newsletter = isset($_POST['newsletter']) ? $_POST['newsletter'] : false; //Indicates that it is a request related to the newsletter
+
         $this->retrieveRoles();
         $this->mapFieldsEgoi();
 		$this->syncronizeEgoi();
 		$this->sincronizeList();
         $this->sincronizeNewsletter();
-        $this->countCostumersByShop();
+        $this->countCostumersByShop($newsletter);
     }
 
 	/**
@@ -72,12 +74,12 @@ class SyncController extends SmartMarketingBaseController
 		);
     }
 
-    public function countCostumersByShop(){
+    public function countCostumersByShop($newsletter){
         if(empty(Tools::getValue("size"))) {
             return false;
         }
 
-        echo json_encode(SmartMarketingPs::sizeList());
+        echo json_encode(SmartMarketingPs::sizeList($newsletter));
         exit;
     }
 
