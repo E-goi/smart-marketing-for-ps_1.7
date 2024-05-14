@@ -205,8 +205,7 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             data:({
-                size: 1,
-                newsletter: true //Indicates that it is a request related to the newsletter
+                size: 1
             }),
             success:function(data, status) {
                 var json = JSON.parse(data);
