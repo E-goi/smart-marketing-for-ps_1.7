@@ -133,7 +133,7 @@ $(document).ready(function() {
             success:function(data, status) {
                 var json = JSON.parse(data);
 
-                if (json.hasOwnProperty("error") && json.length() == 0){
+                if (json.hasOwnProperty("error") && json.length() == 0) {
                     btn_sync.prop('disabled', false);
                     $('.sync_customers2').hide();
                     $('#sync_success2').hide();
@@ -209,7 +209,7 @@ $(document).ready(function() {
                 newsletter: true
             }),
             success:function(data, status) {
-                if (data !=="" && data !== "No users!") {
+                if (data && data !== "No users!") {
                     var json = JSON.parse(data);
                     json = pagesStores = calcPages(json);
 
