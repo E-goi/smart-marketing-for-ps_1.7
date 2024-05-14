@@ -475,7 +475,7 @@ class SyncController extends SmartMarketingBaseController
             return false;
         }
 
-        if(empty(Tools::getValue("newsletter"))) {
+        if(!empty(Tools::getValue("newsletter")) &&  (Tools::getValue("newsletter")!= true)){
             return false;
         }
 

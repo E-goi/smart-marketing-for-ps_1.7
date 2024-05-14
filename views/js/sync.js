@@ -133,7 +133,7 @@ $(document).ready(function() {
             success:function(data, status) {
                 var json = JSON.parse(data);
 
-                if (json.hasOwnProperty("error")) {
+                if (json.hasOwnProperty("error") && json.length() == 0){
                     btn_sync.prop('disabled', false);
                     $('.sync_customers2').hide();
                     $('#sync_success2').hide();
@@ -208,16 +208,41 @@ $(document).ready(function() {
                 size: 1,
                 newsletter: true //Indicates that it is a request related to the newsletter
             }),
-            success:function(data, status) {
-                var json = JSON.parse(data);
-                json = pagesStores = calcPages(json);
+            success: function(data, status) {
 
-                $('#progressbarSync2').show();
-                $('#progressbarValues2').attr("aria-valuemax", totalPages);
-                $('#progressbarValues2').width("0%");
-                $('#progressbarValues2').text("0/" + totalPages);
-                interactionN(json[0].id_shop,0);
+                if (data && data !== "No users!") {
+                    var json = JSON.parse(data);
+                    json = pagesStores = calcPages(json);
 
+                    $('#progressbarSync2').show();
+                    $('#progressbarValues2').attr("aria-valuemax", totalPages);
+                    $('#progressbarValues2').width("0%");
+                    $('#progressbarValues2').text("0/" + totalPages);
+                        
+                    if (json.length > 0) {
+                        interactionN(json[0].id_shop, 0);
+                    } else {
+                        btn_sync.prop('disabled', false);
+                        $('.sync_customers2').hide();
+                        $('#sync_success2').hide();
+                        $('#progressbarSync2').hide();
+    
+                        $('#sync_nousers2').show();
+                        window.setTimeout(function(){
+                            $("#sync_nousers2").fadeOut(400);
+                            btn_news_sync.prop('disabled', false);
+
+                        }, 6000);
+            
+                        return false;
+                    } 
+                } else {
+                    btn_sync.prop('disabled', false);
+                    $('.sync_customers2').hide();
+                    $('#sync_success2').hide();
+                }
+
+               
             },
             error:function(status){
                 btn_sync.prop('disabled', false);
