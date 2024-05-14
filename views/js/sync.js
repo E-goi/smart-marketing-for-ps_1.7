@@ -34,6 +34,7 @@ $(document).ready(function() {
     		$('#egoi_sync_users_ps').hide();
     		$('#sync').html(sub_egoi+': <span class="help"><b>'+egoi+'</b></span><p>'+sub_ps+': <span class="help"><b>'+jm+'</b></span><p>');
     	}
+
     });
 
     function interaction(store,num){
@@ -119,7 +120,7 @@ $(document).ready(function() {
 
     function interactionN(store,num){
 
-        var subs = num;//numero do count
+        var subs = num;
         var token_list = '1';
 
         $.ajax({
@@ -133,7 +134,7 @@ $(document).ready(function() {
             success:function(data, status) {
                 var json = JSON.parse(data);
 
-                if (json.hasOwnProperty("error")) {
+                if (json.hasOwnProperty("error") && json.length() == 0) {
                     btn_sync.prop('disabled', false);
                     $('.sync_customers2').hide();
                     $('#sync_success2').hide();
@@ -183,6 +184,7 @@ $(document).ready(function() {
 
             },
             error:function(status){
+
                 btn_sync.prop('disabled', false);
                 $('.sync_customers2').hide();
                 $('#sync_success2').hide();
@@ -205,24 +207,54 @@ $(document).ready(function() {
         $.ajax({
             type: 'POST',
             data:({
-                size: 1
+                size: 1,
+                newsletter: true
             }),
-            success:function(data, status) {
-                var json = JSON.parse(data);
-                json = pagesStores = calcPages(json);
 
-                $('#progressbarSync2').show();
-                $('#progressbarValues2').attr("aria-valuemax", totalPages);
-                $('#progressbarValues2').width("0%");
-                $('#progressbarValues2').text("0/" + totalPages);
-                interactionN(json[0].id_shop,0);
+            success: function(data, status) {
 
+                if (data && data !== "No users!") {
+                    var json = JSON.parse(data);
+                    json = pagesStores = calcPages(json);
+
+                    $('#progressbarSync2').show();
+                    $('#progressbarValues2').attr("aria-valuemax", totalPages);
+                    $('#progressbarValues2').width("0%");
+                    $('#progressbarValues2').text("0/" + totalPages);
+                        
+                    if (json.length > 0) {
+                        interactionN(json[0].id_shop, 0);
+                    } else {
+                        btn_sync.prop('disabled', false);
+                        $('.sync_customers2').hide();
+                        $('#sync_success2').hide();
+                        $('#progressbarSync2').hide();
+    
+                        $('#sync_nousers2').show();
+                        window.setTimeout(function(){
+                            $("#sync_nousers2").fadeOut(400);
+                            btn_news_sync.prop('disabled', false);
+
+                        }, 6000);
+    
+            
+                        return false;
+                    } 
+                } else {
+                    btn_sync.prop('disabled', false);
+                    $('.sync_customers2').hide();
+                    $('#sync_success2').hide();
+                }
+
+               
             },
-            error:function(status){
+            error: function(xhr, status, error) {
+
                 btn_sync.prop('disabled', false);
                 $('.sync_customers2').hide();
                 $('#sync_success2').hide();
             }
+
         });
     });
 
@@ -354,6 +386,7 @@ $(document).ready(function() {
     }
 
     function getPagesByStore(store){
+
         for (var i = 0;i<pagesStores.length;i++){
             if(pagesStores[i]['id_shop'] == store){
                 return pagesStores[i]['total'];
@@ -362,6 +395,7 @@ $(document).ready(function() {
     }
 
     function getNextStore(store){
+
         for (var i = 0;i<pagesStores.length;i++){
             if(pagesStores[i]['id_shop'] == store){
                 i++;
