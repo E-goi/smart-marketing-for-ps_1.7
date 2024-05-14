@@ -52,7 +52,7 @@ $(document).ready(function() {
             success:function(data, status) {
                 var json = JSON.parse(data);
 
-                if (json.hasOwnProperty("error")) {
+                if (json.hasOwnProperty("error") && json.length() == 0) {
 
                     btn_sync.prop('disabled', false);
                     $('.sync_customers').hide();
@@ -133,7 +133,7 @@ $(document).ready(function() {
             success:function(data, status) {
                 var json = JSON.parse(data);
 
-                if (json.hasOwnProperty("error") && json.length() == 0){
+                if (json.hasOwnProperty("error") && json.length() == 0) {
                     btn_sync.prop('disabled', false);
                     $('.sync_customers2').hide();
                     $('#sync_success2').hide();
@@ -206,10 +206,9 @@ $(document).ready(function() {
             type: 'POST',
             data:({
                 size: 1,
-                newsletter: true //Indicates that it is a request related to the newsletter
+                newsletter: true 
             }),
-            success: function(data, status) {
-
+            success:function(data, status) {
                 if (data && data !== "No users!") {
                     var json = JSON.parse(data);
                     json = pagesStores = calcPages(json);
@@ -218,11 +217,11 @@ $(document).ready(function() {
                     $('#progressbarValues2').attr("aria-valuemax", totalPages);
                     $('#progressbarValues2').width("0%");
                     $('#progressbarValues2').text("0/" + totalPages);
-                        
+
                     if (json.length > 0) {
                         interactionN(json[0].id_shop, 0);
                     } else {
-                        btn_sync.prop('disabled', false);
+                        btn_news_sync.prop('disabled', false);
                         $('.sync_customers2').hide();
                         $('#sync_success2').hide();
                         $('#progressbarSync2').hide();
@@ -237,12 +236,10 @@ $(document).ready(function() {
                         return false;
                     } 
                 } else {
-                    btn_sync.prop('disabled', false);
+                    btn_news_sync.prop('disabled', false);
                     $('.sync_customers2').hide();
                     $('#sync_success2').hide();
                 }
-
-               
             },
             error:function(status){
                 btn_sync.prop('disabled', false);
@@ -263,13 +260,37 @@ $(document).ready(function() {
                 size: 1,
             }),
             success:function(data, status) {
-                var json = JSON.parse(data);
-                json = pagesStores = calcPages(json);
-                $('#progressbarSync').show();
-                $('#progressbarValues').attr("aria-valuemax", totalPages);
-                $('#progressbarValues').width("0%");
-                $('#progressbarValues').text("0/" + totalPages);
-                interaction(json[0].id_shop,0);
+                if (data !== "") {
+                    var json = JSON.parse(data);
+                    json = pagesStores = calcPages(json);
+                    $('#progressbarSync').show();
+                    $('#progressbarValues').attr("aria-valuemax", totalPages);
+                    $('#progressbarValues').width("0%");
+                    $('#progressbarValues').text("0/" + totalPages);
+
+                    if (json.length > 0) {
+                        interaction(json[0].id_shop,0);
+                    }else {
+                        btn_sync.prop('disabled', false);
+                        $('.sync_customers').hide();
+                        $('#sync_success').hide();
+                        $('#progressbarSync').hide();
+
+                        $('#sync_nousers').show();
+                        window.setTimeout(function(){
+                            $("#sync_nousers").fadeOut(400);
+                            btn_sync.prop('disabled', false);
+
+                        }, 6000);
+
+            
+                        return false;
+                    } 
+                } else {
+                    btn_sync.prop('disabled', false);
+                    $('.sync_customers').hide();
+                    $('#sync_success').hide();
+                }
 
             },
             error:function(status){
@@ -279,7 +300,7 @@ $(document).ready(function() {
             }
         });
 	});
-
+    
 	$('#ps_fields').on('change', function() {
 		if(($(this).val() !== '') && ($('#egoi').val() !== '')){
 			$('#save_map_fields').prop('disabled', false);
