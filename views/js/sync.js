@@ -209,7 +209,7 @@ $(document).ready(function() {
                 newsletter: true 
             }),
             success:function(data, status) {
-                if (data && data !== "No users!") {
+                if (data !=="" && data !== "No users!") {
                     var json = JSON.parse(data);
                     json = pagesStores = calcPages(json);
 
@@ -260,7 +260,7 @@ $(document).ready(function() {
                 size: 1,
             }),
             success:function(data, status) {
-                if (data !== "") {
+                if (data !== "" && data !== "No users!") {
                     var json = JSON.parse(data);
                     json = pagesStores = calcPages(json);
                     $('#progressbarSync').show();
