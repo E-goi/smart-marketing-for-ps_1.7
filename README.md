@@ -34,6 +34,9 @@ For a workaround you can add this hook call to your **header.tpl**
 
 ### Changelog
 ```
+-- V.3.0.5
+   -- Added field categories on sync orders
+   -- Bump plugin version to 3.0.5
 
 -- V.3.0.2
    -- Fix store id on sync newsletter subscription
