@@ -2144,10 +2144,6 @@ class SmartMarketingPs extends Module
             )
         );
 
-        // check if this block is activated
-        if($this->processBlockOptions('header')) {
-            return $this->display(__FILE__, 'smartmarketingps.tpl');
-        }
 
         return $this->display(__FILE__, 'ecommerce/front-scripts.tpl');
     }
@@ -2191,33 +2187,6 @@ class SmartMarketingPs extends Module
 
     }
 
-	/**
-	 * Hook for display content in Bottom Page
-	 *
-	 * @param  array $params
-	 * @return mixed
-	 */
-	public function hookDisplayFooter($params)
-	{
-		// check if this block is activated
-		if($this->processBlockOptions('footer')) {
-			return $this->display(__FILE__, 'smartmarketingps.tpl');
-		}
-	}
-
-	/**
-	 * Hook for display content in Home Page
-	 *
-	 * @param  array $params
-	 * @return mixed
-	 */
-	public function hookDisplayHome($params)
-	{
-		// check if this block is activated
-		if($this->processBlockOptions('home')) {
-			return $this->display(__FILE__, 'smartmarketingps.tpl');
-		}
-	}
 
 	/**
 	 * Abandoned cart hook
@@ -2498,53 +2467,6 @@ class SmartMarketingPs extends Module
 		return Db::getInstance()->delete('egoi_customers', "customer='$idc'");
 	}
 
-   	/**
-   	 * Process Block Options
-   	 *
-   	 * @param  $blockName
-   	 * @return bool
-   	 */
-   	private function processBlockOptions($blockName)
-   	{
-   		$block = 'block_'.$blockName;
-   		$res = Db::getInstance(_PS_USE_SQL_SLAVE_)
-					->getRow('SELECT * FROM '._DB_PREFIX_.'egoi_forms WHERE '.$block.'="1"');
-		if (!empty($res)) {
-
-			$this->assign(
-			    array(
-	          		'form_id' => $res['form_id'],
-		          	'is_bootstrap' => $res['is_bootstrap'],
-		          	'form_title' => $res['form_title'],
-		          	$block => $res[$block],
-		          	'form_type' => $res['form_type']
-		      	)
-		  	);
-
-			if($res['popup']) {
-                $this->context->controller->addJS($this->_path. 'views/js/modal.js');
-                $this->context->controller->addCSS($this->_path. 'views/css/modal.css');
-
-                $this->assign($res['popup'], 'popup');
-				if ($res['once']) {
-					$this->assign($res['once'], 'once');
-				}
-			}
-
-			if($res['form_type'] == 'iframe') {
-				$content = '<iframe src="http://'.$res['url'].'" width="'.$res['style_width'].'" height="'.$res['style_height'].'" style="border: 0 none;" onload="window.parent.parent.scrollTo(0,0);"></iframe>';
-			}else{
-				$content = html_entity_decode($res['form_content']);
-			}
-
-			if ($res['enable']) {
-				$this->assign($content, 'content');
-				return true;
-			}
-		}
-
-		return false;
-   	}
 
    	/**
    	 * @param  array|bool $values
