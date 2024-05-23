@@ -35,7 +35,9 @@ For a workaround you can add this hook call to your **header.tpl**
 ### Changelog
 ```
 -- V.3.0.6
-   -- Fix error on debug mode
+   -- Fix errors on debug mode
+   -- Removed listing of contact lists and creation of contact lists from the plugin's account page
+   -- On the customer sync page, locked list of listings to the one originally chosen
    -- Bump plugin version to 3.0.6
 
 -- V.3.0.4
