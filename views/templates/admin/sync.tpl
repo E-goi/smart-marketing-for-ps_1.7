@@ -37,22 +37,15 @@
 					{if !$lists.items}
 						{l s='No lists found, are you connected to E-goi and/or have created lists?' mod='smartmarketingps'}
 					{else}
-						<select name="list" id="egoi_lists">
-							<option disabled>
-								{l s='Select a list..' mod='smartmarketingps'}
-							</option>
-
+						<select disabled name="list" id="egoi_lists" style="border: 1px solid #ccc; -webkit-appearance: none; -moz-appearance: none; appearance: none;">
 							{foreach $lists.items as $list}
 								{if isset($list_id) and ($list_id eq $list.list_id)}
 									<option value="{$list.list_id|escape:'htmlall':'UTF-8'}" selected="selected">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
-								{else}
-									<option value="{$list.list_id|escape:'htmlall':'UTF-8'}">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
 								{/if}
-
 							{/foreach}
-
 						</select>
-						<p>{l s='Select the list to synchronize your PS customers base with.' mod='smartmarketingps'}</p>
+
+						<p>{l s='This list will be the list that will be synchronized with your PS customers base.' mod='smartmarketingps'}</p>
 					{/if}
 				</td>
 			</tr>
