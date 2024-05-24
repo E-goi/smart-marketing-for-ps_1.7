@@ -63,7 +63,7 @@
 						{if isset($list_altered) && $list_altered == false}
 							<p>{l s='Select the list to synchronize your PS customers base with.' mod='smartmarketingps'}</p>
 						{else}
-							<p>{l s='This list will be the list that will be synchronized with your PS customers base.'}</p>
+							<p>{l s='This list will be synced with your PrestaShop customer base. If you want to modify the list, you will need to remove the current integration and create a new one.' mod='smartmarketingps'}</p>
 						{/if}
 					{/if}
 				</td>
