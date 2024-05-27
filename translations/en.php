@@ -25,8 +25,8 @@ $_MODULE['<{smartmarketingps}prestashop>sync_63acc55b44c5678a583b2f3ed54c4c0f'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_d6e8277f739cbbcc56e74de1fdc81652'] = 'The module will automatically keep your PrestaShop clients in sync with the E-goi list you\'ve selected.';
 $_MODULE['<{smartmarketingps}prestashop>sync_dd4926dee0920e3221ec6effbf2487fd'] = 'Sync clients with this list';
 $_MODULE['<{smartmarketingps}prestashop>sync_6c2de16aee773aea471efe55cd1e5f92'] = 'No lists found! Are you connected to E-goi? Have you created any lists?';
-$_MODULE['<{smartmarketingps}prestashop>sync_889510919248c21e3eb8214e4740aacc'] = 'Choose the list your PrestaShop clients will be synched with.';
-$_MODULE['<{smartmarketingps}prestashop>sync_7b89f914ee80ce98114249b876f9a4b8'] = 'This list will be synced with your PrestaShop customer base. If you want to modify the list, you will need to remove the current integration and create a new one.';
+$_MODULE['<{smartmarketingps}prestashop>sync_3ef46c50a7e33d84ef544509ead25908'] = 'Choose the list your PrestaShop clients will be synched with.';
+$_MODULE['<{smartmarketingps}prestashop>sync_b46c89ef93e59d77166fa0d360e5be9d'] = 'This list will be synchronised with your PrestaShop clients. If you want to modify the list, you will need to remove the current integration and create a new one.';
 $_MODULE['<{smartmarketingps}prestashop>sync_356146a079becaac81597d98c4673f67'] = 'Sync clients with this role';
 $_MODULE['<{smartmarketingps}prestashop>sync_6812a65cef34e4e7ddde2fec25ec1069'] = 'All roles';
 $_MODULE['<{smartmarketingps}prestashop>sync_45a314b66aead219143995a24011ca60'] = 'Choose the client role which will be synched with E-goi.';
