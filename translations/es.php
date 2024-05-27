@@ -25,8 +25,8 @@ $_MODULE['<{smartmarketingps}prestashop>sync_63acc55b44c5678a583b2f3ed54c4c0f'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_d6e8277f739cbbcc56e74de1fdc81652'] = 'El módulo sincronizará automáticamente tus clientes PrestaShop con la lista de E-goi que hayas seleccionado.';
 $_MODULE['<{smartmarketingps}prestashop>sync_dd4926dee0920e3221ec6effbf2487fd'] = 'Sincronizar clientes con esta lista';
 $_MODULE['<{smartmarketingps}prestashop>sync_6c2de16aee773aea471efe55cd1e5f92'] = '¡No hay listas! ¿Estás conectado a E-goi? ¿Has creado listas?';
-$_MODULE['<{smartmarketingps}prestashop>sync_889510919248c21e3eb8214e4740aacc'] = 'Elige la lista de E-goi con la cual se van a sincronizar tus clientes PrestaShop.';
-$_MODULE['<{smartmarketingps}prestashop>sync_7b89f914ee80ce98114249b876f9a4b8'] = 'Esta lista se sincronizará con su base de clientes de PrestaShop. Si desea modificar la lista, deberá eliminar la integración actual y crear una nueva.';
+$_MODULE['<{smartmarketingps}prestashop>sync_3ef46c50a7e33d84ef544509ead25908'] = 'Elija la lista con la que se sincronizarán sus clientes PrestaShop.';
+$_MODULE['<{smartmarketingps}prestashop>sync_b46c89ef93e59d77166fa0d360e5be9d'] = 'Esta lista se sincronizará con sus clientes PrestaShop. Si desea modificar la lista, deberá eliminar la integración actual y crear una nueva.';
 $_MODULE['<{smartmarketingps}prestashop>sync_356146a079becaac81597d98c4673f67'] = 'Sincronizar clientes con este rol';
 $_MODULE['<{smartmarketingps}prestashop>sync_6812a65cef34e4e7ddde2fec25ec1069'] = 'Todos los roles';
 $_MODULE['<{smartmarketingps}prestashop>sync_45a314b66aead219143995a24011ca60'] = 'Selecciona el rol de clientes que se sincronizarán con E-goi.';
