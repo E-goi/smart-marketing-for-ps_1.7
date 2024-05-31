@@ -209,7 +209,7 @@ $(document).ready(function() {
                 newsletter: true
             }),
             success:function(data, status) {
-                if (data!=="" && data !== "No users!") {
+                if (data !=="" && data !== "No users!") {
                     var json = JSON.parse(data);
                     json = pagesStores = calcPages(json);
 
@@ -283,9 +283,9 @@ $(document).ready(function() {
 
                         }, 6000);
 
-
+            
                         return false;
-                    }
+                    } 
                 } else {
                     btn_sync.prop('disabled', false);
                     $('.sync_customers').hide();
@@ -300,7 +300,7 @@ $(document).ready(function() {
             }
         });
 	});
-
+    
 	$('#ps_fields').on('change', function() {
 		if(($(this).val() !== '') && ($('#egoi').val() !== '')){
 			$('#save_map_fields').prop('disabled', false);
