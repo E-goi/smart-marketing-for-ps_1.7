@@ -34,7 +34,6 @@ For a workaround you can add this hook call to your **header.tpl**
 
 ### Changelog
 ```
-
 -- V.3.0.5
    -- Fix errors on debug mode
    -- Removed listing of contact lists and creation of contact lists from the plugin's account page

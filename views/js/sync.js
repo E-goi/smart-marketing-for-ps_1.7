@@ -206,7 +206,7 @@ $(document).ready(function() {
             type: 'POST',
             data:({
                 size: 1,
-                newsletter: true 
+                newsletter: true
             }),
             success:function(data, status) {
                 if (data !=="" && data !== "No users!") {
