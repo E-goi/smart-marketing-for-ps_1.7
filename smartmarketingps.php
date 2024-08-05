@@ -57,43 +57,43 @@ class SmartMarketingPs extends Module
     const LIMIT_HOUR_MIN = 10;
     const LIMIT_HOUR_MAX = 22;
 
-	/**
-	 * @var mixed
-	 */
-	protected $success_msg;
+    /**
+     * @var mixed
+     */
+    protected $success_msg;
 
-	/**
-	 * @var mixed
-	 */
-	protected $error_msg;
+    /**
+     * @var mixed
+     */
+    protected $error_msg;
 
-	/**
-	 * Custom Override file
-	 *
-	 * @var string
-	 */
-	protected $custom_override = '/../../override/classes/WebserviceSpecificManagementEgoi.php';
+    /**
+     * Custom Override file
+     *
+     * @var string
+     */
+    protected $custom_override = '/../../override/classes/WebserviceSpecificManagementEgoi.php';
 
     /**
      * Dev Index file Cache
      *
      * @var string
      */
-	protected $dev_cache;
+    protected $dev_cache;
 
     /**
      * Production Index file Cache
      *
      * @var string
      */
-	protected $prod_cache;
+    protected $prod_cache;
 
     /**
      * Transactional API
      *
      * @var $transactionalApi
      */
-	protected $transactionalApi;
+    protected $transactionalApi;
 
     /**
      * API v3
@@ -128,7 +128,7 @@ class SmartMarketingPs extends Module
             'class_name' => 'Account',
             'visible' => true,
             'parent_class_name' => 'SmartMarketingPs',
-            'icon' => 'smartmarketingpsaccount.png',
+            'icon' => 'settings_applications',
             'position' => 0,
         ],
         [
@@ -137,7 +137,7 @@ class SmartMarketingPs extends Module
             'class_name' => 'Sync',
             'visible' => false,
             'parent_class_name' => 'SmartMarketingPs',
-            'icon' => 'smartmarketingpsync.png',
+            'icon' => 'sync',
             'position' => 0,
         ],
         [
@@ -146,7 +146,7 @@ class SmartMarketingPs extends Module
             'class_name' => 'SmsNotifications',
             'visible' => false,
             'parent_class_name' => 'SmartMarketingPs',
-            'icon' => 'smartmarketingsmsnotifications.png',
+            'icon' => 'textsms',
             'position' => 0,
         ],
         [
@@ -155,40 +155,40 @@ class SmartMarketingPs extends Module
             'class_name' => 'Products',
             'visible' => false,
             'parent_class_name' => 'SmartMarketingPs',
-            'icon' => 'smartmarketingproducts.png',
+            'icon' => 'shop',
             'position' => 0,
         ],
     ];
 
 
-	/**
-	* Module Constructor
-	*/
-	public function __construct()
-	{
-		// Module metadata
-		$this->name = 'smartmarketingps';
-	    $this->tab = 'advertising_marketing';
-	    $this->version = '3.0.5';
-	    $this->author = 'E-goi';
-	    $this->need_instance = 1;
-	    $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
-	    $this->bootstrap = true;
+    /**
+     * Module Constructor
+     */
+    public function __construct()
+    {
+        // Module metadata
+        $this->name = 'smartmarketingps';
+        $this->tab = 'advertising_marketing';
+        $this->version = '3.0.5';
+        $this->author = 'E-goi';
+        $this->need_instance = 1;
+        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
+        $this->bootstrap = true;
 
-	    // module key
-	    $this->module_key = '2f50fb7b4988d0a880ac658653d637ad';
+        // module key
+        $this->module_key = '2f50fb7b4988d0a880ac658653d637ad';
 
         $this->dev_cache = dirname(__FILE__).'/../../app/cache/dev/class_index.php';
         $this->prod_cache = dirname(__FILE__).'/../../app/cache/prod/class_index.php';
 
-	    parent::__construct();
+        parent::__construct();
 
-	    // Name & Description
-	    $this->displayName = $this->l('Smart Marketing');
-	    $this->description = $this->l('Easily sync your Prestashop contacts with E-goi.');
+        // Name & Description
+        $this->displayName = $this->l('Smart Marketing');
+        $this->description = $this->l('Easily sync your Prestashop contacts with E-goi.');
 
-	   	// on uninstall
-	    $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
+        // on uninstall
+        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
         require_once $this->getLocalPath() . 'vendor/autoload.php';
 
@@ -197,9 +197,9 @@ class SmartMarketingPs extends Module
         $this->goidini = new GoidiniApi();
 
         $warning_message = $this->l('No Apikey provided');
-	    if (!Configuration::get('smart_api_key')) {
-	      	$this->warning = $warning_message;
-	    }
+        if (!Configuration::get('smart_api_key')) {
+            $this->warning = $warning_message;
+        }
 
         if(!empty(Tools::getValue('smart_api_key')) && !empty($_POST['egoi_client_id'])) {
             $this->addClientId($_POST);
@@ -209,8 +209,7 @@ class SmartMarketingPs extends Module
         $this->validateApiKey();
 
         // check newsletter submissions anywhere
-		//$this->checkNewsletterSubmissions();
-
+        //$this->checkNewsletterSubmissions();
         $current_context = Context::getContext();
         try {
             // Checks that the controller object is defined and that its controller_type property is 'admin'
@@ -220,20 +219,9 @@ class SmartMarketingPs extends Module
         } catch (Exception $e) {
             // If there is an error, it does nothing
         }
-        
-        // check newsletter submissions anywhere
-        //$this->checkNewsletterSubmissions();
-        
-        // Verifica se o contexto atual é do controlador admin antes de chamar checkPluginVersion
-        $current_context = Context::getContext();
-        if ($current_context && $current_context->controller && $current_context->controller->controller_type == 'admin') {
-            $this->checkPluginVersion();
-            
-        }
 
-        
 
-	}
+    }
 
     public function checkPluginVersion(){
         $lastVersion = Configuration::get(self::PLUGIN_VERSION_KEY);
@@ -337,25 +325,44 @@ class SmartMarketingPs extends Module
     }
 
 
-	/**
-	 * Install App
-	 *
-	 * @return bool
-	 */
-	public function install()
-	{
-	  	if (!parent::install() || !$this->installDb() || !$this->createMenu() || !$this->registerHooksEgoi()){
-            $this->_errors[] = $this->l("Error: Failed to create e-goi tables.");
+    /**
+     * Install App
+     *
+     * @return bool
+     */
+    public function install()
+    {
+        PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::LOG: START INSTALL");
+
+        if (!parent::install()) {
+            $this->_errors[] = $this->l("Error: Failed to install from parent.");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to install from parent::" . implode('::', $this->_errors));
             return false;
-        }	
+        }
+        if (!$this->installDb()) {
+            $this->_errors[] = $this->l("Error: Failed to create e-goi tables.");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi tables");
+            return false;
+        }
+        if (!$this->createMenu()) {
+            $this->_errors[] = $this->l("Error: Failed to create e-goi menu.");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi menu");
+            return false;
+        }
+        if (!$this->registerHooksEgoi()) {
+            $this->_errors[] = $this->l("Error: Failed to register webhooks.");
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to register webhooks");
+            return false;
+        }
 
-	    // register WebService
-		$this->registerWebService();
+        // register WebService
+        $this->registerWebService();
+        $this->updateApp();
+        PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::INSTALL OK");
+        return true;
+    }
 
-	  	return true;
-	}
-
-	function registerHooksEgoi(){
+    function registerHooksEgoi(){
         return $this->registerHook(
             array(
                 'cart',
@@ -378,26 +385,46 @@ class SmartMarketingPs extends Module
         );
     }
 
-	/**
-	 * Install required Tables
-	 *
-	 * @return bool
-	 */
-	protected function installDb()
-	{
-		$return = true;
-		$sql = array();
-		include dirname(__FILE__) . '/install/install.php';
+    /**
+     * Install required Tables
+     *
+     * @return bool
+     */
+    protected function installDb()
+    {
+        $return = true;
+        $sql = array();
+        include dirname(__FILE__) . '/install/install.php';
 
-		foreach ($sql as $s){
-		    $return &= Db::getInstance()->execute($s);
-		}
-
-		if ($return) {
-		    $this->mapOrderStateTemplates();
+        foreach ($sql as $s){
+            $return &= Db::getInstance()->execute($s);
         }
-		return $return;
+
+        if ($return) {
+            $this->mapOrderStateTemplates();
+        }
+        return $return;
     }
+
+
+    /**
+     * @return int|true
+     */
+    protected function updateApp()
+    {
+        $updateql = array();
+        include dirname(__FILE__) . '/install/update.php';
+        foreach ($updateql as $u){
+            try {
+                Db::getInstance()->execute($u);
+            } catch (Exception $e) {
+                continue;
+            }
+        }
+
+        return true;
+    }
+
 
     /**
      * Maps order state templates
@@ -680,9 +707,9 @@ class SmartMarketingPs extends Module
 
             if (empty($id_authorization_role)) {
                 Db::getInstance()->insert('authorization_role',
-                    array(
-                        'slug' => $val
-                    )
+                                          array(
+                                              'slug' => $val
+                                          )
                 );
                 $id_authorization_role = Db::getInstance()->getValue("SELECT id_authorization_role FROM "._DB_PREFIX_."authorization_role WHERE slug = '".$val."'");
             }
@@ -690,10 +717,10 @@ class SmartMarketingPs extends Module
             $result = Db::getInstance()->getValue("SELECT id_profile,id_authorization_role FROM "._DB_PREFIX_."access WHERE id_profile = '1' AND id_authorization_role = '".$id_authorization_role."'");
             if (empty($result)) {
                 Db::getInstance()->insert('access',
-                    array(
-                        'id_profile' => '1',
-                        'id_authorization_role' => $id_authorization_role
-                    )
+                                          array(
+                                              'id_profile' => '1',
+                                              'id_authorization_role' => $id_authorization_role
+                                          )
                 );
             }
         }
@@ -730,18 +757,18 @@ class SmartMarketingPs extends Module
     }
 
     /**
-	 * Create menu
-	 *
-	 * @return bool
-	 */
-	private function createMenu()
-	{
+     * Create menu
+     *
+     * @return bool
+     */
+    private function createMenu()
+    {
         $this->createPermissions();
         foreach ($this->menus as $menu) {
             $this->addTab($menu['class_name'], $menu['name'], $menu['parent_class_name'], $menu['icon'], $menu['visible'], $menu['position']);
         }
-		return true;
-	}
+        return true;
+    }
 
     /**
      * @param $class_name
@@ -791,18 +818,18 @@ class SmartMarketingPs extends Module
      * @return bool
      */
     protected function uninstallDb()
-	{
-		// drop all tables from the plugin
-		include dirname(__FILE__) . '/install/uninstall.php';
-    	foreach ($sql as $name => $v){
-       		Db::getInstance()->execute('DROP TABLE IF EXISTS '.$name);
-   		}
+    {
+        // drop all tables from the plugin
+        include dirname(__FILE__) . '/install/uninstall.php';
+        foreach ($sql as $name => $v){
+            Db::getInstance()->execute('DROP TABLE IF EXISTS '.$name);
+        }
 
-   		// remove menus
-   		$this->removeMenu();
+        // remove menus
+        $this->removeMenu();
 
-   		// remove API Key in cache
-   		Configuration::deleteByName('smart_api_key');
+        // remove API Key in cache
+        Configuration::deleteByName('smart_api_key');
 
         Configuration::deleteByName(self::SMS_NOTIFICATIONS_SENDER_CONFIGURATION);
 
@@ -812,145 +839,168 @@ class SmartMarketingPs extends Module
 
         Configuration::deleteByName(self::SMS_NOTIFICATIONS_ADMINISTRATOR_CONFIGURATION);
 
-		// remove webservice
-		$this->uninstallWebService();
+        // remove webservice
+        $this->uninstallWebService();
 
-   		// remove custom override file
-   		@unlink(dirname(__FILE__).$this->custom_override);
-    	return true;
+        // remove custom override file
+        @unlink(dirname(__FILE__).$this->custom_override);
+        return true;
     }
 
-	/**
-	 * Uninstall App
-	 *
-	 * @return bool
-	 */
-	public function uninstall()
-	{
-	  	if (!parent::uninstall() || !$this->uninstallDb())
-	    	return false;
+    /**
+     * Uninstall App
+     *
+     * @return bool
+     */
+    public function uninstall()
+    {
+        if (!parent::uninstall() || !$this->uninstallDb())
+            return false;
 
-	  	return true;
-	}
+        return true;
+    }
 
-	/**
-	 * Register WebService Overrides
-	 *
-	 * @return bool
-	 */
-	public function registerWebService()
-	{
-		Db::getInstance()->insert('webservice_account', array(
-			'key' => md5(time()),
-			'class_name' => "WebserviceRequest",
-			'description' => "E-goi",
-			'active' => 1
-		));
+    /**
+     * Register WebService Overrides
+     *
+     * @return bool
+     */
+    public function registerWebService()
+    {
+        try {
+            $row = Db::getInstance()
+                ->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
 
-		$row = Db::getInstance()
-					->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
+            if(empty($row)) {
+                Db::getInstance()->insert('webservice_account', array(
+                    'key' => md5(time().uniqid('egoi')),
+                    'class_name' => "WebserviceRequest",
+                    'description' => "E-goi",
+                    'active' => 1
+                ));
 
-		if(!empty($row)) {
-			$id_webservice = $row['id_webservice_account'];
+                $row = Db::getInstance()
+                    ->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
+            }
 
-			// add webservice relation
-			Db::getInstance()->insert('webservice_account_shop',
-				array(
-					'id_webservice_account' => $id_webservice,
-					'id_shop' => 1,
-				)
-			);
+            if(!empty($row)) {
+                $id_webservice = $row['id_webservice_account'];
 
-			// assign webservice permissions
-			Db::getInstance()->insert('webservice_permission',
-				array(
-					'id_webservice_account' => $id_webservice,
-					'resource' => 'egoi',
-					'method' => "GET",
-				)
-			);
+                $row_webservice_account = Db::getInstance()
+                    ->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account_shop WHERE id_webservice_account="'.$id_webservice.'"');
 
-			return true;
-		}
-		return false;
-	}
+                if (empty($row_webservice_account)) {
+                    // add webservice relation
+                    Db::getInstance()->insert(
+                        'webservice_account_shop',
+                        array(
+                            'id_webservice_account' => $id_webservice,
+                            'id_shop' => 1,
+                        )
+                    );
+                }
 
-	/**
-	 * Uninstall WebService Overrides
-	 *
-	 * @return bool
-	 */
-	public function uninstallWebService()
-	{
-		$row = Db::getInstance()
-					->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
-		if(!empty($row)) {
-			$qry_webservice = 'id_webservice_account="'.$row['id_webservice_account'].'"';
-			Db::getInstance()->delete('webservice_account', $qry_webservice);
+                $row_webservice_permission = Db::getInstance()
+                    ->getRow(
+                        'SELECT id_webservice_account FROM ' . _DB_PREFIX_ . 'webservice_permission WHERE id_webservice_account="' . $id_webservice . '"'
+                    );
+                if (empty($row_webservice_permission)) {
+                    // assign webservice permissions
+                    Db::getInstance()->insert(
+                        'webservice_permission',
+                        array(
+                            'id_webservice_account' => $id_webservice,
+                            'resource' => 'egoi',
+                            'method' => "GET",
+                        )
+                    );
+                }
 
-			// remove webservice from Shop
-			Db::getInstance()->delete('webservice_account_shop', $qry_webservice);
+                return true;
+            }
+        } catch (Exception $e) {
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: {$e->getMessage()}");
+        }
 
-			// remove webservice permissions
-			Db::getInstance()->delete('webservice_permission', $qry_webservice);
-			return true;
-		}
+        return false;
+    }
 
-		return false;
-	}
+    /**
+     * Uninstall WebService Overrides
+     *
+     * @return bool
+     */
+    public function uninstallWebService()
+    {
+        $row = Db::getInstance()
+            ->getRow('SELECT id_webservice_account FROM '._DB_PREFIX_.'webservice_account WHERE description="E-goi"');
+        if(!empty($row)) {
+            $qry_webservice = 'id_webservice_account="'.$row['id_webservice_account'].'"';
+            Db::getInstance()->delete('webservice_account', $qry_webservice);
 
-	/**
-	 * Filter Request data from Configuration page
-	 *
-	 * @return string
-	 */
-	public function getContent()
-	{
+            // remove webservice from Shop
+            Db::getInstance()->delete('webservice_account_shop', $qry_webservice);
 
-	    if (Tools::isSubmit('submit_api_key')) {
+            // remove webservice permissions
+            Db::getInstance()->delete('webservice_permission', $qry_webservice);
+            return true;
+        }
 
-	    	$api_key = Tools::getValue('smart_api_key');
+        return false;
+    }
 
-	    	if (!$api_key)
+    /**
+     * Filter Request data from Configuration page
+     *
+     * @return string
+     */
+    public function getContent()
+    {
+
+        if (Tools::isSubmit('submit_api_key')) {
+
+            $api_key = Tools::getValue('smart_api_key');
+
+            if (!$api_key)
                 $this->error_msg = $this->displayError($this->l('Indicate correct API key.'));
 
-	        if (!sizeof($this->_errors)) {
+            if (!sizeof($this->_errors)) {
                 Configuration::updateValue('smart_api_key', ($api_key));
                 $this->transactionalApi = new TransactionalApi();
                 $this->transactionalApi->enableClient();
                 $this->success_msg = $this->displayConfirmation($this->l('API Key saved and updated'));
             }
-	    }
-	    return $this->displayForm();
-	}
+        }
+        return $this->displayForm();
+    }
 
-	/**
-	 * Show Configuration Form
-	 *
-	 * @return mixed
-	 */
-	public function displayForm()
-	{
-		//add headers
-		$this->context->controller->addJS($this->_path. 'views/js/config.js');
-		$this->context->controller->addCSS($this->_path. 'views/css/main.css');
+    /**
+     * Show Configuration Form
+     *
+     * @return mixed
+     */
+    public function displayForm()
+    {
+        //add headers
+        $this->context->controller->addJS($this->_path. 'views/js/config.js');
+        $this->context->controller->addCSS($this->_path. 'views/css/main.css');
 
-		// assign vars
+        // assign vars
         $this->assign($this->success_msg, 'success_msg');
         $this->assign($this->error_msg, 'error_msg');
         $this->assign(Configuration::get('smart_api_key') ? false : true, 'smart_api_key_error');
 
-	    return $this->display($this->name, 'views/templates/admin/config.tpl');
-	}
+        return $this->display($this->name, 'views/templates/admin/config.tpl');
+    }
 
-	/**
-	 * Validate Api Key
-	 *
-	 * @return void
-	 */
-	public function validateApiKey()
-	{
-		if(!empty(Tools::getValue("api_key"))) {
+    /**
+     * Validate Api Key
+     *
+     * @return void
+     */
+    public function validateApiKey()
+    {
+        if(!empty(Tools::getValue("api_key"))) {
             $this->apiv3->setApiKey(Tools::getValue("api_key"));
             $cache_id = 'getMyAccount::'.$this->apiv3->getApiKey();
 
@@ -968,46 +1018,46 @@ class SmartMarketingPs extends Module
                 header('HTTP/1.1 403 Forbidden');
                 exit;
             }
-		}
-	}
+        }
+    }
 
     public function hookactionNewsletterRegistrationAfter($params)
     {
         return $this->addNewsletterCustomer($params);
     }
 
-	/**
-    * Hook for Add customer
-    *
-    * @param array $params
-    * @return bool
-    */
+    /**
+     * Hook for Add customer
+     *
+     * @param array $params
+     * @return bool
+     */
     public function hookActionObjectCustomerAddAfter($params)
     {
         return $this->addCustomer($params);
-	}
+    }
 
-	/**
-	 * Hook for Update customer
-	 *
-	 * @param array $params
-	 * @return bool
-	 */
-	public function hookActionObjectCustomerUpdateAfter($params)
-	{
-		return $this->updateCustomer($params);
-	}
+    /**
+     * Hook for Update customer
+     *
+     * @param array $params
+     * @return bool
+     */
+    public function hookActionObjectCustomerUpdateAfter($params)
+    {
+        return $this->updateCustomer($params);
+    }
 
-	/**
-	 * Hook for Delete customer
-	 *
-	 * @param array $params
-	 * @return bool
-	 */
-	public function hookActionObjectCustomerDeleteAfter($params)
-	{
-		return $this->deleteCustomer($params);
-	}
+    /**
+     * Hook for Delete customer
+     *
+     * @param array $params
+     * @return bool
+     */
+    public function hookActionObjectCustomerDeleteAfter($params)
+    {
+        return $this->deleteCustomer($params);
+    }
 
     /**
      * Hook for triggering reminders
@@ -1036,7 +1086,7 @@ class SmartMarketingPs extends Module
      *
      * @return bool
      */
-	public function hookActionOrderStatusPostUpdate($params)
+    public function hookActionOrderStatusPostUpdate($params)
     {
         $this->syncOrderTE($params);
         return $this->sendSmsNotification($params);
@@ -1087,7 +1137,9 @@ class SmartMarketingPs extends Module
                     continue;
                 }
 
-                $data = static::mapProduct($product, $langId, $currencyId);
+                $selectedCatalog = Db::getInstance()->executeS("SELECT * FROM " . _DB_PREFIX_ . "egoi_active_catalogs WHERE catalog_id=".$catalog['catalog_id']);
+
+                $data = static::mapProduct($product, $langId, $currencyId, !empty($selectedCatalog[0]["sync_descriptions"]), !empty($selectedCatalog[0]["sync_categories"]), !empty($selectedCatalog[0]["sync_related_products"]));
                 $result = $this->apiv3->createProduct($catalog['catalog_id'], $data);
 
                 if (!empty($result['errors']['product_already_exists'])) {
@@ -1146,8 +1198,12 @@ class SmartMarketingPs extends Module
         return true;
     }
 
-    public static function mapProduct($product, $lang, $currency)
+    public static function mapProduct($product, $lang, $currency, $sync_descriptions = true, $sync_categories = true, $sync_related_products = true)
     {
+        $desc = '';
+        $categories = array();
+        $relatedProducts = array();
+
         if (is_array($product)) {
             $product = new Product($product['id_product'], true, $lang);
         } else {
@@ -1156,10 +1212,12 @@ class SmartMarketingPs extends Module
 
         $link = new Link();
 
-        $desc = empty($product->description_short) ? filter_var(substr($product->description,0,800), FILTER_SANITIZE_STRING) : filter_var($product->description_short, FILTER_SANITIZE_STRING);
+        if(!empty($sync_descriptions)) {
+            $desc = empty($product->description_short) ? filter_var(substr($product->description,0,800), FILTER_SANITIZE_STRING) : filter_var($product->description_short, FILTER_SANITIZE_STRING);
+        }
 
-        $price = $product->getPrice(true);
-        $salePrice = $product->getPrice(true);
+        $price = Product::getPriceStatic($product->id, true, null, 2, ',', false, false);
+        $salePrice = Product::getPriceStatic($product->id, true, null, 2, ',', false, true);
 
         if ($price == $salePrice) {
             $salePrice = 0;
@@ -1178,14 +1236,15 @@ class SmartMarketingPs extends Module
         $ssl = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
         $imageUrl = $ssl . $link->getImageLink(isset($product->link_rewrite) ? $product->link_rewrite : $product->name, (int)$img['id_image'], 'home_default');
 
-        $categories = static::buildBreadcrumbs($product->getCategories(), $lang);
-        
-        
-        $relatedProducts = array();
+        if(!empty($sync_categories)) {
+            $categories = static::buildBreadcrumbs($product->getCategories(), $lang);
+        }
 
-        $acessories = Product::getAccessoriesLight($lang, $product->id);
-        foreach ($acessories as $item) {
-            $relatedProducts[] = $item['id_product'];
+        if(!empty($sync_related_products)) {
+            $acessories = Product::getAccessoriesLight($lang, $product->id);
+            foreach ($acessories as $item) {
+                $relatedProducts[] = $item['id_product'];
+            }
         }
 
         return array(
@@ -1207,22 +1266,19 @@ class SmartMarketingPs extends Module
 
     private static function buildBreadcrumbs($categories, $lang)
     {
-
-        $categoryCount = count($categories);
-
         $result = array();
-        for ($i = 0; $i < $categoryCount; $i++) {
-            $category = new Category($categories[$i], $lang);
-            $breadcrumb = $category->name;
-
-            while ($category->id_parent !== 1 && $category->id_parent !== 0) {
-                $category = new Category($category->id_parent, $lang);
-                $breadcrumb = $category->name . '>' . $breadcrumb;
+        if(!empty($categories))
+            foreach ($categories as $category) {
+                $category = new Category($category, $lang);
+                if(!empty($category->name)) {
+                    $breadcrumb = $category->name;
+                    while ($category->id_parent > '1') {
+                        $category = new Category($category->id_parent, $lang);
+                        $breadcrumb = $category->name . '>' . $breadcrumb;
+                    }
+                    $result[] = $breadcrumb;
+                }
             }
-
-            $result[] = $breadcrumb;
-
-        }
 
         return $result;
     }
@@ -1244,6 +1300,9 @@ class SmartMarketingPs extends Module
         $list_id            = $res['list_id'];
         $newsletter_sync    = $res['newsletter_sync'];
         $store_id = Tools::getValue("store_id");
+        if(empty($store_id)) {
+            $store_id = (int)Context::getContext()->shop->id;
+        }
         if(!empty($store_id)){
             $store_filter = ' AND '._DB_PREFIX_.'customer.id_shop="'.$store_id.'" ';
         }else{
@@ -1487,7 +1546,7 @@ class SmartMarketingPs extends Module
     private function getNotifMessages($orderStatusId, $langId)
     {
         return Db::getInstance()->getRow("SELECT client_message,admin_message FROM "._DB_PREFIX_.
-            "egoi_sms_notif_messages WHERE order_status_id=" .pSQL($orderStatusId). " AND lang_id=".pSQL($langId)
+                                         "egoi_sms_notif_messages WHERE order_status_id=" .pSQL($orderStatusId). " AND lang_id=".pSQL($langId)
         );
     }
 
@@ -1611,7 +1670,7 @@ class SmartMarketingPs extends Module
             }
 
             $message = $this->parseMessage($message, $orderState, $order);
-            
+
             if (!empty($message)) {
                 Db::getInstance()->insert(
                     'egoi_sms_notif_order_reminder',
@@ -1639,8 +1698,8 @@ class SmartMarketingPs extends Module
     private function getReminderMessage($orderStatusId, $langId)
     {
         return Db::getInstance()->getRow("SELECT message FROM "._DB_PREFIX_.
-            "egoi_sms_notif_reminder_messages WHERE lang_id=".pSQL($langId)
-            ." AND active=1"
+                                         "egoi_sms_notif_reminder_messages WHERE lang_id=".pSQL($langId)
+                                         ." AND active=1"
         );
     }
 
@@ -1908,14 +1967,14 @@ class SmartMarketingPs extends Module
         return true;
     }
 
-	/**
-	 * Add customer
-	 *
-	 * @param  $params
-	 * @return bool
-	 */
-	protected function addCustomer($params)
-	{
+    /**
+     * Add customer
+     *
+     * @param  $params
+     * @return bool
+     */
+    protected function addCustomer($params)
+    {
 
         $params = json_decode(json_encode ( $params ) , true);
 
@@ -1956,7 +2015,7 @@ class SmartMarketingPs extends Module
             );
         }
         return true;
-	}
+    }
 
     public static function getShopsName($id){
         try{
@@ -1994,13 +2053,13 @@ class SmartMarketingPs extends Module
     }
 
     /**
-	 * Update customer
-	 *
+     * Update customer
+     *
      * @param array $params
-	 * @return mixed
-	 */
-	protected function updateCustomer($params)
-	{
+     * @return mixed
+     */
+    protected function updateCustomer($params)
+    {
         $params = json_decode(json_encode ( $params ) , true);
 
         if(empty($params)) {
@@ -2046,16 +2105,16 @@ class SmartMarketingPs extends Module
             }
         }
         return true;
-	}
+    }
 
-	/**
-	 * Delete customer
-	 *
+    /**
+     * Delete customer
+     *
      * @param array $params
-	 * @return bool
-	 */
-	protected function deleteCustomer($params)
-	{
+     * @return bool
+     */
+    protected function deleteCustomer($params)
+    {
         $params = json_decode(json_encode ( $params ) , true);
 
         if(empty($params)) {
@@ -2104,7 +2163,7 @@ class SmartMarketingPs extends Module
             );
         }
         return true;
-	}
+    }
 
     /**
      * Get role from Customer
@@ -2113,7 +2172,7 @@ class SmartMarketingPs extends Module
      * @param $customer_role
      * @return bool
      */
-	protected function getRole($customer_id, $customer_role)
+    protected function getRole($customer_id, $customer_role)
     {
         if ($customer_role) {
             $role = Db::getInstance()
@@ -2144,20 +2203,19 @@ class SmartMarketingPs extends Module
             )
         );
 
-
         return $this->display(__FILE__, 'ecommerce/front-scripts.tpl');
     }
 
-	/**
-   	 * Hook for display content in Top Page
-   	 *
-   	 * @param array $params
-   	 * @return mixed
-   	 */
-   	public function hookDisplayTop($params)
-   	{
+    /**
+     * Hook for display content in Top Page
+     *
+     * @param array $params
+     * @return mixed
+     */
+    public function hookDisplayTop($params)
+    {
         return $this->egoiScriptsTPL($params);
-	}
+    }
 
     /**
      * Hook for display TE sccript, use if theme doesn't call hookDisplayTop naturaly
@@ -2188,56 +2246,56 @@ class SmartMarketingPs extends Module
     }
 
 
-	/**
-	 * Abandoned cart hook
-	 *
-	 * @param  array $params
-	 * @return void
-	 */
-	public function hookActionCartSave($params)
-	{
-		$this->addToCart($params);
-	}
+    /**
+     * Abandoned cart hook
+     *
+     * @param  array $params
+     * @return void
+     */
+    public function hookActionCartSave($params)
+    {
+        $this->addToCart($params);
+    }
 
-	/**
-	 * Abandoned cart hook
-	 *
-	 * @param  array $params
-	 * @return void
-	 */
-	public function hookCart($params)
-	{
-		$this->addToCart($params);
-	}
+    /**
+     * Abandoned cart hook
+     *
+     * @param  array $params
+     * @return void
+     */
+    public function hookCart($params)
+    {
+        $this->addToCart($params);
+    }
 
-	/**
-	 * Track&Engage - check is customer has an Abandoned Cart
-	 *
-	 * @return string|bool
-	 */
-	public function te()
-	{
-		$res = self::getClientData('track', 1);
-		if (!empty($res)) {
-			$list_id = $res['list_id'];
-			$client = $res['client_id'];
-			$track = $res['track'];
+    /**
+     * Track&Engage - check is customer has an Abandoned Cart
+     *
+     * @return string|bool
+     */
+    public function te()
+    {
+        $res = self::getClientData('track', 1);
+        if (!empty($res)) {
+            $list_id = $res['list_id'];
+            $client = $res['client_id'];
+            $track = $res['track'];
             $te = '';
 
-			if($client && $list_id && $track) {
-				if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
-					return false;
-				}
+            if($client && $list_id && $track) {
+                if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && ($_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest')) {
+                    return false;
+                }
 
-				// set customer email var to use in t&e
-				$customer = !$this->context->cookie->__isset('egoi_uid')
+                // set customer email var to use in t&e
+                $customer = !$this->context->cookie->__isset('egoi_uid')
                     ? $this->context->cookie->email
                     : $this->context->cookie->__get('egoi_uid');
 
-				$cart_id = $this->context->cookie->id_cart;//$this->getCartId($this->getCustomerId());
-				$cart = new Cart($cart_id);
+                $cart_id = $this->context->cookie->id_cart;//$this->getCartId($this->getCustomerId());
+                $cart = new Cart($cart_id);
 
-				$products = $cart->getProducts();
+                $products = $cart->getProducts();
 
                 $cs_code = Configuration::get(static::CONNECTED_SITES_CODE);
                 if(!empty($cs_code)){
@@ -2248,44 +2306,44 @@ class SmartMarketingPs extends Module
                     include 'includes/te.php';
                 }
 
-			}
+            }
 
             return $te;
-		}
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Add to Cart
-	 *
-	 * @param array $params
-	 */
-	protected function addToCart($params)
-	{
-	 	$json = isset($params['json']) && is_array($params['json']) ? json_decode($params['json']['id']) : $params['cookie']->id_cart;
+    /**
+     * Add to Cart
+     *
+     * @param array $params
+     */
+    protected function addToCart($params)
+    {
+        $json = isset($params['json']) && is_array($params['json']) ? json_decode($params['json']['id']) : $params['cookie']->id_cart;
 
-	 	$res = self::getClientData('track', 1);
-		if (!empty($res)) {
-			$list_id = $res['list_id'];
-			$track = $res['track'];
-			$client = $res['client_id'];
-			if($client && $track && $list_id){
-				// check if customer has products in the cart (has cart ID?)
-				if($json) {
-					$idc = $this->getCustomerId();
+        $res = self::getClientData('track', 1);
+        if (!empty($res)) {
+            $list_id = $res['list_id'];
+            $track = $res['track'];
+            $client = $res['client_id'];
+            if($client && $track && $list_id){
+                // check if customer has products in the cart (has cart ID?)
+                if($json) {
+                    $idc = $this->getCustomerId();
 
-					if(empty($this->getCartId($idc))) {
-						Db::getInstance()->insert('egoi_customers', array(
-							'customer' => $idc,
-							'id_cart' => (int)$json,
-							'estado' => 1
-						));
-					}
-				}
-			}
-		}
-	}
+                    if(empty($this->getCartId($idc))) {
+                        Db::getInstance()->insert('egoi_customers', array(
+                            'customer' => $idc,
+                            'id_cart' => (int)$json,
+                            'estado' => 1
+                        ));
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Get all mapped fields
@@ -2381,26 +2439,25 @@ class SmartMarketingPs extends Module
     }
 
     /**
-	 * Get Client Data from DB
-	 *
+     * Get Client Data from DB
+     *
      * @param $field
      * @param $val
-	 * @return array|null
-	 */
-	public static function getClientData($field = false, $val = false)
-	{
+     * @return array|null
+     */
+    public static function getClientData($field = false, $val = false)
+    {
         $query = "SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' order by egoi_id DESC";
-		if ($field && $val) {
+        if ($field && $val) {
             $query = "SELECT * FROM "._DB_PREFIX_."egoi WHERE client_id != '' and $field='$val' order by egoi_id DESC";
-		}
+        }
         if (!Cache::isStored($query)) {
             $return = Db::getInstance(_PS_USE_SQL_SLAVE_)
                 ->getRow($query);
             Cache::store($query, $return);
         }
         return Cache::retrieve($query);
-	}
-
+    }
 
     /**
      * Clean Index class from cache for Dev && Production
@@ -2422,69 +2479,69 @@ class SmartMarketingPs extends Module
         }
     }
 
-	/**
-	 * Get Cart ID from Customer Id
-	 *
-	 * @param  $customerId
-	 * @return mixed
-	 */
-	private function getCartId($customerId)
-	{
-		return Db::getInstance(_PS_USE_SQL_SLAVE_)
-					->getValue("SELECT id_cart FROM "._DB_PREFIX_."egoi_customers WHERE customer='".(int)$customerId."'");
-	}
+    /**
+     * Get Cart ID from Customer Id
+     *
+     * @param  $customerId
+     * @return mixed
+     */
+    private function getCartId($customerId)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->getValue("SELECT id_cart FROM "._DB_PREFIX_."egoi_customers WHERE customer='".(int)$customerId."'");
+    }
 
-	/**
-	 * Get Order details from ID
-	 *
-	 * @param int $orderId
-	 * @return mixed
-	 */
-	private function getOrderDetails($orderId)
-	{
-		return Db::getInstance(_PS_USE_SQL_SLAVE_)
-					->getRow("SELECT * FROM "._DB_PREFIX_."orders WHERE id_order='".(int)$orderId."'");
-	}
+    /**
+     * Get Order details from ID
+     *
+     * @param int $orderId
+     * @return mixed
+     */
+    private function getOrderDetails($orderId)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)
+            ->getRow("SELECT * FROM "._DB_PREFIX_."orders WHERE id_order='".(int)$orderId."'");
+    }
 
-	/**
-	 * Get current customer ID from cookie or from session
-	 *
-	 * @return int|null
-	 */
-	private function getCustomerId()
-	{
-		return (int)$this->context->cookie->id_customer;
-	}
+    /**
+     * Get current customer ID from cookie or from session
+     *
+     * @return int|null
+     */
+    private function getCustomerId()
+    {
+        return (int)$this->context->cookie->id_customer;
+    }
 
-	/**
-	 * Remove customer cart from DB
-	 *
-	 * @return bool
-	 */
-	private function removeCart()
-	{
-		$idc = $this->getCustomerId();
-		return Db::getInstance()->delete('egoi_customers', "customer='$idc'");
-	}
+    /**
+     * Remove customer cart from DB
+     *
+     * @return bool
+     */
+    private function removeCart()
+    {
+        $idc = $this->getCustomerId();
+        return Db::getInstance()->delete('egoi_customers', "customer='$idc'");
+    }
 
 
-   	/**
-   	 * @param  array|bool $values
-   	 * @param $key
-   	 * @return void
-   	 */
-   	private function assign($values, $key = false)
-   	{
-    	if(!empty($values) && is_array($values)){
-	        foreach ($values as $key => $value) {
-	        	$this->smarty->assign($key, $value);
-	        }
+    /**
+     * @param  array|bool $values
+     * @param $key
+     * @return void
+     */
+    private function assign($values, $key = false)
+    {
+        if(!empty($values) && is_array($values)){
+            foreach ($values as $key => $value) {
+                $this->smarty->assign($key, $value);
+            }
 
-	    }else{
-	    	if ($key) {
-	    		$this->smarty->assign($key, $values);
-			}
-	    }
+        }else{
+            if ($key) {
+                $this->smarty->assign($key, $values);
+            }
+        }
     }
 
     /**
@@ -2495,16 +2552,16 @@ class SmartMarketingPs extends Module
      */
     private function addClientId($post)
     {
-    	// clean table
-		Db::getInstance()->execute('TRUNCATE TABLE '._DB_PREFIX_.'egoi');
-		// then insert new data
-		Db::getInstance()->insert('egoi',
-			array(
-				'client_id' => (int)$post['egoi_client_id']
-			)
-		);
-		return true;
-	}
+        // clean table
+        Db::getInstance()->execute('TRUNCATE TABLE '._DB_PREFIX_.'egoi');
+        // then insert new data
+        Db::getInstance()->insert('egoi',
+                                  array(
+                                      'client_id' => (int)$post['egoi_client_id']
+                                  )
+        );
+        return true;
+    }
 
 
     private function syncOrderTE($params) {
@@ -2531,9 +2588,9 @@ class SmartMarketingPs extends Module
         $uid = Db::getInstance()->getValue('SELECT uid FROM '._DB_PREFIX_."egoi_customer_uid WHERE email='".pSQL($customer->email)."';");
         $teSdk = new TESDK($client, empty($uid)?$customer->email:$uid ,$list_id);
         $teSdk->convertOrder([
-            'order' => $order,
-            'products' => $products
-        ]);
+                                 'order' => $order,
+                                 'products' => $products
+                             ]);
 
     }
 
