@@ -10,22 +10,21 @@
 
 <div class="panel">
 	<div class="egoi panel-heading"><span class="icon-group" id="subs"></span> <span class="baseline">{l s='My Subscribers' mod='smartmarketingps'}</span></div>
-    <form method="post">
-
-    	<span id="sub_in_egoi" style="display: none;">{l s='Subscribed in E-goi (Active)' mod='smartmarketingps'}</span>
-    	<span id="sub_in_ps" style="display: none;">{l s='Subscribed in PrestaShop' mod='smartmarketingps'}</span>
+	<form method="post">
+		<span id="sub_in_egoi" style="display: none;">{l s='Subscribed in E-goi (Active)' mod='smartmarketingps'}</span>
+		<span id="sub_in_ps" style="display: none;">{l s='Subscribed in PrestaShop' mod='smartmarketingps'}</span>
 
 		{if isset($sync) and ($sync)}
 			<div style="border:1px solid #ccc;text-align:center;margin-bottom: 20px;" class="alert alert-info">
 				<span style="background:#1e94ab;color:#fff;padding:5px;">{l s='Syncronization ON' mod='smartmarketingps'}</span>
-                <p style="padding-top: 20px;"></p>
-                <div id="sync">
-                    <span id="valid_sync"></span>
-                    <p id="egoi_sync_users_ps"></p>
-                    <div class="egoi_sync_users">
-                        {l s='Loading Subscribers Information...' mod='smartmarketingps'}
-                    </div>
-                </div>
+				<p style="padding-top: 20px;"></p>
+				<div id="sync">
+					<span id="valid_sync"></span>
+					<p id="egoi_sync_users_ps"></p>
+					<div class="egoi_sync_users">
+						{l s='Loading Subscribers Information...' mod='smartmarketingps'}
+					</div>
+				</div>
 				<p>{l s='The Module is listening to changes and will automatically keep your customers sync with the selected E-goi list' mod='smartmarketingps'}</p>
 			</div>
 		{/if}
@@ -57,7 +56,7 @@
 									{/if}
 								{/foreach}
 							</select>
-    						<input type="hidden" name="list" id="egoi_lists" value="{if isset($listValue) && $listValue !== null}{$listValue|escape:'htmlall':'UTF-8'}{/if}">
+							<input type="hidden" name="list" id="egoi_lists" value="{if isset($listValue) && $listValue !== null}{$listValue|escape:'htmlall':'UTF-8'}{/if}">
 						{/if}
 
 						{if isset($list_altered) && $list_altered == false}
@@ -75,11 +74,11 @@
 					<select name="role">
 						<option value="">{l s='All roles' mod='smartmarketingps'}</option>
 						{foreach $roles as $role}?>
-							{if isset($role_id) and ($role_id eq $role.id_group)}
-								<option value="{$role.id_group|escape:'htmlall':'UTF-8'}" selected="selected">{$role.name|escape:'htmlall':'UTF-8'}</option>
-							{else}
-								<option value="{$role.id_group|escape:'htmlall':'UTF-8'}">{$role.name|escape:'htmlall':'UTF-8'}</option>
-							{/if}	
+						{if isset($role_id) and ($role_id eq $role.id_group)}
+							<option value="{$role.id_group|escape:'htmlall':'UTF-8'}" selected="selected">{$role.name|escape:'htmlall':'UTF-8'}</option>
+						{else}
+							<option value="{$role.id_group|escape:'htmlall':'UTF-8'}">{$role.name|escape:'htmlall':'UTF-8'}</option>
+						{/if}
 						{/foreach}?>
 					</select>
 					<p>{l s='Select the role to synchronize your Subscribers with.' mod='smartmarketingps'}</p>
@@ -103,7 +102,7 @@
 					</td>
 				</tr>
 
-{*			{if isset($sync) and ($sync)}*}
+				{*			{if isset($sync) and ($sync)}*}
 				<tr valign="top">
 					<th class="egoi-td" scope="row">{l s='Sync existing customers' mod='smartmarketingps'}</th>
 					<td>
@@ -249,11 +248,11 @@
 
 							{foreach $states as $state}
 
-							{if isset($track_state) and ($track_state eq $state['id_order_state'])}
-								<option value="{$state['id_order_state']}" selected="selected">{$state['name']|escape:'htmlall':'UTF-8'}</option>
-							{else}
-								<option value="{$state['id_order_state']}">{$state['name']|escape:'htmlall':'UTF-8'}</option>
-							{/if}
+								{if isset($track_state) and ($track_state eq $state['id_order_state'])}
+									<option value="{$state['id_order_state']}" selected="selected">{$state['name']|escape:'htmlall':'UTF-8'}</option>
+								{else}
+									<option value="{$state['id_order_state']}">{$state['name']|escape:'htmlall':'UTF-8'}</option>
+								{/if}
 
 
 							{/foreach}
@@ -291,68 +290,69 @@
 
 	<!-- Custom Fields -->
 	<div class="modal fade" id="CustomFields" role="dialog">
-	    <div class="modal-dialog">
-	        <div class="modal-content">
-                <div class="modal-header egoi-map-header">
-                    <h1 class="modal-title egoi-title"><span class="icon-exchange" id="egoi-map-icon"></span> {l s='Map Custom Fields' mod='smartmarketingps'}</h1>
-                </div>
-                <div class="modal-body">
-                    <div class="row" style="padding-bottom: 20px;">
-                        <div class="col-md-5 col-sm-5">
-                            <label style="display: block;">{l s='PrestaShop Fields' mod='smartmarketingps'}</label>
-                            <select name="ps_fields" id="ps_fields" class="form-control" style="width:180px;">
-                                <option value="">{l s='Select Field' mod='smartmarketingps'}</option>
-                                <option value="firstname">{l s='First Name' mod='smartmarketingps'}</option>
-                                <option value="lastname">{l s='Last Name' mod='smartmarketingps'}</option>
-                                <option value="birthday">{l s='Birthday' mod='smartmarketingps'}</option>
-                                <option value="newsletter">{l s='Newsletter' mod='smartmarketingps'}</option>
-                                <option value="optin">{l s='Optin' mod='smartmarketingps'}</option>
-                            </select>
-                        </div>
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header egoi-map-header">
+					<h1 class="modal-title egoi-title"><span class="icon-exchange" id="egoi-map-icon"></span> {l s='Map Custom Fields' mod='smartmarketingps'}</h1>
+				</div>
+				<div class="modal-body">
+					<div class="row" style="padding-bottom: 20px;">
+						<div class="col-md-5 col-sm-5">
+							<label style="display: block;">{l s='PrestaShop Fields' mod='smartmarketingps'}</label>
+							<select name="ps_fields" id="ps_fields" class="form-control" style="width:180px;">
+								<option value="">{l s='Select Field' mod='smartmarketingps'}</option>
+								<option value="firstname">{l s='First Name' mod='smartmarketingps'}</option>
+								<option value="lastname">{l s='Last Name' mod='smartmarketingps'}</option>
+								<option value="birthday">{l s='Birthday' mod='smartmarketingps'}</option>
+								<option value="newsletter">{l s='Newsletter' mod='smartmarketingps'}</option>
+								<option value="optin">{l s='Optin' mod='smartmarketingps'}</option>
+								<option value="roles">{l s='Roles' mod='smartmarketingps'}</option>
+							</select>
+						</div>
 
-                        <div class="col-md-5 col-sm-5">
-                            <label style="display: block;">E-goi Fields</label>
-                            <select name="egoi" id="egoi" style="width:180px;display:inline;">
-                                <option value="">{l s='Select Field' mod='smartmarketingps'}</option>
-                                {if isset($select) and ($select)}
-                                    {$select}
-                                {/if}
-                            </select>
-                        </div>
-                        <div class="col-md-2 col-sm-2" style="padding-top: 20px;">
-                            <button class="btn btn-primary" type="button" id="save_map_fields" disabled style="text-transform: none;">
-                                <span class="icon-plus"></span> {l s='Assign' mod='smartmarketingps'}
-                                <div id="load_map" style="display:none;"></div>
-                            </button>
-                        </div>
-                    </div>
-                    <hr style="margin:0;">
+						<div class="col-md-5 col-sm-5">
+							<label style="display: block;">E-goi Fields</label>
+							<select name="egoi" id="egoi" style="width:180px;display:inline;">
+								<option value="">{l s='Select Field' mod='smartmarketingps'}</option>
+								{if isset($select) and ($select)}
+									{$select}
+								{/if}
+							</select>
+						</div>
+						<div class="col-md-2 col-sm-2" style="padding-top: 20px;">
+							<button class="btn btn-primary" type="button" id="save_map_fields" disabled style="text-transform: none;">
+								<span class="icon-plus"></span> {l s='Assign' mod='smartmarketingps'}
+								<div id="load_map" style="display:none;"></div>
+							</button>
+						</div>
+					</div>
+					<hr style="margin:0;">
 
-                    <div class="row" id="all_fields_mapped" style="padding-top: 15px;">
-                        <div class="col-md-12 col-sm-12" style="border-bottom: 1px solid #e5e5e5;">
-                            <b>{l s='Mapped Fields' mod='smartmarketingps'}</b>
-                        </div>
-                        {if isset($mapped_fields) and (!empty($mapped_fields))}
-                            {foreach $mapped_fields as $row}
-                                <div id="egoi_fields_{$row['id']}">
-                                    <div class="col-sm-5" style='font-size: 14px;padding-top: 10px;'>{$row['ps_name']|escape:'htmlall':'UTF-8'}</div>
-                                    <div class="col-sm-5" style='font-size: 14px;padding-top: 10px;'>{$row['egoi_name']|escape:'htmlall':'UTF-8'}</div>
-                                    <div class="col-sm-2" style="padding-top: 10px;">
-                                        <button type='button' id="field_{$row['id']|escape:'htmlall':'UTF-8'}" class='egoi_fields btn btn-default' data-target="{$row['id']|escape:'htmlall':'UTF-8'}">
-                                        <span class="icon-trash"></span></button>
-                                    </div>
-                                </div>
-                            {/foreach}
-                        {/if}
-                    </div>
-                    <div id="error_map" class="alert alert-danger col-md-8 col-md-offset-2" style="display:none;">
-                    	{l s='The selected fields are already mapped!' mod='smartmarketingps'}
-                    </div>
-                </div>
+					<div class="row" id="all_fields_mapped" style="padding-top: 15px;">
+						<div class="col-md-12 col-sm-12" style="border-bottom: 1px solid #e5e5e5;">
+							<b>{l s='Mapped Fields' mod='smartmarketingps'}</b>
+						</div>
+						{if isset($mapped_fields) and (!empty($mapped_fields))}
+							{foreach $mapped_fields as $row}
+								<div id="egoi_fields_{$row['id']}">
+									<div class="col-sm-5" style='font-size: 14px;padding-top: 10px;'>{$row['ps_name']|escape:'htmlall':'UTF-8'}</div>
+									<div class="col-sm-5" style='font-size: 14px;padding-top: 10px;'>{$row['egoi_name']|escape:'htmlall':'UTF-8'}</div>
+									<div class="col-sm-2" style="padding-top: 10px;">
+										<button type='button' id="field_{$row['id']|escape:'htmlall':'UTF-8'}" class='egoi_fields btn btn-default' data-target="{$row['id']|escape:'htmlall':'UTF-8'}">
+											<span class="icon-trash"></span></button>
+									</div>
+								</div>
+							{/foreach}
+						{/if}
+					</div>
+					<div id="error_map" class="alert alert-danger col-md-8 col-md-offset-2" style="display:none;">
+						{l s='The selected fields are already mapped!' mod='smartmarketingps'}
+					</div>
+				</div>
 
-	            <div class="modal-footer">
-	        	    <button type="button" class="btn btn-default" id="close_fields" data-dismiss="modal">Close</button>
-	            </div>
-	        </div>
-	    </div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" id="close_fields" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
 	</div>
