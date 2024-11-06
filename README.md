@@ -34,6 +34,10 @@ For a workaround you can add this hook call to your **header.tpl**
 
 ### Changelog
 ```
+-- V.3.0.7
+   -- Add toolbar button for documentation
+   -- Bump plugin version to 3.0.7
+   
 -- V.3.0.6
    -- Add options to product sync, so user can opt to sync categories, descriptions and related products
    -- Fix price and sale price on product sync
