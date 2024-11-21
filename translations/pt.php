@@ -161,6 +161,9 @@ $_MODULE['<{smartmarketingps}prestashop>sync_77587239bf4c54ea493c7033e1dbf636'] 
 $_MODULE['<{smartmarketingps}prestashop>sync_aac772216aecbeca0e86d06671fe985a'] = 'Data de nascimento';
 $_MODULE['<{smartmarketingps}prestashop>sync_ffb7e666a70151215b4c55c6268d7d72'] = 'Newsletter';
 $_MODULE['<{smartmarketingps}prestashop>sync_5455146337d77d4c1271350f7da83c4a'] = 'Opt-in';
+$_MODULE['<{smartmarketingps}prestashop>sync_a5cd3ed116608dac017f14c046ea56bf'] = 'Papéis';
+$_MODULE['<{smartmarketingps}prestashop>sync_e3fb0b5e9ce53fe70b119648fc217f44'] = 'Nome da Loja';
+$_MODULE['<{smartmarketingps}prestashop>sync_1bde011eb44127efa717b9ad809c0fd2'] = 'Linguagem da Loja';
 $_MODULE['<{smartmarketingps}prestashop>sync_185b7133db22230701a857c059360cc2'] = 'Atribuir';
 $_MODULE['<{smartmarketingps}prestashop>sync_234b6206205c09f587001fddeac2e314'] = 'Campos mapeados';
 $_MODULE['<{smartmarketingps}prestashop>sync_2c99d9e9d949e4feb67525256a7ea77d'] = 'Os campos que escolheu já estão mapeados';
