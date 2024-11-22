@@ -2553,7 +2553,7 @@ class SmartMarketingPs extends Module
                 if ($fieldName === 'store_language') {
                     $languageName = self::getLangName($idLang);
 
-                    // Verificar se o campo mapeado é base ou extra
+                    // Verify if the field is extra or base
                     if (strpos($field['egoi'], 'extra') !== false) {
                         $subscriber['extra'][] = [
                             'field_id' => (int) str_replace('extra_', '', $field['egoi']),
@@ -2566,7 +2566,7 @@ class SmartMarketingPs extends Module
 
                 if ($fieldName === 'store_name') {
                     $storeName = self::getStoreName($idShop);
-
+                    // Verify if the field is extra or base
                     if (strpos($field['egoi'], 'extra') !== false) {
                         $subscriber['extra'][] = [
                             'field_id' => (int) str_replace('extra_', '', $field['egoi']),
@@ -2607,6 +2607,12 @@ class SmartMarketingPs extends Module
         return $subscriber;
     }
 
+    /**
+     * Get Store Name from DB
+     *
+     * @param $id_shop
+     * @return string|null
+     */
     private static function getStoreName($id_shop)
     {
         if (empty($id_shop)) {
@@ -2620,6 +2626,12 @@ class SmartMarketingPs extends Module
         return $shopName ?: null;
     }
 
+    /**
+     * Get Client Language from DB
+     *
+     * @param $id_lang
+     * @return string|null
+     */
     private static function getLangName($id_lang)
     {
         if (empty($id_lang)) {
