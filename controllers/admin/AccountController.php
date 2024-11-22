@@ -50,6 +50,14 @@ class AccountController extends SmartMarketingBaseController
     {
         parent::initPageHeaderToolbar();
 
+        $this->page_header_toolbar_btn['goto-egoi'] = array(
+            'short' => $this->l('Go to E-goi'),
+            'icon' => 'icon-external-link',
+            'href' => 'https://login.egoiapp.com',
+            'desc' => $this->l('Go to E-goi'),
+            'js' => $this->l('$( \'#save-form\' ).click();')
+        );
+
         // Toolbar button for documentation
         $this->page_header_toolbar_btn['egoiDocumentation'] = array(
             'short' => $this->l('E-goi Documentation'),
@@ -58,14 +66,6 @@ class AccountController extends SmartMarketingBaseController
             'desc' => $this->l('E-goi Documentation'),
             'js' => $this->l('$( \'#outro-form\' ).click();')
         );
-
-    	$this->page_header_toolbar_btn['goto-egoi'] = array(
-		    'short' => $this->l('Go to E-goi'),
-		    'icon' => 'icon-external-link',
-		    'href' => 'https://login.egoiapp.com',
-		    'desc' => $this->l('Go to E-goi'),
-		    'js' => $this->l('$( \'#save-form\' ).click();')
-		);
     }
 
 	/**
