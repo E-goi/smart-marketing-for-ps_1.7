@@ -169,7 +169,7 @@ class SmartMarketingPs extends Module
         // Module metadata
         $this->name = 'smartmarketingps';
         $this->tab = 'advertising_marketing';
-        $this->version = '3.0.8';
+        $this->version = '3.0.9';
         $this->author = 'E-goi';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -385,8 +385,37 @@ class SmartMarketingPs extends Module
                 'displayTop',
                 'displayFooter',
                 'egoiDisplayTE',
+                'displayFooterProduct'
             )
         );
+    }
+
+    public function hookDisplayFooterProduct($params)
+    {
+        if (!isset($params['product'])) {
+            return '';
+        }
+
+        $product = $params['product'];
+
+        $product_id = $product->id;
+        $product_name = htmlentities($product->name);
+        $product_category = empty($product->id_category_default) ? '-' : $product->id_category_default;
+        $product_price = (float)($product->price ? $product->price : $product->base_price);
+
+        // Monta o código de tracking
+        $tracking_code = "<script type='text/javascript'>
+        var _egoiaq = _egoiaq || [];
+        _egoiaq.push(['setEcommerceView', 
+            \"$product_id\", 
+            \"$product_name\", 
+            \"$product_category\", 
+            \"$product_price\"
+        ]);
+        _egoiaq.push(['trackPageView']);
+    </script>";
+
+        return $tracking_code;
     }
 
     /**
