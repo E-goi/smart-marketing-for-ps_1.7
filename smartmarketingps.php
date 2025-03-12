@@ -390,6 +390,10 @@ class SmartMarketingPs extends Module
         );
     }
 
+    /**
+     * Track Products Page views Hook
+     *
+     */
     public function hookDisplayFooterProduct($params)
     {
         if (!isset($params['product'])) {
