@@ -1,7 +1,7 @@
 <?php
 function upgrade_module_3_1_0($module)
 {
-    PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.0");
+    PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.0");
 
     $return = true;
     $sql = array();
@@ -11,19 +11,19 @@ function upgrade_module_3_1_0($module)
     if (file_exists($installFile)) {
         include $installFile;
     } else {
-        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::ERROR: install.php not found!");
+        PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: install.php not found!");
         return false;
     }
 
     foreach ($sql as $s) {
         if (!Db::getInstance()->execute($s)) {
-            PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::ERROR: Failed to execute SQL query: " . $s);
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to execute SQL query: " . $s);
             $return = false;
         }
     }
 
     if (!$return) {
-        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::ERROR: Stopping upgrade due to previous errors.");
+        PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Stopping upgrade due to previous errors.");
         return false;
     }
 
@@ -41,7 +41,7 @@ function upgrade_module_3_1_0($module)
             'egoi_id' => (int)$state['egoi_id'],
             'name' => pSQL($state['name'])
         ])) {
-            PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::ERROR: Failed to insert egoi_order_state: " . $state['name']);
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to insert egoi_order_state: " . $state['name']);
             return false;
         }
     }
@@ -49,7 +49,7 @@ function upgrade_module_3_1_0($module)
     //Mapping Egoi States with Prestashop States
     $egoiStateMap = Db::getInstance()->executeS('SELECT egoi_id FROM `' . _DB_PREFIX_ . 'egoi_order_states`');
     if (!$egoiStateMap) {
-        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::ERROR: Failed to fetch egoi_order_states");
+        PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to fetch egoi_order_states");
         return false;
     }
 
@@ -96,17 +96,17 @@ function upgrade_module_3_1_0($module)
             'type' => pSQL($map['type']),
             'active' => 1,
         ])) {
-            PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::ERROR: Failed to insert order state mapping for Prestashop ID " . $map['prestashop_state_id']);
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to insert order state mapping for Prestashop ID " . $map['prestashop_state_id']);
             return false;
         }
     }
 
     if (!$module->updateMenu()) {
-        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::ERROR: Failed to update menu.");
+        PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to update menu.");
         return false;
     }
 
-    PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::UPGRADE TO 3.1.0 SUCCESSFUL");
+    PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::UPGRADE TO 3.1.0 SUCCESSFUL");
     return true;
 }
 ?>
