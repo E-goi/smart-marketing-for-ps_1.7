@@ -1,5 +1,5 @@
 <?php
-function upgrade_module_4_0_0($module)
+function upgrade_module_3_1_0($module)
 {
     PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.0");
 
