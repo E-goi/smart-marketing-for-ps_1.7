@@ -248,7 +248,7 @@ class EcommerceController extends SmartMarketingBaseController
 
         $total_orders = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($count_sql);
 
-        $sql = 'SELECT o.id_order, o.reference, o.total_paid, o.date_add, o.current_state, o.id_shop AS store_id, 
+        $sql = 'SELECT o.id_order, o.reference, o.total_paid_tax_incl, o.date_add, o.current_state, o.id_shop AS store_id, 
                 c.email AS customer_email, od.product_id, od.product_attribute_id, od.product_name, 
                 od.product_quantity, od.unit_price_tax_incl AS product_price, 
                 p.id_category_default, od.product_reference, od.reduction_amount
@@ -271,7 +271,7 @@ class EcommerceController extends SmartMarketingBaseController
         foreach ($results as $row) {
             $orderId = $row['id_order'];
 
-            if (empty($row['id_order']) || empty($row['customer_email']) || empty($row['total_paid'])) {
+            if (empty($row['id_order']) || empty($row['customer_email']) || empty($row['total_paid_tax_incl'])) {
                 continue;
             }
 
@@ -279,7 +279,7 @@ class EcommerceController extends SmartMarketingBaseController
                 $ordersGrouped[$orderId] = [
                     'order_id' => (string) $row['id_order'],
                     'order_status' => SmartMarketingPs::getEgoiOrderStatusName($row['current_state']),
-                    'revenue' => (float) $row['total_paid'],
+                    'revenue' => (float) $row['total_paid_tax_incl'],
                     'contact_id' => $row['customer_email'],
                     'store_url' => Context::getContext()->shop->getBaseURL(true),
                     'date' => $row['date_add'],
