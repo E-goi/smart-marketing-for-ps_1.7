@@ -37,10 +37,10 @@ function upgrade_module_3_1_0($module)
     ];
 
     foreach ($states as $state) {
-        if (!Db::getInstance()->insert('egoi_order_states', [
-            'egoi_id' => (int)$state['egoi_id'],
-            'name' => pSQL($state['name'])
-        ])) {
+        $sql = 'INSERT IGNORE INTO `'._DB_PREFIX_.'egoi_order_states` (`egoi_id`, `name`) 
+            VALUES ('.(int)$state['egoi_id'].', "'.pSQL($state['name']).'")';
+
+        if (!Db::getInstance()->execute($sql)) {
             PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to insert egoi_order_state: " . $state['name']);
             return false;
         }
