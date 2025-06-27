@@ -232,6 +232,7 @@ class EcommerceController extends SmartMarketingBaseController
 
         $res = SmartMarketingPs::getClientData();
         $list_id = $res['list_id'] ?? null;
+        $roleSync = (int)($res['role'] ?? 0);
 
         if (!$list_id) {
             echo json_encode(['error' => 'List ID not found!']);
@@ -249,7 +250,7 @@ class EcommerceController extends SmartMarketingBaseController
         $total_orders = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue($count_sql);
 
         $sql = 'SELECT o.id_order, o.reference, o.total_paid_tax_incl, o.date_add, o.current_state, o.id_shop AS store_id, 
-                c.email AS customer_email, od.product_id, od.product_attribute_id, od.product_name, 
+                c.id_customer, c.email AS customer_email, od.product_id, od.product_attribute_id, od.product_name, 
                 od.product_quantity, od.unit_price_tax_incl AS product_price, 
                 p.id_category_default, od.product_reference, od.reduction_amount
             FROM ' . _DB_PREFIX_ . 'orders o
@@ -270,9 +271,26 @@ class EcommerceController extends SmartMarketingBaseController
         $ordersGrouped = [];
         foreach ($results as $row) {
             $orderId = $row['id_order'];
+            $customerId = (int)($row['id_customer'] ?? 0);
 
-            if (empty($row['id_order']) || empty($row['customer_email']) || empty($row['total_paid_tax_incl'])) {
+            if (empty($orderId) || empty($row['customer_email']) || empty($row['total_paid_tax_incl'])) {
                 continue;
+            }
+
+            // Validação por grupo
+            if (!empty($roleSync) && $customerId > 0) {
+                $customergroups = Customer::getGroupsStatic($customerId);
+
+                $hasRoleInParams = in_array($roleSync, $customergroups);
+                $hasRoleInDB = Db::getInstance()->getValue(
+                    "SELECT COUNT(*) FROM " . _DB_PREFIX_ . "customer_group 
+                 WHERE id_customer = " . (int)$customerId . " 
+                 AND id_group = " . (int)$roleSync
+                );
+
+                if (!$hasRoleInParams && !$hasRoleInDB) {
+                    continue;
+                }
             }
 
             if (!isset($ordersGrouped[$orderId])) {

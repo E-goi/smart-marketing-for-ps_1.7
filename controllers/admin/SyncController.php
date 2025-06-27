@@ -409,6 +409,7 @@ class SyncController extends SmartMarketingBaseController
         return (new SmartMarketingPs)->getMappedFields();
     }
 
+
     /**
      * Syncronize all subscribers to list
      *
@@ -416,49 +417,47 @@ class SyncController extends SmartMarketingBaseController
      */
     protected function sincronizeList()
     {
-        // on a specific POST request
-        if(empty(Tools::getValue("token_list"))) {
+        if (empty(Tools::getValue("token_list"))) {
             return false;
         }
 
-        if(!empty(Tools::getValue("newsletter"))) {
+        if (!empty(Tools::getValue("newsletter"))) {
             return false;
         }
 
         $res = SmartMarketingPs::getClientData();
-
         $list_id = $res['list_id'];
-        $roleSync = $res['role'];
+        $roleSync = (int)($res['role'] ?? 0);
 
         $subs = Tools::getValue("subs");
         $store_id = Tools::getValue("store_id");
 
-        if(empty($store_id)) {
+        if (empty($store_id)) {
             try {
                 $store_id = (int)Context::getContext()->shop->id;
             } catch (Exception $e) {
                 $store_id = 1;
             }
         }
+
         $store_name = SmartMarketingPs::getShopsName($store_id);
-        $store_filter = 'AND '._DB_PREFIX_.'customer.id_shop="'.$store_id.'" ';
-        // get main customers
+        $store_filter = 'AND ' . _DB_PREFIX_ . 'customer.id_shop="' . $store_id . '" ';
 
-        $ts = [];
-        if(!empty($store_id) && !empty($store_name)){
-            array_push($ts, $store_name);
-        }
-
-        $add='';
-
+        $add = '';
         $buff = 1000;
         $count = intval($subs);
 
-        $sqlc = 'SELECT '._DB_PREFIX_.'customer.id_customer, email, '._DB_PREFIX_.'customer.firstname, '._DB_PREFIX_.'customer.lastname, birthday, '._DB_PREFIX_.'customer.newsletter, '._DB_PREFIX_.'customer.optin, id_shop, id_lang, phone, phone_mobile, call_prefix FROM '._DB_PREFIX_.'customer LEFT JOIN '._DB_PREFIX_.'address ON '._DB_PREFIX_.'customer.id_customer = '._DB_PREFIX_.'address.id_customer LEFT JOIN '._DB_PREFIX_.'country ON '._DB_PREFIX_.'country.id_country = '._DB_PREFIX_.'address.id_country WHERE '._DB_PREFIX_.'customer.active="1" '.$add.$store_filter.' GROUP BY '._DB_PREFIX_.'customer.id_customer LIMIT ' . ($count * $buff) . ', ' . $buff;//AND newsletter="1"
+        $sqlc = 'SELECT ' . _DB_PREFIX_ . 'customer.id_customer, email, ' . _DB_PREFIX_ . 'customer.firstname, ' . _DB_PREFIX_ . 'customer.lastname, birthday, ' . _DB_PREFIX_ . 'customer.newsletter, ' . _DB_PREFIX_ . 'customer.optin, id_shop, id_lang, phone, phone_mobile, call_prefix 
+    FROM ' . _DB_PREFIX_ . 'customer 
+    LEFT JOIN ' . _DB_PREFIX_ . 'address ON ' . _DB_PREFIX_ . 'customer.id_customer = ' . _DB_PREFIX_ . 'address.id_customer 
+    LEFT JOIN ' . _DB_PREFIX_ . 'country ON ' . _DB_PREFIX_ . 'country.id_country = ' . _DB_PREFIX_ . 'address.id_country 
+    WHERE ' . _DB_PREFIX_ . 'customer.active="1" ' . $add . $store_filter . ' 
+    GROUP BY ' . _DB_PREFIX_ . 'customer.id_customer 
+    LIMIT ' . ($count * $buff) . ', ' . $buff;
 
         $getcs = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sqlc);
 
-        if(empty($getcs)){
+        if (empty($getcs)) {
             echo json_encode(['error' => 'No users!']);
             exit;
         }
@@ -474,37 +473,82 @@ class SyncController extends SmartMarketingBaseController
 
         $allFields = $this->getMappedFields();
 
-        foreach($getcs as $row){
-            $row['roles'] = '';
-            $customergroups = Customer::getGroupsStatic((int)$row['id_customer']);
+        foreach ($getcs as $row) {
+            $customer = new Customer((int)$row['id_customer']);
 
-            if(!empty($roleSync)) {
-                if(!in_array($roleSync, $customergroups)) {
-                    continue; // sync only this group
+            if (!Validate::isLoadedObject($customer) || !$customer->active || $customer->deleted) {
+                PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::Ignorado (cliente inválido/inativo/deletado) - ID Cliente: {$row['id_customer']}", 1);
+                continue;
+            }
+
+            $customergroups = Customer::getGroupsStatic($customer->id);
+
+            if (!empty($roleSync)) {
+                $hasRoleInParams = in_array($roleSync, $customergroups);
+                $hasRoleInDB = Db::getInstance()->getValue(
+                    "SELECT COUNT(*) FROM " . _DB_PREFIX_ . "customer_group 
+                 WHERE id_customer = " . (int)$customer->id . " 
+                 AND id_group = " . (int)$roleSync
+                );
+
+                if (!$hasRoleInParams && !$hasRoleInDB) {
+                    PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::Ignorado (fora do grupo) - ID Cliente: {$customer->id}, Grupos: [" . implode(',', $customergroups) . "], Grupo necessário: $roleSync", 1);
+                    continue;
                 }
             }
 
-            if(!empty($customergroups) && !empty($groups)) {
+            $row['roles'] = '';
+            if (!empty($customergroups) && !empty($groups)) {
                 $roles = [];
                 foreach ($customergroups as $customergroup) {
-                    if(!empty($customergroup)) {
-                        foreach ($groups as $r) {
-                            if($r['id_group'] == $customergroup) {
-                                $roles[] = $r['name'];
-                            }
+                    foreach ($groups as $r) {
+                        if ($r['id_group'] == $customergroup) {
+                            $roles[] = $r['name'];
                         }
                     }
                 }
-            }
-
-            if(!empty($roles)) {
-                $row['roles'] = implode(', ', $roles);
+                if (!empty($roles)) {
+                    $row['roles'] = implode(', ', $roles);
+                }
             }
 
             $importContacts['contacts'][] = SmartMarketingPs::mapSubscriber($row, $allFields ? $allFields : []);
         }
 
-        $this->apiv3->addSubscriberBulk($list_id, $importContacts);
+        if (count($importContacts['contacts']) === 1) {
+            $originalContact = $importContacts['contacts'][0];
+
+            $flatContact = [];
+
+            if (isset($originalContact['base']) && is_array($originalContact['base'])) {
+                $flatContact = array_merge($flatContact, $originalContact['base']);
+            }
+
+            if (isset($originalContact['extra']) && is_array($originalContact['extra'])) {
+                foreach ($originalContact['extra'] as $extraField) {
+                    if (isset($extraField['field'], $extraField['value'])) {
+                        $flatContact[$extraField['field']] = $extraField['value'];
+                    }
+                }
+            }
+
+            $email = $flatContact['email'] ?? null;
+
+            if (!empty($email)) {
+                $contactId = $this->apiv3->searchContactByEmail($email, $list_id);
+
+                if (!empty($contactId)) {
+                    $this->apiv3->patchContact($list_id, $contactId, $flatContact);
+                } else {
+                    $this->apiv3->createContact($list_id, ['base' => $flatContact]);
+                }
+            } else {
+                PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::Erro - unique contact without email", 3);
+            }
+        } else {
+            $this->apiv3->addSubscriberBulk($list_id, $importContacts);
+        }
+
         Configuration::updateValue(SmartMarketingPs::ADDRESS_CRON_TIME_CONFIGURATION, time());
 
         $count++;
