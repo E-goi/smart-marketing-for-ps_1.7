@@ -2294,9 +2294,15 @@ class SmartMarketingPs extends Module
 
         if($options['sync']) {
             // check if is a role defined
-            if (!empty($roleSync) && !$this->getRole($params['id'], $roleSync)) {
-                return false;
+            if (!empty($roleSync)) {
+                $hasRoleInParams = isset($params['groupBox']) && in_array((int)$roleSync, $params['groupBox']);
+                $hasRoleInDB = $this->getRole($params['id'], $roleSync);
+
+                if (!$hasRoleInParams && !$hasRoleInDB) {
+                    return false;
+                }
             }
+
             $allFields = $this->getMappedFields();
             $customergroups = Customer::getGroupsStatic((int)$params['id']);
             $groups = Group::getGroups(Context::getContext()->language->id, true);
@@ -2991,6 +2997,8 @@ class SmartMarketingPs extends Module
 
     //Function to Sync Order By APIv3
     private function syncOrderAPI($params) {
+        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::DEBUG syncOrderAPI:\n" . print_r($params, true));
+
 
         $res = self::getClientData('track', 1);
         if (empty($res['track'])) {
@@ -3009,6 +3017,11 @@ class SmartMarketingPs extends Module
         $this->apiv3 = new ApiV3();
 
         $order = self::formatOrder($order, $products);
+
+        if ($order === false) {
+            return false;
+        }
+
         $apiv3 = new ApiV3();
 
         //Get Domain
@@ -3021,6 +3034,10 @@ class SmartMarketingPs extends Module
 
     private function formatOrder($order, $products) {
         $customer = new Customer($order->id_customer);
+
+        if (!$this->canSyncCustomer($customer->id)) {
+            return false;
+        }
 
         $formattedOrder = [
             "order_total" => (float)$order->total_paid,
@@ -3057,6 +3074,30 @@ class SmartMarketingPs extends Module
 
         return $formattedOrder;
     }
+
+    private function canSyncCustomer($customer_id) {
+        $customer = new Customer($customer_id);
+
+        $options = self::getClientData();
+        $roleSync = (int)($options['role'] ?? 0);
+
+        if (!empty($roleSync)) {
+            $customerGroups = Customer::getGroupsStatic($customer_id);
+            $hasRoleInParams = in_array($roleSync, $customerGroups);
+            $hasRoleInDB = $this->getRole($customer_id, $roleSync);
+
+            $grupoCliente = implode(',', $customerGroups);
+
+            if ($hasRoleInParams || $hasRoleInDB) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
 
     private function formatContact($customer) {
