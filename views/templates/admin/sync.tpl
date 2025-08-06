@@ -37,7 +37,7 @@
 						{l s='No lists found, are you connected to E-goi and/or have created lists?' mod='smartmarketingps'}
 					{else}
 						{if isset($list_altered) && $list_altered == false}
-							<select name="list" id="egoi_lists" style="border: 1px solid #ccc;>
+							<select name="list" id="egoi_lists" style="border: 1px solid #ccc;">
 								{foreach $lists.items as $list}
 									{if isset($list_id) && ($list_id eq $list.list_id)}
 										<option value="{$list.list_id|escape:'htmlall':'UTF-8'}" selected="selected">{$list.internal_name|escape:'htmlall':'UTF-8'}</option>
