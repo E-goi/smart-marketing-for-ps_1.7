@@ -178,7 +178,7 @@ class SmartMarketingPs extends Module
         // Module metadata
         $this->name = 'smartmarketingps';
         $this->tab = 'advertising_marketing';
-        $this->version = '3.1.2';
+        $this->version = '3.1.3';
         $this->author = 'E-goi';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -1477,67 +1477,86 @@ class SmartMarketingPs extends Module
     public static function mapProduct($product, $lang, $currency, $sync_descriptions = true, $sync_categories = true, $sync_related_products = true)
     {
         $desc = '';
-        $categories = array();
-        $relatedProducts = array();
+        $categories = [];
+        $relatedProducts = [];
 
-        if (is_array($product)) {
+        // Instancia o Product corretamente
+        if (is_array($product) && !empty($product['id_product'])) {
             $product = new Product($product['id_product'], true, $lang);
-        } else {
+        } elseif (!empty($product->id)) {
             $product = new Product($product->id, true, $lang);
+        } else {
+            return null; // produto inválido
         }
 
         $link = new Link();
 
-        if(!empty($sync_descriptions)) {
-            $desc = empty($product->description_short) ? filter_var(substr($product->description,0,800), FILTER_SANITIZE_STRING) : filter_var($product->description_short, FILTER_SANITIZE_STRING);
+        // Descrição
+        if ($sync_descriptions) {
+            $descRaw = !empty($product->description_short) ? $product->description_short : $product->description;
+            $desc = !empty($descRaw) ? filter_var(substr($descRaw, 0, 800), FILTER_SANITIZE_STRING) : '';
         }
 
+        // Preço
         $price = Product::getPriceStatic($product->id, true, null, 2, ',', false, false);
         $salePrice = Product::getPriceStatic($product->id, true, null, 2, ',', false, true);
-
         if ($price == $salePrice) {
             $salePrice = 0;
         }
 
+        // URL do produto
+        $productSlug = !empty($product->link_rewrite) ? $product->link_rewrite : Tools::link_rewrite($product->name);
         $url = $link->getProductLink($product, null, null, null, $lang, null);
-        if (strpos($url, '?') !== false) {
-            $concatChar = '&';
-        } else {
-            $concatChar = '?';
-        }
+        $concatChar = strpos($url, '?') !== false ? '&' : '?';
+        $url .= $concatChar . 'SubmitCurrency=1&id_currency=' . $currency;
 
-        $url = $link->getProductLink($product, null, null, null, $lang, null) . $concatChar . 'SubmitCurrency=1&id_currency=' . $currency;
-
+        // Imagem
         $img = $product->getCover($product->id);
-        $ssl = empty($_SERVER['HTTPS']) ? 'http://' : 'https://';
-        $imageUrl = $ssl . $link->getImageLink(isset($product->link_rewrite) ? $product->link_rewrite : $product->name, (int)$img['id_image'], 'home_default');
+        $ssl = !empty($_SERVER['HTTPS']) ? 'https://' : 'http://';
 
-        if(!empty($sync_categories)) {
-            $categories = static::buildBreadcrumbs($product->getCategories(), $lang);
+        if (is_array($img) && isset($img['id_image'])) {
+            $imageUrl = $ssl . $link->getImageLink($productSlug, (int)$img['id_image'], 'home_default');
+        } else {
+            // fallback seguro PS1.7 → PS8
+            $imageUrl = defined('_THEME_PROD_PIC_DIR_')
+                ? $ssl . _THEME_PROD_PIC_DIR_ . 'default-home_default.jpg'
+                : '';
         }
 
-        if(!empty($sync_related_products)) {
-            $acessories = Product::getAccessoriesLight($lang, $product->id);
-            foreach ($acessories as $item) {
-                $relatedProducts[] = $item['id_product'];
+        // Categorias
+        $cats = $product->getCategories();
+        if ($sync_categories && is_array($cats) && !empty($cats)) {
+            $categories = static::buildBreadcrumbs($cats, $lang);
+        }
+
+        // Produtos relacionados
+        if ($sync_related_products) {
+            $accessories = Product::getAccessoriesLight($lang, $product->id);
+            if (is_array($accessories) && !empty($accessories)) {
+                foreach ($accessories as $item) {
+                    if (!empty($item['id_product'])) {
+                        $relatedProducts[] = $item['id_product'];
+                    }
+                }
             }
         }
 
-        return array(
+        // Retorno final
+        return [
             'product_identifier' => $product->id,
-            'name' => $product->name,
+            'name' => $product->name ?? '',
             'description' => $desc,
-            'sku' => $product->reference,
-            'upc' => $product->upc,
-            'ean' => $product->ean13,
+            'sku' => $product->reference ?? '',
+            'upc' => $product->upc ?? '',
+            'ean' => $product->ean13 ?? '',
             'link' => $url,
             'image_link' => $imageUrl,
             'price' => $price,
             'sale_price' => $salePrice,
-            'brand' => $product->manufacturer_name,
+            'brand' => $product->manufacturer_name ?? '',
             'categories' => $categories,
             'related_products' => $relatedProducts
-        );
+        ];
     }
 
     private static function buildBreadcrumbs($categories, $lang)
