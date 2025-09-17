@@ -3269,7 +3269,7 @@ class SmartMarketingPs extends Module
             return false;
         }
 
-        // Monta payload e hash estável
+
         $cartPayload = self::formatCart($cart, $products, $customer);
         if ($cartPayload === false) {
             return false;
@@ -3278,10 +3278,8 @@ class SmartMarketingPs extends Module
 
         $db     = Db::getInstance();
         $idCart = (int)$cart->id;
-        $cid    = (int)$customer->id; // guardar ID do customer
+        $cid    = (int)$customer->id;
 
-        // IMPORTANTE: id_cart deve ser UNIQUE na ps_egoi_customers
-        // Este UPSERT só faz UPDATE quando o hash é diferente (ou nulo)
         $sql = 'INSERT INTO `'._DB_PREFIX_.'egoi_customers` (customer, id_cart, payload_hash, estado)
             VALUES ('.(int)$cid.', '.$idCart.', "'.$payloadHash.'", 1)
             ON DUPLICATE KEY UPDATE
@@ -3291,7 +3289,6 @@ class SmartMarketingPs extends Module
 
         $ok = $db->execute($sql);
 
-        // Linhas afetadas: 1=insert, 2=update (mudou hash), 0=no-op (hash igual)
         $affected = 0;
         if (method_exists($db, 'Affected_Rows')) {
             $affected = (int)$db->Affected_Rows();
@@ -3421,8 +3418,8 @@ class SmartMarketingPs extends Module
 
         $cartUrl = $link->getPageLink(
             'cart',
-            true,                       // SSL se disponível
-            (int)$cart->id_lang,        // idioma do carrinho
+            true,
+            (int)$cart->id_lang,
             [
                 'recover_cart' => (int)$cart->id,
                 'token_cart'   => (string)$cart->secure_key,
@@ -3462,7 +3459,6 @@ class SmartMarketingPs extends Module
             ];
         }
 
-        // Mantém a tua estrutura original (apenas corrige o total)
         $formattedCart = [
             "cart_id"    => (string)$cart->id,
             "cart_total" => (float)round($cartTotal, 2),
@@ -3485,7 +3481,6 @@ class SmartMarketingPs extends Module
             }
         }
 
-        // remove duplicados
         $names = array_unique($names);
 
         return $names;
