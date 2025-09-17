@@ -30,8 +30,10 @@ $sql[_DB_PREFIX_.'egoi_customers'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.
 			  `egoi_id` int(11) NOT NULL AUTO_INCREMENT,
 			  `customer` varchar(255) NOT NULL,
 			  `id_cart` int(11) NOT NULL,
+			  `payload_hash` char(32) NOT NULL,
 			  `estado` int(1) NOT NULL,
-			  PRIMARY KEY (`egoi_id`)
+			  PRIMARY KEY (`egoi_id`),
+			  UNIQUE KEY `uniq_cart` (`id_cart`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
 
 $sql[_DB_PREFIX_.'egoi_map_fields'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'egoi_map_fields` (
