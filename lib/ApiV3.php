@@ -275,6 +275,19 @@ class ApiV3 extends EgoiRestApi
     {
         return $this->call('POST', '/webpush/sites', $data);
     }
+
+    /**
+     * Creates a new Cart
+     *
+     * @param $data
+     *
+     * @return mixed
+     */
+    public function convertCart($domain, $cart)
+    {
+        return $this->call('POST', '/'. $domain . '/carts' , $cart);
+    }
+
     /**
      * Creates a new Order
      *
