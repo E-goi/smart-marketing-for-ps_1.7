@@ -1,7 +1,60 @@
 <?php
 function upgrade_module_3_1_2($module)
 {
+
     PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.2");
+
+    $db = Db::getInstance();
+    $return = true;
+
+    $table = _DB_PREFIX_.'egoi_customers';
+
+    if (!$db->execute('TRUNCATE TABLE `'.$table.'`')) {
+        PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to truncate egoi_customers");
+        return false;
+    }
+    PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: Truncated egoi_customers");
+
+    $hasPayloadHash = (bool)$db->getValue('
+        SELECT COUNT(*)
+          FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = "'.pSQL($table).'"
+           AND COLUMN_NAME = "payload_hash"
+    ');
+
+    if (!$hasPayloadHash) {
+        $q = 'ALTER TABLE `'.$table.'` ADD COLUMN `payload_hash` CHAR(32) NOT NULL AFTER `id_cart`';
+        if (!$db->execute($q)) {
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to add payload_hash column");
+            $return = false;
+        } else {
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: Added payload_hash column");
+        }
+    } else {
+        PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: payload_hash already exists");
+    }
+
+    $hasUniqueIdCart = (bool)$db->getValue('
+        SELECT COUNT(*)
+          FROM INFORMATION_SCHEMA.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = "'.pSQL($table).'"
+           AND INDEX_NAME = "uniq_cart"
+    ');
+
+    if (!$hasUniqueIdCart) {
+        $q = 'ALTER TABLE `'.$table.'` ADD UNIQUE KEY `uniq_cart` (`id_cart`)';
+        if (!$db->execute($q)) {
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to add UNIQUE index uniq_cart(id_cart)");
+            $return = false;
+        } else {
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: Added UNIQUE index uniq_cart(id_cart)");
+        }
+    } else {
+        PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: uniq_cart index already exists");
+    }
+
 
     $return = true;
     $sql = array();

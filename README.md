@@ -34,6 +34,10 @@ For a workaround you can add this hook call to your **header.tpl**
 
 ### Changelog
 ```
+-- V.3.1.2
+   -- Improve the cart sync process
+   -- Bump plugin version to 3.1.2
+   
 -- V.3.1.3
    -- Add some improvements to map Products
    -- Bump plugin version to 3.1.3
