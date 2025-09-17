@@ -2573,6 +2573,8 @@ class SmartMarketingPs extends Module
      * @return mixed
      */
     public function egoiScriptsTPL($params){
+        $this->recoverCartFromUrl();
+
         $webPush = null;
         $appCode = Configuration::get(static::WEB_PUSH_APP_CODE);
         include_once 'includes/webPush.php';
@@ -2586,6 +2588,50 @@ class SmartMarketingPs extends Module
         );
 
         return $this->display(__FILE__, 'ecommerce/front-scripts.tpl');
+    }
+
+    /**
+     * Recover cart from URL parameters
+     */
+    private function recoverCartFromUrl(): void
+    {
+        // só atua se existirem os params
+        $idCart = (int)Tools::getValue('recover_cart');
+        $token  = (string)Tools::getValue('token_cart');
+        if (!$idCart || $token === '') {
+            return;
+        }
+
+        // evita correr em chamadas AJAX
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
+            return;
+        }
+
+        $cart = new Cart($idCart);
+        if (!Validate::isLoadedObject($cart)) {
+            return;
+        }
+
+        // valida token igual ao secure_key do carrinho
+        if (!hash_equals((string)$cart->secure_key, $token)) {
+            return;
+        }
+
+        // coloca no contexto e grava cookie
+        $this->context->cart = $cart;
+        $this->context->cookie->id_cart = (int)$cart->id;
+
+        // opcional: alinhar idioma do carrinho
+        if ($cart->id_lang && $cart->id_lang != $this->context->language->id) {
+            $this->context->language = new Language((int)$cart->id_lang);
+            $this->context->cookie->id_lang = (int)$cart->id_lang;
+        }
+
+        $this->context->cookie->write();
+
+        // redireciona para limpar a query string e evitar repetir a lógica
+        $link = $this->context->link->getPageLink('cart', true, (int)$this->context->language->id);
+        Tools::redirect($link);
     }
 
     /**
@@ -2678,6 +2724,8 @@ class SmartMarketingPs extends Module
                 $cart = new Cart($cart_id);
 
                 $products = $cart->getProducts();
+                // Send the cart by APIV3
+                $this->syncCartAPI($cart, $products, $list_id);
 
                 $cs_code = Configuration::get(static::CONNECTED_SITES_CODE);
                 if(!empty($cs_code)){
@@ -3014,6 +3062,67 @@ class SmartMarketingPs extends Module
         return true;
     }
 
+    private function syncCartAPI($cart, $products, $list_id) {
+        $customer = new Customer($cart->id_customer);
+        if (empty($products) || empty($customer)) {
+            return false;
+        }
+
+        // Monta payload e hash estável
+        $cartPayload = self::formatCart($cart, $products, $customer);
+        if ($cartPayload === false) {
+            return false;
+        }
+        $payloadHash = md5(json_encode($cartPayload));
+
+        $db     = Db::getInstance();
+        $idCart = (int)$cart->id;
+        $cid    = (int)$customer->id; // guardar ID do customer
+
+        // IMPORTANTE: id_cart deve ser UNIQUE na ps_egoi_customers
+        // Este UPSERT só faz UPDATE quando o hash é diferente (ou nulo)
+        $sql = 'INSERT INTO `'._DB_PREFIX_.'egoi_customers` (customer, id_cart, payload_hash, estado)
+            VALUES ('.(int)$cid.', '.$idCart.', "'.$payloadHash.'", 1)
+            ON DUPLICATE KEY UPDATE
+                customer = VALUES(customer),
+                estado   = VALUES(estado),
+                payload_hash = IF(payload_hash IS NULL OR payload_hash <> VALUES(payload_hash), VALUES(payload_hash), payload_hash)';
+
+        $ok = $db->execute($sql);
+
+        // Linhas afetadas: 1=insert, 2=update (mudou hash), 0=no-op (hash igual)
+        $affected = 0;
+        if (method_exists($db, 'Affected_Rows')) {
+            $affected = (int)$db->Affected_Rows();
+        } else {
+            // fallback
+            $affected = (int)$db->getValue('SELECT ROW_COUNT()');
+        }
+
+        PrestaShopLogger::addLog("[EGOI-PS8]::".__FUNCTION__."::ok={$ok} affected={$affected} cart={$idCart} hash={$payloadHash}");
+
+        if (!$ok || $affected === 0) {
+            // Já existia e o hash é igual → não enviar
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__FUNCTION__."::SKIP same payload for cart {$idCart}");
+            return false;
+        }
+
+        // Domínio
+        $baseUrl = _PS_BASE_URL_;
+        $domain  = parse_url($baseUrl, PHP_URL_HOST) ?: '';
+
+        // Enviar para a API (apenas quando é novo ou mudou)
+        try {
+            $apiv3 = new ApiV3();
+            $apiv3->convertCart($domain, $cartPayload);
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__FUNCTION__."::SENT cart {$idCart}");
+            return true;
+        } catch (\Throwable $e) {
+            PrestaShopLogger::addLog("[EGOI-PS8]::".__FUNCTION__."::ERROR ".$e->getMessage(), 3);
+            return false;
+        }
+    }
+
     //Function to Sync Order By APIv3
     private function syncOrderAPI($params) {
         PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::DEBUG syncOrderAPI:\n" . print_r($params, true));
@@ -3077,6 +3186,7 @@ class SmartMarketingPs extends Module
             $productName = trim($product['product_name'] ?? "");
 
             $uniqueId = !empty($attributeId) ? "{$productId}_{$attributeId}" : $productId;
+            $categories = $this->getProductCategoriesPath($productId, (int)$order->id_lang);
 
             $productList[] = [
                 "product_identifier" => (string)$uniqueId,
@@ -3086,12 +3196,98 @@ class SmartMarketingPs extends Module
                 "price" => (float)$product['product_price'],
                 "sale_price" => (float)($product['reduction_amount'] ?? $product['product_price']),
                 "quantity" => (int)$product['product_quantity'],
+                "categories" => $categories,
             ];
         }
 
         $formattedOrder['products'] = $productList;
 
         return $formattedOrder;
+    }
+
+    private function formatCart($cart, $products, $customer) {
+        if (!$this->canSyncCustomer($customer->id)) {
+            return false;
+        }
+
+        if (empty($products) || empty($cart->id)) {
+            return false;
+        }
+
+        $productList = [];
+        $cartTotal = 0.0;
+        $link = Context::getContext()->link;
+
+        $cartUrl = $link->getPageLink(
+            'cart',
+            true,                       // SSL se disponível
+            (int)$cart->id_lang,        // idioma do carrinho
+            [
+                'recover_cart' => (int)$cart->id,
+                'token_cart'   => (string)$cart->secure_key,
+            ]
+        );
+
+        foreach ($products as $product) {
+            $productId   = $product['id_product'] ?? '';
+            $attributeId = $product['id_product_attribute'] ?? ($product['product_attribute_id'] ?? '');
+            $uniqueId    = !empty($attributeId) ? "{$productId}_{$attributeId}" : (string)$productId;
+
+            $productName        = trim($product['name'] ?? ($product['product_name'] ?? ''));
+            $productReference   = (string)($product['reference'] ?? ($product['product_reference'] ?? ''));
+
+            $priceOriginal = (float)($product['price_without_reduction'] ?? $product['price'] ?? $product['product_price'] ?? 0);
+            $priceSale     = (float)($product['price_with_reduction'] ?? $product['product_price'] ?? $priceOriginal);
+
+            $qty = (int)($product['cart_quantity'] ?? $product['product_quantity'] ?? $product['quantity'] ?? 0);
+
+            $lineTotal = isset($product['total'])
+                ? (float)$product['total']
+                : $priceSale * $qty;
+
+            $cartTotal += $lineTotal;
+
+            $categories = $this->getProductCategoriesPath($productId, (int)$cart->id_lang);
+
+
+            $productList[] = [
+                "product_identifier" => (string)$uniqueId,
+                "name"        => $productName,
+                "sku"         => $productReference,
+                "price"       => $priceOriginal,
+                "sale_price"  => $priceSale,
+                "quantity"    => $qty,
+                "categories"  => $categories,
+            ];
+        }
+
+        // Mantém a tua estrutura original (apenas corrige o total)
+        $formattedCart = [
+            "cart_id"    => (string)$cart->id,
+            "cart_total" => (float)round($cartTotal, 2),
+            "cart_url"   => $cartUrl, // mantido como no teu código
+            "contact"    => $this->formatContact($customer),
+            "products"   => $productList,
+        ];
+
+        return $formattedCart;
+    }
+
+    private function getProductCategoriesPath($productId, $idLang) {
+        $categories = Product::getProductCategoriesFull((int)$productId, (int)$idLang);
+
+        $names = [];
+        foreach ($categories as $cat) {
+            $categoryObj = new Category((int)$cat['id_category'], (int)$idLang);
+            if (Validate::isLoadedObject($categoryObj)) {
+                $names[] = Tools::strtolower(trim($categoryObj->name));
+            }
+        }
+
+        // remove duplicados
+        $names = array_unique($names);
+
+        return $names;
     }
 
     private function canSyncCustomer($customer_id) {
