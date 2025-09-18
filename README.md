@@ -1,4 +1,4 @@
-# Egoi Email Marketing for Prestashop 1.7.X (V.3.1.3)
+# Egoi Email Marketing for Prestashop 1.7.X (V.3.1.4)
 
 Keep your contacts sync with E-goi and increase your sales! Easily design email marketing or SMS campaigns, create the segmentation you want for your contacts or build intuitive automation processes for all channels available on E-goi.
 
@@ -34,7 +34,7 @@ For a workaround you can add this hook call to your **header.tpl**
 
 ### Changelog
 ```
--- V.3.1.2
+-- V.3.1.4
    -- Improve the cart sync process
    -- Bump plugin version to 3.1.2
    
