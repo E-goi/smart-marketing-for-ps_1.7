@@ -1,8 +1,8 @@
 <?php
-function upgrade_module_3_1_2($module)
+function upgrade_module_3_1_4($module)
 {
 
-    PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.2");
+    PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.4");
 
     $db = Db::getInstance();
     $return = true;
@@ -159,7 +159,7 @@ function upgrade_module_3_1_2($module)
         return false;
     }
 
-    PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::UPGRADE TO 3.1.2 SUCCESSFUL");
+    PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::UPGRADE TO 3.1.4 SUCCESSFUL");
     return true;
 }
 ?>
