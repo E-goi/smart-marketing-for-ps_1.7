@@ -3384,6 +3384,7 @@ class SmartMarketingPs extends Module
             $productName = trim($product['product_name'] ?? "");
 
             $uniqueId = !empty($attributeId) ? "{$productId}-{$attributeId}" : $productId;
+            $uniqueId = !empty($attributeId) ? "{$productId}_{$attributeId}" : $productId;
             $categories = $this->getProductCategoriesPath($productId, (int)$order->id_lang);
 
             $productList[] = [
