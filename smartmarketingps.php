@@ -178,7 +178,7 @@ class SmartMarketingPs extends Module
         // Module metadata
         $this->name = 'smartmarketingps';
         $this->tab = 'advertising_marketing';
-        $this->version = '3.1.4';
+        $this->version = '3.1.5';
         $this->author = 'E-goi';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -1741,7 +1741,7 @@ class SmartMarketingPs extends Module
         $comb = new Combination($ipa);
         $sku  = $comb->reference ?: $product->reference;
 
-        $uniqueId = !empty($ipa) ? "{$productId}-{$ipa}" : $productId; // unique identifier for variant (productId + attributeId)
+        $uniqueId = !empty($ipa) ? "{$productId}_{$ipa}" : $productId;
 
         return [
             'product_identifier' => $uniqueId,
@@ -3383,7 +3383,6 @@ class SmartMarketingPs extends Module
             $productReference = $product['product_reference'] ?? "";
             $productName = trim($product['product_name'] ?? "");
 
-            $uniqueId = !empty($attributeId) ? "{$productId}-{$attributeId}" : $productId;
             $uniqueId = !empty($attributeId) ? "{$productId}_{$attributeId}" : $productId;
             $categories = $this->getProductCategoriesPath($productId, (int)$order->id_lang);
 
@@ -3463,7 +3462,7 @@ class SmartMarketingPs extends Module
         $formattedCart = [
             "cart_id"    => (string)$cart->id,
             "cart_total" => (float)round($cartTotal, 2),
-            "cart_url"   => $cartUrl, // mantido como no teu código
+            "cart_url"   => $cartUrl,
             "contact"    => $this->formatContact($customer),
             "products"   => $productList,
         ];
