@@ -532,6 +532,18 @@ class ProductsController extends SmartMarketingBaseController
             case 'catalog_toggle_related_false':
                 $this->assign('success_msg', $this->displaySuccess($this->l('Sync related products disabled for the selected catalog')));
                 break;
+            case 'catalog_toggle_stock_true':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Sync stock products enabled for the selected catalog')));
+                break;
+            case 'catalog_toggle_stock_false':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Sync stock products disabled for the selected catalog')));
+                break;
+            case 'catalog_toggle_variations_true':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Sync variations products enabled for the selected catalog')));
+                break;
+            case 'catalog_toggle_variations_false':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Sync variations products disabled for the selected catalog')));
+                break;
             case 'lang_not_active':
                 $this->errors[] = $this->l('The language of the selected catalog is not active in your store');
                 break;

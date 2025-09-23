@@ -148,11 +148,11 @@ $_MODULE['<{smartmarketingps}prestashop>create-catalog_1a6028c1c0f2c8d276b12c1c2
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_f268c0c88302d6c514ebbd9cf9b78a50'] = 'Enable product descriptions synchronization';
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_93cba07454f06a4a960172bbd6e2a435'] = 'Yes';
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_bafd7322c6e97d25b6299b5d6fe8920b'] = 'No';
-$_MODULE['<{smartmarketingps}prestashop>create-catalog_ca49ec89e89559f68f41679cbabc09d1'] = 'Select \"yes\" if you want to activate synchronization of porducts descriptions for this catalog';
+$_MODULE['<{smartmarketingps}prestashop>create-catalog_ca49ec89e89559f68f41679cbabc09d1'] = 'Select \"yes\" if you want to activate synchronization of products descriptions for this catalog';
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_c4b3cfcc1cd0a6d1024f0f68880c5bf1'] = 'Enable product categories synchronization';
-$_MODULE['<{smartmarketingps}prestashop>create-catalog_829e375dcde1e66fccc810df7d9ef68f'] = 'Select \"yes\" if you want to activate synchronization of porducts categories for this catalog';
+$_MODULE['<{smartmarketingps}prestashop>create-catalog_829e375dcde1e66fccc810df7d9ef68f'] = 'Select \"yes\" if you want to activate synchronization of products categories for this catalog';
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_242de5d6ecc4893ceb2b5c8ce52ac17e'] = 'Enable related products synchronization';
-$_MODULE['<{smartmarketingps}prestashop>create-catalog_87fab27bc0ad6463ac9b348e64a6c6b1'] = 'Select \"yes\" if you want to activate synchronization of related porducts for this catalog';
+$_MODULE['<{smartmarketingps}prestashop>create-catalog_87fab27bc0ad6463ac9b348e64a6c6b1'] = 'Select \"yes\" if you want to activate synchronization of related products for this catalog';
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_061a4b797b74909c552d43507b87f513'] = 'Sync active';
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_ce1f0edee082ca28c3cce884b0dfde63'] = 'Select \"yes\" if you want auto sync in this catalog';
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_ea4788705e6873b424c65e91c2846b19'] = 'Cancel';

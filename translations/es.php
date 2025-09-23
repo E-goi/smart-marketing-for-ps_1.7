@@ -130,9 +130,15 @@ $_MODULE['<{smartmarketingps}prestashop>sync-products_ba4a685dcb7ef452cbbe95c883
 $_MODULE['<{smartmarketingps}prestashop>sync-products_c3155733862f64afbd14e0bfdd4eceb4'] = 'Activar sincronización de categorías';
 $_MODULE['<{smartmarketingps}prestashop>sync-products_75f428e805b536167320e83fa2e89eba'] = 'Desactivar sincronización de productos relacionados';
 $_MODULE['<{smartmarketingps}prestashop>sync-products_19053f98a26d0ddb86e1e80af86375e0'] = 'Activar sincronización de productos relacionados';
+$_MODULE['<{smartmarketingps}prestashop>sync-products_df2eed3ce0fb2cd51640b37e83ef2117'] = 'Sincronizar productos con stock';
+$_MODULE['<{smartmarketingps}prestashop>sync-products_87ce653cde186db9a5f21ad8e15d90dd'] = 'Sincronizar variaciones';
 $_MODULE['<{smartmarketingps}prestashop>sync-products_ea61e29a1119abd8586c94ce4b174c3e'] = 'Desactiva la sincronización automática';
 $_MODULE['<{smartmarketingps}prestashop>sync-products_bd3191105d0310ff50c446ffe52048ce'] = 'Activa la sincronización automática';
 $_MODULE['<{smartmarketingps}prestashop>sync-products_c03fafa3a653240e6104348e1293bb88'] = 'Sincronizar ahora';
+$_MODULE['<{smartmarketingps}prestashop>sync-products_da60e0f00d3008876e22d835e45068f0'] = 'Desactivar la sincronización de productos en stock';
+$_MODULE['<{smartmarketingps}prestashop>sync-products_0622e072f2fbd9b93167eba0de533303'] = 'Activar la sincronización de productos en stock';
+$_MODULE['<{smartmarketingps}prestashop>sync-products_1cf9cb7e45ad5ca215b39bedb3663d5f'] = 'Desactivar la sincronización de variaciones de productos';
+$_MODULE['<{smartmarketingps}prestashop>sync-products_1c404a3b33befaff35bf749009e85a17'] = 'Activar la sincronización de variaciones de productos';
 $_MODULE['<{smartmarketingps}prestashop>sync-products_b2d7c99e984831bd36221baf34e9c26e'] = 'Borrar catálogo';
 $_MODULE['<{smartmarketingps}prestashop>sync-products_087fb8756d4add87f2d162304ccd486b'] = 'No se encontraron registros';
 $_MODULE['<{smartmarketingps}prestashop>sync-products_4abb93c4cf8bde22f5a43bca9857c858'] = 'Agregar catálogo';
@@ -155,6 +161,10 @@ $_MODULE['<{smartmarketingps}prestashop>create-catalog_87fab27bc0ad6463ac9b348e6
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_061a4b797b74909c552d43507b87f513'] = 'Sincronización activa';
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_ce1f0edee082ca28c3cce884b0dfde63'] = 'Seleccione \"SI\" si desea activar la sincronización automática de productos para este catálogo';
 $_MODULE['<{smartmarketingps}prestashop>create-catalog_ea4788705e6873b424c65e91c2846b19'] = 'Cancelar';
+$_MODULE['<{smartmarketingps}prestashop>create-catalog_104a567c66c8d7a5ca41fb5c9b7c93dd'] = 'Activar la sincronización de productos solo en stock';
+$_MODULE['<{smartmarketingps}prestashop>create-catalog_273f94d55cb7d3464f53c490ae486555'] = 'Seleccione "sí" si desea activar la sincronización de productos solo con stock para este catálogo';
+$_MODULE['<{smartmarketingps}prestashop>create-catalog_4ff7368af4052e74ae8a570bc973e7f5'] = 'Activar la sincronización de las variaciones de productos';
+$_MODULE['<{smartmarketingps}prestashop>create-catalog_be1a9abf38d7d4354b47505e58d9a941'] = 'Seleccione "sí" si desea activar la sincronización de variaciones de productos para este catálogo';
 $_MODULE['<{smartmarketingps}prestashop>sync_528a93013b04d581c067f39e6c73ca9a'] = 'Mis contactos';
 $_MODULE['<{smartmarketingps}prestashop>sync_a2a2502ce2af7371eb0905fa590ba318'] = 'Contactos en E-goi (activos)';
 $_MODULE['<{smartmarketingps}prestashop>sync_27efa92dc9957febe76771d9eded8a2f'] = 'Clientes en mi Prestashop';
