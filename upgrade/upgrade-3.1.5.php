@@ -1,7 +1,6 @@
 <?php
 function upgrade_module_3_1_5($module)
 {
-
     PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.4");
 
     $db = Db::getInstance();
@@ -55,7 +54,6 @@ function upgrade_module_3_1_5($module)
         PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: uniq_cart index already exists");
     }
 
-
     $return = true;
     $sql = array();
 
@@ -75,10 +73,54 @@ function upgrade_module_3_1_5($module)
         }
     }
 
+    // Add sync_stock and sync_variations columns to egoi_active_catalogs
+    $catalogsTable = _DB_PREFIX_.'egoi_active_catalogs';
+
+    $hasSyncStock = (bool)$db->getValue('
+        SELECT COUNT(*)
+          FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = "'.pSQL($catalogsTable).'"
+           AND COLUMN_NAME = "sync_stock"
+    ');
+
+    if (!$hasSyncStock) {
+        $q = 'ALTER TABLE `'.$catalogsTable.'` ADD `sync_stock` int(1) NOT NULL DEFAULT \'1\'';
+        if (!$db->execute($q)) {
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to add sync_stock column");
+            $return = false;
+        } else {
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: Added sync_stock column");
+        }
+    } else {
+        PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: sync_stock already exists");
+    }
+
+    $hasSyncVariations = (bool)$db->getValue('
+        SELECT COUNT(*)
+          FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = "'.pSQL($catalogsTable).'"
+           AND COLUMN_NAME = "sync_variations"
+    ');
+
+    if (!$hasSyncVariations) {
+        $q = 'ALTER TABLE `'.$catalogsTable.'` ADD `sync_variations` int(1) NOT NULL DEFAULT \'1\'';
+        if (!$db->execute($q)) {
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Failed to add sync_variations column");
+            $return = false;
+        } else {
+            PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: Added sync_variations column");
+        }
+    } else {
+        PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::LOG: sync_variations already exists");
+    }
+
     if (!$return) {
         PrestaShopLogger::addLog("[EGOI-PS17]::" . __FUNCTION__ . "::ERROR: Stopping upgrade due to previous errors.");
         return false;
     }
+
 
     // Insert Egoi Basic Fields
     $states = [
