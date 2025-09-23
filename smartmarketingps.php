@@ -1614,7 +1614,6 @@ class SmartMarketingPs extends Module
             $imageUrl = defined('_THEME_PROD_PIC_DIR_')
                 ? $ssl . _THEME_PROD_PIC_DIR_ . 'default-home_default.jpg'
                 : '';
-        }
 
         // Categorias
         $cats = $product->getCategories();
@@ -1650,7 +1649,6 @@ class SmartMarketingPs extends Module
             'categories' => $categories,
             'related_products' => $relatedProducts
         ];
-    }
 
     public static function mapProductVariant(
         int $productId,
@@ -1698,7 +1696,7 @@ class SmartMarketingPs extends Module
             null,          // ean
             $langId,       // lang
             null,          // shop
-            $ipa,          // <<< id_product_attribute
+            $ipa,          // id_product_attribute
             false,         // force_routes
             false,         // relative_protocol
             true           // add_anchor
