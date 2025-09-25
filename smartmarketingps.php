@@ -1690,7 +1690,6 @@ class SmartMarketingPs extends Module
         $salePrice = Product::getPriceStatic($productId, true, $ipa, 2, ',', false, true);
         if ($price == $salePrice) $salePrice = 0;
 
-        // Link direto para a variação (passa o $ipa) + moeda
         $url = $link->getProductLink(
             $product,      // Product
             null,          // alias
@@ -1705,7 +1704,6 @@ class SmartMarketingPs extends Module
         );
         $url .= (strpos($url, '?') !== false ? '&' : '?') . 'SubmitCurrency=1&id_currency=' . (int)$currencyId;
 
-        // Imagem: da combinação -> fallback capa
         $ssl = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
         $imageUrl = '';
         $combImgs = $product->getCombinationImages($langId);
@@ -1741,11 +1739,25 @@ class SmartMarketingPs extends Module
         $comb = new Combination($ipa);
         $sku  = $comb->reference ?: $product->reference;
 
-        $uniqueId = !empty($ipa) ? "{$productId}_{$ipa}" : $productId;
+        $variantName = $product->name;
+        if ($ipa > 0) {
+            $attributes = $product->getAttributeCombinations($langId);
+            $combinationAttributes = [];
+            foreach ($attributes as $attribute) {
+                if ((int)$attribute['id_product_attribute'] === $ipa) {
+                    $combinationAttributes[] = $attribute['attribute_name'];
+                }
+            }
+            if (!empty($combinationAttributes)) {
+                $variantName = $product->name . ' - ' . implode(', ', $combinationAttributes);
+            }
+        }
+
+        $uniqueId = !empty($ipa) ? "{$productId}-{$ipa}" : $productId;
 
         return [
             'product_identifier' => $uniqueId,
-            'name'         => $product->name,
+            'name'         => $variantName,
             'description'  => $desc,
             'sku'          => $sku,
             'link'         => $url,
@@ -3383,7 +3395,7 @@ class SmartMarketingPs extends Module
             $productReference = $product['product_reference'] ?? "";
             $productName = trim($product['product_name'] ?? "");
 
-            $uniqueId = !empty($attributeId) ? "{$productId}_{$attributeId}" : $productId;
+            $uniqueId = !empty($attributeId) ? "{$productId}-{$attributeId}" : $productId;
             $categories = $this->getProductCategoriesPath($productId, (int)$order->id_lang);
 
             $productList[] = [
@@ -3429,7 +3441,7 @@ class SmartMarketingPs extends Module
         foreach ($products as $product) {
             $productId   = $product['id_product'] ?? '';
             $attributeId = $product['id_product_attribute'] ?? ($product['product_attribute_id'] ?? '');
-            $uniqueId    = !empty($attributeId) ? "{$productId}_{$attributeId}" : (string)$productId;
+            $uniqueId    = !empty($attributeId) ? "{$productId}-{$attributeId}" : (string)$productId;
 
             $productName        = trim($product['name'] ?? ($product['product_name'] ?? ''));
             $productReference   = (string)($product['reference'] ?? ($product['product_reference'] ?? ''));
