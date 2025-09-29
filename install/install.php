@@ -84,6 +84,11 @@ $sql[_DB_PREFIX_.'egoi_active_catalogs'] = 'CREATE TABLE IF NOT EXISTS `'._DB_PR
               `language` varchar(2) NOT NULL,
               `currency` char(3) NOT NULL,
 			  `active` int(1) NOT NULL DEFAULT \'0\',
+			  `sync_descriptions` int(1) NOT NULL DEFAULT \'1\',
+			  `sync_categories` int(1) NOT NULL DEFAULT \'1\',
+			  `sync_related_products` int(1) NOT NULL DEFAULT \'1\',
+			  `sync_stock` int(1) NOT NULL DEFAULT \'1\',
+			  `sync_variations` int(1) NOT NULL DEFAULT \'1\',
 			  PRIMARY KEY (`catalog_id`)
 			) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8;';
 

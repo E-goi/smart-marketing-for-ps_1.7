@@ -65,6 +65,13 @@
         window.location.replace("{$smarty.server.REQUEST_URI}&toggleRelated=" + id + "&value=" + value);
     }
 
+    function toggleStock(id, value) {
+        window.location.replace("{$smarty.server.REQUEST_URI}&toggleStock=" + id + "&value=" + value);
+    }
+    function toggleVariations(id, value) {
+        window.location.replace("{$smarty.server.REQUEST_URI}&toggleVariations=" + id + "&value=" + value);
+    }
+
     $(document).ready(function () {
         $('#confirm-delete').click(function () {
             window.location.replace("{$smarty.server.REQUEST_URI}&deleteCatalog=" + $('#confirm-delete').attr('value'));
@@ -166,6 +173,17 @@
                 </div>
             </th>
 
+            <th>
+                <div class="text-center">
+                    <b>{l s='Sync Stock Products' mod='smartmarketingps'}</b>
+                </div>
+            </th>
+
+            <th>
+                <div class="text-center">
+                    <b>{l s='Sync Variations Products' mod='smartmarketingps'}</b>
+                </div>
+            </th>
 
             <th>
                 <div class="text-center">
@@ -264,6 +282,49 @@
                         {/if}
                     </td>
 
+                    <td class="text-center">
+                        {if isset($catalog.sync_stock) && $catalog.sync_stock == 1}
+                            <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Disable Stock Products Sync' mod='smartmarketingps'}">
+                                <a class="btn tooltip-link js-submit-row-action dropdown-item"
+                                   onclick="toggleStock({$catalog.catalog_id}, 1)">
+                                    <i class="material-icons action-enabled egoi-enabled">
+                                        check
+                                    </i>
+                                </a>
+                            </span>
+                        {else}
+                            <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enable Stock Products Sync' mod='smartmarketingps'}">
+                                <a class="btn tooltip-link js-submit-row-action dropdown-item"
+                                   onclick="toggleStock({$catalog.catalog_id}, 0)">
+                                    <i class="material-icons action-disabled egoi-disabled">
+                                        clear
+                                    </i>
+                                </a>
+                            </span>
+                        {/if}
+                    </td>
+
+                    <td class="text-center">
+                        {if isset($catalog.sync_variations) && $catalog.sync_variations == 1}
+                            <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Disable Variations Products Sync' mod='smartmarketingps'}">
+                                <a class="btn tooltip-link js-submit-row-action dropdown-item"
+                                   onclick="toggleVariations({$catalog.catalog_id}, 1)">
+                                    <i class="material-icons action-enabled egoi-enabled">
+                                        check
+                                    </i>
+                                </a>
+                            </span>
+                        {else}
+                            <span data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enable Variations Products Sync' mod='smartmarketingps'}">
+                                <a class="btn tooltip-link js-submit-row-action dropdown-item"
+                                   onclick="toggleVariations({$catalog.catalog_id}, 0)">
+                                    <i class="material-icons action-disabled egoi-disabled">
+                                        clear
+                                    </i>
+                                </a>
+                            </span>
+                        {/if}
+                    </td>
 
                     <td class="text-center">
                         {if isset($catalog.active) && $catalog.active == 1}
@@ -305,7 +366,7 @@
             {/foreach}
         {else}
             <tr>
-                <td class="list-empty" colspan="8">
+                <td class="list-empty" colspan="12">
                     <div class="list-empty-msg">
                         <i class="icon-warning-sign list-empty-icon"></i>
                         {l s='No records found' mod='smartmarketingps'}
