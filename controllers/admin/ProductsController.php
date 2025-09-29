@@ -79,6 +79,10 @@ class ProductsController extends SmartMarketingBaseController
                 $this->toggleSync($_GET['toggleSync']);
             } elseif (!empty($_GET['toggleDescriptions']) && isset($_GET['value'])) {
                 $this->toggleDescriptions($_GET['toggleDescriptions']);
+            } elseif (!empty($_GET['toggleStock']) && isset($_GET['value'])) {
+                $this->toggleStock($_GET['toggleStock']);
+            } elseif (!empty($_GET['toggleVariations']) && isset($_GET['value'])) {
+                $this->toggleVariations($_GET['toggleVariations']);
             } elseif (!empty($_GET['toggleCategories']) && isset($_GET['value'])) {
                 $this->toggleCategories($_GET['toggleCategories']);
             } elseif (!empty($_GET['toggleRelated']) && isset($_GET['value'])) {
@@ -105,6 +109,8 @@ class ProductsController extends SmartMarketingBaseController
             $descriptionsSync = 0;
             $categoriesSync = 0;
             $relatedSync = 0;
+            $stockSync = 0;
+            $variationSync = 0;
             if ($_POST['catalogSync']) {
                 $catalogSync = 1;
             }
@@ -117,10 +123,22 @@ class ProductsController extends SmartMarketingBaseController
             if ($_POST['relatedSync']) {
                 $relatedSync = 1;
             }
+            if ($_POST['stockSync']) {
+                $stockSync = 1;
+            }
+            if ($_POST['variationsSync']) {
+                $variationSync = 1;
+            }
+
+            $baseUrl = _PS_BASE_URL_;
+            $parsedUrl = parse_url($baseUrl);
+            $domain = $parsedUrl['host'] ?? '';
             $data = array(
                 'title' => 'Prestashop_' . $_POST['egoi-catalog-name'],
                 'language' => $_POST['egoi-catalog-language'],
-                'currency' => $_POST['egoi-catalog-currency']
+                'currency' => $_POST['egoi-catalog-currency'],
+                'domain' => $domain,
+                'default' => false,
             );
 
             $result = $this->apiv3->createCatalog($data);
@@ -219,13 +237,61 @@ class ProductsController extends SmartMarketingBaseController
         if ($page != 0) {
             $page = ($page - 1) * 100;
         }
-
+        $syncVariations = !empty($selectedCatalog[0]["sync_variations"]);
         $products = Product::getProducts($langId, $page, 100, 'id_product', 'DESC', false, true);
 
         foreach ($products as $product) {
-            $data['products'][] = SmartMarketingPs::mapProduct($product, $langId, $currencyId, !empty($selectedCatalog[0]["sync_descriptions"]), !empty($selectedCatalog[0]["sync_categories"]), !empty($selectedCatalog[0]["sync_related_products"]));
-        }
+            $mapped = SmartMarketingPs::mapProduct(
+                $product,
+                $langId,
+                $currencyId,
+                !empty($selectedCatalog[0]["sync_descriptions"]),
+                !empty($selectedCatalog[0]["sync_categories"]),
+                !empty($selectedCatalog[0]["sync_related_products"]),
+                !empty($selectedCatalog[0]["sync_stock"]),
+                $syncVariations
+            );
 
+            if (!empty($mapped) && is_array($mapped)) {
+                $data['products'][] = $mapped;
+            }
+
+            if ($syncVariations) {
+                PrestaShopLogger::addLog(
+                    "[EGOI-PS17]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.1 . " . json_encode($syncVariations)
+                );
+                $prodId = is_array($product) ? (int)$product['id_product'] : (int)$product->id;
+                $ipaList = Product::getProductAttributesIds($prodId);
+
+                PrestaShopLogger::addLog(
+                    "[EGOI-PS17]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.1 . " . json_encode($prodId)
+                );
+                PrestaShopLogger::addLog(
+                    "[EGOI-PS17]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.1 . " . json_encode($ipaList)
+                );
+                if (!empty($ipaList)) {
+                    foreach ($ipaList as $ipaRow) {
+                        $ipa = (int)$ipaRow['id_product_attribute'];
+
+                        $variant = SmartMarketingPs::mapProductVariant(
+                            $prodId,
+                            $ipa,
+                            $langId,
+                            $currencyId,
+                            !empty($selectedCatalog[0]["sync_descriptions"]),
+
+                            !empty($selectedCatalog[0]["sync_categories"]),
+                            !empty($selectedCatalog[0]["sync_related_products"]),
+                            !empty($selectedCatalog[0]["sync_stock"])
+                        );
+
+                        if (!empty($variant) && is_array($variant)) {
+                            $data['products'][] = $variant;
+                        }
+                    }
+                }
+            }
+        }
         $result = $this->apiv3->importProducts($id, $data);
 
         if ($skip) return;
@@ -235,6 +301,46 @@ class ProductsController extends SmartMarketingBaseController
         }
 
         $this->redirectProducts('import_failed');
+    }
+
+    function toggleStock($id)
+    {
+        $this->checkCatalogValid($id, $_GET['value'] != 0 && $_GET['value'] != 1);
+
+        $newValue = (int)!$_GET['value'];
+        Db::getInstance()->update(
+            'egoi_active_catalogs',
+            array(
+                'sync_stock' => $newValue
+            ),
+            'catalog_id = ' . (int)$id
+        );
+
+        if ($newValue === 1) {
+            $this->redirectProducts('catalog_toggle_stock_true');
+        }
+
+        $this->redirectProducts('catalog_toggle_stock_false');
+    }
+
+    function toggleVariations($id)
+    {
+        $this->checkCatalogValid($id, $_GET['value'] != 0 && $_GET['value'] != 1);
+
+        $newValue = (int)!$_GET['value'];
+        Db::getInstance()->update(
+            'egoi_active_catalogs',
+            array(
+                'sync_variations' => $newValue
+            ),
+            'catalog_id = ' . (int)$id
+        );
+
+        if ($newValue === 1) {
+            $this->redirectProducts('catalog_toggle_variations_true');
+        }
+
+        $this->redirectProducts('catalog_toggle_variations_false');
     }
 
     private function toggleSync($id)
@@ -335,6 +441,8 @@ class ProductsController extends SmartMarketingBaseController
                     $catalogs[$i]['sync_descriptions'] = $catalogEnabled[$key]['sync_descriptions'];
                     $catalogs[$i]['sync_categories'] = $catalogEnabled[$key]['sync_categories'];
                     $catalogs[$i]['sync_related_products'] = $catalogEnabled[$key]['sync_related_products'];
+                    $catalogs[$i]['sync_stock'] = $catalogEnabled[$key]['sync_stock'];
+                    $catalogs[$i]['sync_variations'] = $catalogEnabled[$key]['sync_variations'];
                     $showCatalogs[] = $catalogs[$i];
                     if ($syncAll) {
                         $this->syncCatalog($catalogs[$i]['catalog_id'], $catalogs[$i]['language'], $catalogs[$i]['currency'], true);
@@ -402,6 +510,18 @@ class ProductsController extends SmartMarketingBaseController
                 break;
             case 'catalog_toggle_related_false':
                 $this->assign('success_msg', $this->displaySuccess($this->l('Sync related products disabled for the selected catalog')));
+                break;
+            case 'catalog_toggle_stock_true':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Sync stock products enabled for the selected catalog')));
+                break;
+            case 'catalog_toggle_stock_false':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Sync stock products disabled for the selected catalog')));
+                break;
+            case 'catalog_toggle_variations_true':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Sync variations products enabled for the selected catalog')));
+                break;
+            case 'catalog_toggle_variations_false':
+                $this->assign('success_msg', $this->displaySuccess($this->l('Sync variations products disabled for the selected catalog')));
                 break;
             case 'lang_not_active':
                 $this->errors[] = $this->l('The language of the selected catalog is not active in your store');

@@ -77,6 +77,34 @@
             </tr>
 
             <tr>
+                <th class="egoi-td" scope="row">{l s='Enable stock products synchronization' mod='smartmarketingps'}</th>
+                <td class="nowrap input-group">
+						<span class="switch prestashop-switch fixed-width-lg">
+                            <input type="radio" name="stockSync" id="stockSync0" value="1" checked>
+							<label for="catalog-sync0">{l s='Yes' mod='smartmarketingps'}</label>
+							<input type="radio" name="stockSync" id="stockSync1" value="0">
+							<label for="catalog-sync1">{l s='No' mod='smartmarketingps'}</label>
+							<a class="slide-button btn"></a>
+						</span>
+                    <p class="help">{l s='Select "yes" if you want to activate synchronization of stock porducts for this catalog' mod='smartmarketingps'}</p>
+                </td>
+            </tr>
+
+            <tr>
+                <th class="egoi-td" scope="row">{l s='Enable variations products synchronization' mod='smartmarketingps'}</th>
+                <td class="nowrap input-group">
+						<span class="switch prestashop-switch fixed-width-lg">
+                            <input type="radio" name="variationsSync" id="variationsSync0" value="1" checked>
+							<label for="catalog-sync0">{l s='Yes' mod='smartmarketingps'}</label>
+							<input type="radio" name="variationsSync" id="variationsSync1" value="0">
+							<label for="catalog-sync1">{l s='No' mod='smartmarketingps'}</label>
+							<a class="slide-button btn"></a>
+						</span>
+                    <p class="help">{l s='Select "yes" if you want to activate synchronization of variations porducts for this catalog' mod='smartmarketingps'}</p>
+                </td>
+            </tr>
+
+            <tr>
                 <th class="egoi-td" scope="row">{l s='Synchronization Active' mod='smartmarketingps'}</th>
                 <td class="nowrap input-group">
 						<span class="switch prestashop-switch fixed-width-lg">
