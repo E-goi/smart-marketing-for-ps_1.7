@@ -477,7 +477,7 @@ class SyncController extends SmartMarketingBaseController
             $customer = new Customer((int)$row['id_customer']);
 
             if (!Validate::isLoadedObject($customer) || !$customer->active || $customer->deleted) {
-                PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::Ignorado (cliente inválido/inativo/deletado) - ID Cliente: {$row['id_customer']}", 1);
+                DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::Ignorado (cliente inválido/inativo/deletado) - ID Cliente: {$row['id_customer']}", 1);
                 continue;
             }
 
@@ -492,7 +492,7 @@ class SyncController extends SmartMarketingBaseController
                 );
 
                 if (!$hasRoleInParams && !$hasRoleInDB) {
-                    PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::Ignorado (fora do grupo) - ID Cliente: {$customer->id}, Grupos: [" . implode(',', $customergroups) . "], Grupo necessário: $roleSync", 1);
+                    DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::Ignorado (fora do grupo) - ID Cliente: {$customer->id}, Grupos: [" . implode(',', $customergroups) . "], Grupo necessário: $roleSync", 1);
                     continue;
                 }
             }
@@ -543,7 +543,7 @@ class SyncController extends SmartMarketingBaseController
                     $this->apiv3->createContact($list_id, ['base' => $flatContact]);
                 }
             } else {
-                PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::Erro - unique contact without email", 3);
+                DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::Erro - unique contact without email", 3);
             }
         } else {
             $this->apiv3->addSubscriberBulk($list_id, $importContacts);
