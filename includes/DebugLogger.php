@@ -22,7 +22,7 @@ class DebugLogger
             return false;
         }
 
-        DebugLogger::log($message);
+        PrestaShopLogger::addLog($message);
         return true;
     }
 
