@@ -151,6 +151,8 @@ class ProductsController extends SmartMarketingBaseController
                         'sync_descriptions' => $descriptionsSync,
                         'sync_categories' => $categoriesSync,
                         'sync_related_products' => $relatedSync,
+                        'sync_stock' => $stockSync,
+                        'sync_variations' => $variationSync,
                         'language' => $result['language'],
                         'currency' => $result['currency']
                     )
