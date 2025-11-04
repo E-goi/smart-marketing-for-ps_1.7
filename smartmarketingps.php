@@ -353,7 +353,7 @@ class SmartMarketingPs extends Module
         }
         if (!$this->installDb()) {
             $this->_errors[] = $this->l("Error: Failed to create e-goi tables.");
-            DebugLogger::log(("[EGOI-PS1.7]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi tables");
+            DebugLogger::log("[EGOI-PS1.7]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi tables");
             return false;
         }
         if (!$this->createMenu()) {
@@ -1185,7 +1185,7 @@ class SmartMarketingPs extends Module
 
                 // Log debug mode change using PrestaShop Logger
                 $status = $debugMode ? 'enabled' : 'disabled';
-                DebugLogger::log('[EGOI-PS8]::getContent::Debug Mode ' . $status . ' by user');
+                DebugLogger::log('[EGOI-PS1.7]::getContent::Debug Mode ' . $status . ' by user');
 
                 // Return JSON response for AJAX (from toggle or button)
                 header('Content-Type: application/json');
@@ -3357,7 +3357,7 @@ class SmartMarketingPs extends Module
         try {
             $apiv3 = new ApiV3();
             $apiv3->convertCart($domain, $cartPayload);
-            DebugLogger::log("[EGOI-1.7]::".__FUNCTION__."::SENT cart {$idCart}");
+            DebugLogger::log("[EGOI-PS1.7]::".__FUNCTION__."::SENT cart {$idCart}");
             return true;
         } catch (\Throwable $e) {
             DebugLogger::log("[EGOI-PS1.7]::".__FUNCTION__."::ERROR ".$e->getMessage(), 3);
