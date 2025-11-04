@@ -36,8 +36,8 @@ class DebugLogger
         $db = Db::getInstance();
 
         try {
-            // Delete all logs that contain [EGOI-PS8]
-            $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'log` WHERE `message` LIKE "%[EGOI-PS17%" OR `message` LIKE "%[EGOI-PS1.7]%" OR `message` LIKE "%[EGOI::%";';
+            // Delete all logs that contain EGOI
+            $sql = 'DELETE FROM `' . _DB_PREFIX_ . 'log` WHERE `message` LIKE "%EGOI%";';
             $result = $db->execute($sql);
 
             return $result !== false;
