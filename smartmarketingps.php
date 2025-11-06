@@ -12,6 +12,9 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+// Load DebugLogger helper
+require_once __DIR__ . '/includes/DebugLogger.php';
+
 class SmartMarketingPs extends Module
 {
 
@@ -178,7 +181,7 @@ class SmartMarketingPs extends Module
         // Module metadata
         $this->name = 'smartmarketingps';
         $this->tab = 'advertising_marketing';
-        $this->version = '3.1.5';
+        $this->version = '3.1.6';
         $this->author = 'E-goi';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -341,36 +344,36 @@ class SmartMarketingPs extends Module
      */
     public function install()
     {
-        PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::LOG: START INSTALL");
+        DebugLogger::log("[EGOI-PS1.7]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::LOG: START INSTALL");
 
         if (!parent::install()) {
             $this->_errors[] = $this->l("Error: Failed to install from parent.");
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to install from parent::" . implode('::', $this->_errors));
+            DebugLogger::log("[EGOI-PS1.7]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to install from parent::" . implode('::', $this->_errors));
             return false;
         }
         if (!$this->installDb()) {
             $this->_errors[] = $this->l("Error: Failed to create e-goi tables.");
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi tables");
+            DebugLogger::log("[EGOI-PS1.7]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi tables");
             return false;
         }
         if (!$this->createMenu()) {
             $this->_errors[] = $this->l("Error: Failed to create e-goi menu.");
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi menu");
+            DebugLogger::log("[EGOI-PS1.7]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to create e-goi menu");
             return false;
         }
         if (!$this->registerHooksEgoi()) {
             $this->_errors[] = $this->l("Error: Failed to register webhooks.");
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to register webhooks");
+            DebugLogger::log("[EGOI-PS1.7]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: Failed to register webhooks");
             return false;
         }
         if (!$this->addEgoiStates()) {
             $this->_errors[] = $this->l("Error: Failed to add E-goi states.");
-            PrestaShopLogger::addLog("[EGOI-PS8]::" . __CLASS__ . "::" . __FUNCTION__ . "::LINE::" . __LINE__ . "::ERROR: Failed to add E-goi states");
+            DebugLogger::log("[EGOI-PS1.7]::" . __CLASS__ . "::" . __FUNCTION__ . "::LINE::" . __LINE__ . "::ERROR: Failed to add E-goi states");
             return false;
         }
         if (!$this->mapEgoiToPrestashopStates()) {
             $this->_errors[] = $this->l("Error: Failed to map E-goi states to PrestaShop states.");
-            PrestaShopLogger::addLog("[EGOI-PS8]::" . __CLASS__ . "::" . __FUNCTION__ . "::LINE::" . __LINE__ . "::ERROR: Failed to map E-goi states to PrestaShop states");
+            DebugLogger::log("[EGOI-PS1.7]::" . __CLASS__ . "::" . __FUNCTION__ . "::LINE::" . __LINE__ . "::ERROR: Failed to map E-goi states to PrestaShop states");
             return false;
         }
 
@@ -378,7 +381,7 @@ class SmartMarketingPs extends Module
         // register WebService
         $this->registerWebService();
         $this->updateApp();
-        PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::INSTALL OK");
+        DebugLogger::log("[EGOI-PS1.7]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::INSTALL OK");
         return true;
     }
 
@@ -936,11 +939,11 @@ class SmartMarketingPs extends Module
      */
     public function updateMenu()
     {
-        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::LOG: Removing old menu...");
+        DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: Removing old menu...");
 
         $this->removeMenu();
 
-        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::LOG: Adding new menu...");
+        DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: Adding new menu...");
 
         foreach ($this->menus as $menu) {
             $this->addTab(
@@ -955,7 +958,7 @@ class SmartMarketingPs extends Module
 
         $this->updateApp();
         $this->enableMenus();
-        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::LOG: Menu updated successfully.");
+        DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: Menu updated successfully.");
         return true;
     }
 
@@ -1129,7 +1132,7 @@ class SmartMarketingPs extends Module
                 return true;
             }
         } catch (Exception $e) {
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: {$e->getMessage()}");
+            DebugLogger::log("[EGOI-PS1.7]::".__CLASS__."::".__FUNCTION__."::LINE::".__LINE__."::ERROR: {$e->getMessage()}");
         }
 
         return false;
@@ -1166,6 +1169,35 @@ class SmartMarketingPs extends Module
      */
     public function getContent()
     {
+
+        // Handle Debug Mode - Both AJAX (from toggle) and form submission (from button)
+        // Works exactly like API Key validation
+        if (Tools::getValue('EGOI_DEBUG_MODE') !== false && !Tools::isSubmit('submit_api_key')) {
+            try {
+                $debugMode = (int)Tools::getValue('EGOI_DEBUG_MODE', 0);
+
+                // If disabling, clear all EGOI logs BEFORE updating configuration
+                if (!$debugMode) {
+                    DebugLogger::clearLogsEgoi();
+                }
+
+                Configuration::updateValue('EGOI_DEBUG_MODE', $debugMode);
+
+                // Log debug mode change using PrestaShop Logger
+                $status = $debugMode ? 'enabled' : 'disabled';
+                DebugLogger::log('[EGOI-PS1.7]::getContent::Debug Mode ' . $status . ' by user');
+
+                // Return JSON response for AJAX (from toggle or button)
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => 'Debug mode saved']);
+                exit;
+            } catch (Exception $e) {
+                header('Content-Type: application/json');
+                http_response_code(500);
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+                exit;
+            }
+        }
 
         if (Tools::isSubmit('submit_api_key')) {
 
@@ -1573,11 +1605,11 @@ class SmartMarketingPs extends Module
         if (!empty($sync_stock)){
             $shopId = (int)Context::getContext()->shop->id;
             $totalQty = (int)StockAvailable::getQuantityAvailableByProduct((int)$product->id, 0, $shopId);
-            PrestaShopLogger::addLog(
-                "[EGOI-PS17]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.1 . " . json_encode($shopId)
+            DebugLogger::log(
+                "[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.1 . " . json_encode($shopId)
             );
-            PrestaShopLogger::addLog(
-                "[EGOI-PS17]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.1 . " . json_encode($totalQty)
+            DebugLogger::log(
+                "[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.1 . " . json_encode($totalQty)
             );
             if ($sync_stock && $totalQty <= 0) {
                 return array();
@@ -3309,11 +3341,11 @@ class SmartMarketingPs extends Module
             $affected = (int)$db->getValue('SELECT ROW_COUNT()');
         }
 
-        PrestaShopLogger::addLog("[EGOI-PS8]::".__FUNCTION__."::ok={$ok} affected={$affected} cart={$idCart} hash={$payloadHash}");
+        DebugLogger::log("[EGOI-PS1.7]::".__FUNCTION__."::ok={$ok} affected={$affected} cart={$idCart} hash={$payloadHash}");
 
         if (!$ok || $affected === 0) {
             // Já existia e o hash é igual → não enviar
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__FUNCTION__."::SKIP same payload for cart {$idCart}");
+            DebugLogger::log("[EGOI-PS1.7]::".__FUNCTION__."::SKIP same payload for cart {$idCart}");
             return false;
         }
 
@@ -3325,17 +3357,17 @@ class SmartMarketingPs extends Module
         try {
             $apiv3 = new ApiV3();
             $apiv3->convertCart($domain, $cartPayload);
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__FUNCTION__."::SENT cart {$idCart}");
+            DebugLogger::log("[EGOI-PS1.7]::".__FUNCTION__."::SENT cart {$idCart}");
             return true;
         } catch (\Throwable $e) {
-            PrestaShopLogger::addLog("[EGOI-PS8]::".__FUNCTION__."::ERROR ".$e->getMessage(), 3);
+            DebugLogger::log("[EGOI-PS1.7]::".__FUNCTION__."::ERROR ".$e->getMessage(), 3);
             return false;
         }
     }
 
     //Function to Sync Order By APIv3
     private function syncOrderAPI($params) {
-        PrestaShopLogger::addLog("[EGOI-PS8]::" . __FUNCTION__ . "::DEBUG syncOrderAPI:\n" . print_r($params, true));
+        DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::DEBUG syncOrderAPI:\n" . print_r($params, true));
 
 
         $res = self::getClientData('track', 1);

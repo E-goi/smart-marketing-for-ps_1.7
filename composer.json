@@ -13,7 +13,8 @@
       "lib/TransactionalApi.php",
       "lib/ApiV3.php",
       "lib/GoidiniApi.php",
-      "includes/TESDK.php"
+      "includes/TESDK.php",
+      "includes/DebugLogger.php"
     ],
     "config": {
       "prepend-autoloader": false
