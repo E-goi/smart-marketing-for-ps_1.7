@@ -181,7 +181,7 @@ class SmartMarketingPs extends Module
         // Module metadata
         $this->name = 'smartmarketingps';
         $this->tab = 'advertising_marketing';
-        $this->version = '3.1.7';
+        $this->version = '3.1.8';
         $this->author = 'E-goi';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -2510,7 +2510,7 @@ class SmartMarketingPs extends Module
 
         $fields = array(
             'email' => $params['email'],
-            'newsletter' => 1
+            'newsletter' => '1'
         );
 
         $options = self::getClientData();
@@ -3082,10 +3082,14 @@ class SmartMarketingPs extends Module
             $subscriber['base']['phone'] = self::parsePhoneNumber($data['call_prefix'], $data['phone']);
         }
 
+        if (isset($data['newsletter']) && $data['newsletter'] === false) {
+            $data['newsletter'] = '0';
+        }
+
         $idShop = $data['id_shop'];
         $idLang = $data['id_lang'];
 
-        if (!empty($fields) && !empty($idShop) && !empty($idLang)) {
+        if (!empty($fields)) {
             $fieldsIndex = [];
             foreach ($fields as $field) {
                 $fieldsIndex[$field['ps']] = $field;
@@ -3093,29 +3097,33 @@ class SmartMarketingPs extends Module
 
             foreach ($fieldsIndex as $fieldName => $field) {
                 if ($fieldName === 'store_language') {
-                    $languageName = self::getLangName($idLang);
+                    if(!empty($idLang)) {
+                        $languageName = self::getLangName($idLang);
 
-                    // Verify if the field is extra or base
-                    if (strpos($field['egoi'], 'extra') !== false) {
-                        $subscriber['extra'][] = [
-                            'field_id' => (int) str_replace('extra_', '', $field['egoi']),
-                            'value' => $languageName
-                        ];
-                    } else {
-                        $subscriber['base'][$field['egoi']] = $languageName;
+                        // Verify if the field is extra or base
+                        if (strpos($field['egoi'], 'extra') !== false) {
+                            $subscriber['extra'][] = [
+                                    'field_id' => (int)str_replace('extra_', '', $field['egoi']),
+                                    'value' => $languageName
+                            ];
+                        } else {
+                            $subscriber['base'][$field['egoi']] = $languageName;
+                        }
                     }
                 }
 
                 if ($fieldName === 'store_name') {
-                    $storeName = self::getStoreName($idShop);
-                    // Verify if the field is extra or base
-                    if (strpos($field['egoi'], 'extra') !== false) {
-                        $subscriber['extra'][] = [
-                            'field_id' => (int) str_replace('extra_', '', $field['egoi']),
-                            'value' => $storeName
-                        ];
-                    } else {
-                        $subscriber['base'][$field['egoi']] = $storeName;
+                    if(!empty($idShop)) {
+                        $storeName = self::getStoreName($idShop);
+                        // Verify if the field is extra or base
+                        if (strpos($field['egoi'], 'extra') !== false) {
+                            $subscriber['extra'][] = [
+                                    'field_id' => (int)str_replace('extra_', '', $field['egoi']),
+                                    'value' => $storeName
+                            ];
+                        } else {
+                            $subscriber['base'][$field['egoi']] = $storeName;
+                        }
                     }
                 }
             }
