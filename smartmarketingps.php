@@ -2510,7 +2510,7 @@ class SmartMarketingPs extends Module
 
         $fields = array(
             'email' => $params['email'],
-            'newsletter' => 1
+            'newsletter' => '1'
         );
 
         $options = self::getClientData();
