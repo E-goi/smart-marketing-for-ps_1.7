@@ -351,6 +351,34 @@ class ApiV3 extends EgoiRestApi
     }
 
     /**
+     * Returns system automations
+     *
+     * @return mixed
+     */
+    public function getSystemAutomations()
+    {
+        return $this->call('GET', '/automations/system');
+    }
+
+    /**
+     * Updates system automation state
+     *
+     * @param bool $paused
+     * @param string $domain
+     * @param string $type
+     * @return mixed
+     */
+    public function setSystemAutomations($paused, $domain, $type)
+    {
+        $payload = array(
+            'paused' => (bool)$paused,
+            'type' => $type,
+            'domain' => $domain
+        );
+        return $this->call('POST', '/automations/system', $payload);
+    }
+
+    /**
      * Calls api v3
      *
      * @param $method

@@ -16,6 +16,85 @@ $(document).ready(function () {
     var pagesStores = [];
     var btn_sync_orders = $("#sync_old_orders");
 
+    var $pausedToggleOn = $('#egoi_paused_toggle_on');
+    var $pausedToggleOff = $('#egoi_paused_toggle_off');
+    var $pausedLoading = $('#egoi_paused_loading');
+
+    // Fetch paused status on page load
+    $.ajax({
+        type: 'POST',
+        data: {
+            action: 'getPausedStatus',
+            ajax: true
+        },
+        success: function (response) {
+            $pausedLoading.hide();
+            try {
+                var json = typeof response === 'string' ? JSON.parse(response) : response;
+                var isActive = false;
+                var showWarning = false;
+                
+                if (json && Array.isArray(json.items) && json.items.length > 0) {
+                    var abandonedCartItem = null;
+                    for (var i = 0; i < json.items.length; i++) {
+                        if (json.items[i].type === 'abandoned_cart') {
+                            abandonedCartItem = json.items[i];
+                            break;
+                        }
+                    }
+                    
+                    // If we found the item and paused is explicitly false
+                    if (abandonedCartItem && abandonedCartItem.paused === false) {
+                        if (abandonedCartItem.url && json.current_domain && abandonedCartItem.url !== json.current_domain) {
+                            showWarning = true;
+                        } else {
+                            isActive = true;
+                        }
+                    }
+                }
+                
+                if (showWarning) {
+                    $('#egoi_paused_toggle_wrapper').hide();
+                    $('#egoi_paused_help').hide();
+                    $('#egoi_paused_warning').show();
+                    $('#egoi_paused_toggle_hidden').val("1");
+                } else {
+                    $('#egoi_paused_toggle_wrapper').show();
+                    $('#egoi_paused_help').show();
+                    $('#egoi_paused_warning').hide();
+                    
+                    if (isActive) {
+                        $pausedToggleOn.prop('checked', true);
+                        $pausedToggleOff.prop('checked', false);
+                        $('#egoi_paused_toggle_hidden').val("0");
+                    } else {
+                        $pausedToggleOn.prop('checked', false);
+                        $pausedToggleOff.prop('checked', true);
+                        $('#egoi_paused_toggle_hidden').val("1");
+                    }
+                }
+
+            } catch (e) {
+                console.error('Error parsing response', e);
+                $pausedToggleOn.prop('checked', false);
+                $pausedToggleOff.prop('checked', true);
+                $('#egoi_paused_toggle_hidden').val("1");
+                $('#egoi_paused_toggle_wrapper').show();
+                $('#egoi_paused_help').show();
+            }
+        },
+        error: function () {
+            $pausedLoading.hide();
+            $('#egoi_paused_toggle_wrapper').show();
+            $('#egoi_paused_help').show();
+            console.error('Error fetching paused status');
+        }
+    });
+
+    $('input[name="egoi_paused_toggle"]').on('change', function() {
+        $('#egoi_paused_toggle_hidden').val($(this).val());
+    });
+
 
     function interactionOrders(store, page) {
         var token_list = '1';

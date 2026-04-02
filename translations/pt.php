@@ -308,3 +308,9 @@ $_MODULE['<{smartmarketingps}prestashop>config_896064c0e07ebc77b085975fb8dae297'
 $_MODULE['<{smartmarketingps}prestashop>config_93cba07454f06a4a960172bbd6e2a435'] = 'Sim';
 $_MODULE['<{smartmarketingps}prestashop>config_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Não';
 $_MODULE['<{smartmarketingps}prestashop>config_1c049ce8fc1ed4190a568ed3e8f64a33'] = 'Erro ao gravar o modo de debug!';
+
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_7b02e2dc3e9cead891aa9c8f2421cf5a'] = 'Automatizar comunicação de Carrinho Abandonado';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_2fc7b8ccfc62b41973bd5d200745c9bb'] = 'Esta configuração já se encontra ativa para outro dominio.';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_4d3d769b812b6faa6b76e1a8abaece2d'] = 'Ativado';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_b9f5c797ebbf55adccdd8539a65a0241'] = 'Desativado';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_c854171bbca90fedb982aa5ec1f238d1'] = 'Ativa o teu fluxo automatizado de carrinho abandonado no E-goi.';

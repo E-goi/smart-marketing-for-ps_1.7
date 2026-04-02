@@ -100,6 +100,7 @@ class EcommerceController extends SmartMarketingBaseController
         if ($this->isValid()) {
             if(!empty($_POST)) {
                 $this->saveOrdersSync();
+                $this->saveSystemAutomations();
             }
 
             $statesData = $this->collectOrderStatesData();
@@ -216,6 +217,23 @@ class EcommerceController extends SmartMarketingBaseController
         }
 
         Cache::clean($cacheKey);
+        return true;
+    }
+
+    /**
+     * Save system automations configuration to E-goi API
+     */
+    protected function saveSystemAutomations()
+    {
+        if (!isset($_POST['egoi_paused_toggle_hidden'])) {
+            return false;
+        }
+
+        $isPaused = (int)Tools::getValue('egoi_paused_toggle_hidden') === 1;
+        $baseUrl = Context::getContext()->shop->getBaseURL(true);
+        $domain = parse_url($baseUrl, PHP_URL_HOST) ?: '';
+
+        $this->apiv3->setSystemAutomations($isPaused, $domain, 'abandoned_cart');
         return true;
     }
 
@@ -351,6 +369,26 @@ class EcommerceController extends SmartMarketingBaseController
             'total_orders' => $total_orders,
             'has_more' => $has_more
         ]);
+        exit;
+    }
+
+    /**
+     * AJAX action to get paused status
+     */
+    public function ajaxProcessGetPausedStatus()
+    {
+        $response = $this->apiv3->getSystemAutomations();
+        
+        $baseUrl = Context::getContext()->shop->getBaseURL(true);
+        $domain = parse_url($baseUrl, PHP_URL_HOST) ?: '';
+
+        if (is_array($response)) {
+            $response['current_domain'] = $domain;
+        } else {
+            $response = array('current_domain' => $domain, 'items' => array());
+        }
+
+        echo json_encode($response);
         exit;
     }
 }
