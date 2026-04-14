@@ -104,6 +104,14 @@
                                         {l s='Completed' mod='smartmarketingps'}
                                     {elseif $egoiState.name == 'canceled'}
                                         {l s='Canceled' mod='smartmarketingps'}
+                                    {elseif $egoiState.name == 'payment_pending'}
+                                        {l s='PaymentPending' mod='smartmarketingps'}
+                                    {elseif $egoiState.name == 'payment_failed'}
+                                        {l s='PaymentFailed' mod='smartmarketingps'}
+                                    {elseif $egoiState.name == 'shipped'}
+                                        {l s='Shipped' mod='smartmarketingps'}
+                                    {elseif $egoiState.name == 'paid'}
+                                        {l s='Paid' mod='smartmarketingps'}
                                     {else}
                                         {l s='Unknown' mod='smartmarketingps'}
                                     {/if}

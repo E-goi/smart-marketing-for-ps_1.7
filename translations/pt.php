@@ -314,3 +314,7 @@ $_MODULE['<{smartmarketingps}prestashop>ecommerce_2fc7b8ccfc62b41973bd5d200745c9
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_4d3d769b812b6faa6b76e1a8abaece2d'] = 'Ativado';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_b9f5c797ebbf55adccdd8539a65a0241'] = 'Desativado';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_c854171bbca90fedb982aa5ec1f238d1'] = 'Envie automaticamente comunicações de recuperação sempre que um carrinho é abandonado.';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_a895668a0952bbf66d1922b781abcb62'] = 'Pagamento Pendente';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_251933d38f41ffeb9096c2066123843d'] = 'Pagamento Falhado';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_e0010a0a1a3259ab5c06a19bad532851'] = 'Pago';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_747cf5c8587184b9e489ff897d97c20d'] = 'Enviado';

@@ -397,7 +397,11 @@ class SmartMarketingPs extends Module
             ['egoi_id' => 2, 'name' => 'pending'],
             ['egoi_id' => 3, 'name' => 'canceled'],
             ['egoi_id' => 4, 'name' => 'completed'],
-            ['egoi_id' => 5, 'name' => 'unknown']
+            ['egoi_id' => 5, 'name' => 'unknown'],
+            ['egoi_id' => 6, 'name' => 'payment_pending'],
+            ['egoi_id' => 7, 'name' => 'payment_failed'],
+            ['egoi_id' => 8, 'name' => 'paid'],
+            ['egoi_id' => 9, 'name' => 'shipped']
         ];
 
         foreach ($states as $state) {
