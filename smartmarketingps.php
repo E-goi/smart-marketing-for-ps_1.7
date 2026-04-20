@@ -181,7 +181,7 @@ class SmartMarketingPs extends Module
         // Module metadata
         $this->name = 'smartmarketingps';
         $this->tab = 'advertising_marketing';
-        $this->version = '3.1.8';
+        $this->version = '3.1.9';
         $this->author = 'E-goi';
         $this->need_instance = 1;
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
@@ -397,7 +397,11 @@ class SmartMarketingPs extends Module
             ['egoi_id' => 2, 'name' => 'pending'],
             ['egoi_id' => 3, 'name' => 'canceled'],
             ['egoi_id' => 4, 'name' => 'completed'],
-            ['egoi_id' => 5, 'name' => 'unknown']
+            ['egoi_id' => 5, 'name' => 'unknown'],
+            ['egoi_id' => 6, 'name' => 'payment_pending'],
+            ['egoi_id' => 7, 'name' => 'payment_failed'],
+            ['egoi_id' => 8, 'name' => 'paid'],
+            ['egoi_id' => 9, 'name' => 'shipped']
         ];
 
         foreach ($states as $state) {

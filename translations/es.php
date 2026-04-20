@@ -307,3 +307,12 @@ $_MODULE['<{smartmarketingps}prestashop>config_896064c0e07ebc77b085975fb8dae297'
 $_MODULE['<{smartmarketingps}prestashop>config_93cba07454f06a4a960172bbd6e2a435'] = 'Sí';
 $_MODULE['<{smartmarketingps}prestashop>config_bafd7322c6e97d25b6299b5d6fe8920b'] = 'No';
 $_MODULE['<{smartmarketingps}prestashop>config_1c049ce8fc1ed4190a568ed3e8f64a33'] = '¡Error al guardar el modo de depuración!';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_7b02e2dc3e9cead891aa9c8f2421cf5a'] = 'Automatizar recuperación de carritos abandonados';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_2fc7b8ccfc62b41973bd5d200745c9bb'] = 'Esta configuración ya se encuentra activa para otro dominio.';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_4d3d769b812b6faa6b76e1a8abaece2d'] = 'Activado';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_b9f5c797ebbf55adccdd8539a65a0241'] = 'Desactivado';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_c854171bbca90fedb982aa5ec1f238d1'] = 'Envía automáticamente comunicaciones de recuperación siempre que un carrito es abandonado.';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_a895668a0952bbf66d1922b781abcb62'] = 'Pago Pendiente';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_251933d38f41ffeb9096c2066123843d'] = 'Pago Fallido';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_e0010a0a1a3259ab5c06a19bad532851'] = 'Pagado';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_747cf5c8587184b9e489ff897d97c20d'] = 'Enviado';

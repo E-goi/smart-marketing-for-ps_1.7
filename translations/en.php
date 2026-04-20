@@ -302,3 +302,13 @@ $_MODULE['<{smartmarketingps}prestashop>custom_information_88082c48100d134488901
 $_MODULE['<{smartmarketingps}prestashop>balance_8610be9376aa2240dbd0d765cb2ccfe0'] = 'Your account balance in E-goi';
 $_MODULE['<{smartmarketingps}prestashop>language_selection_4994a8ffeba4ac3140beb89e8d41f174'] = 'Language';
 $_MODULE['<{smartmarketingps}prestashop>language_selection_dfbcfc41aeacad10a7a893c01983e5aa'] = ' SMS\'s content language.';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_7b02e2dc3e9cead891aa9c8f2421cf5a'] = 'Automate abandoned cart recovery';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_2fc7b8ccfc62b41973bd5d200745c9bb'] = 'This configuration is already active for another domain.';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_4d3d769b812b6faa6b76e1a8abaece2d'] = 'Enabled';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_b9f5c797ebbf55adccdd8539a65a0241'] = 'Disabled';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_c854171bbca90fedb982aa5ec1f238d1'] = 'Send automated recovery communications whenever a cart is abandoned.';
+
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_a895668a0952bbf66d1922b781abcb62'] = 'Payment Pending';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_251933d38f41ffeb9096c2066123843d'] = 'Payment Failed';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_e0010a0a1a3259ab5c06a19bad532851'] = 'Paid';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_747cf5c8587184b9e489ff897d97c20d'] = 'Shipped';

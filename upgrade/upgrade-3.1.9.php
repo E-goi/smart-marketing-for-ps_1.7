@@ -1,30 +1,30 @@
 <?php
-function upgrade_module_3_1_8($module)
+function upgrade_module_3_1_9($module)
 {
 
-    DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.8");
+    DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.9");
 
     $db = Db::getInstance();
     $return = true;
 
-    $table = _DB_PREFIX_.'egoi_customers';
+    $table = _DB_PREFIX_ . 'egoi_customers';
 
-    if (!$db->execute('TRUNCATE TABLE `'.$table.'`')) {
+    if (!$db->execute('TRUNCATE TABLE `' . $table . '`')) {
         DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::ERROR: Failed to truncate egoi_customers");
         return false;
     }
     DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: Truncated egoi_customers");
 
-    $hasPayloadHash = (bool)$db->getValue('
+    $hasPayloadHash = (bool) $db->getValue('
         SELECT COUNT(*)
           FROM INFORMATION_SCHEMA.COLUMNS
          WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = "'.pSQL($table).'"
+           AND TABLE_NAME = "' . pSQL($table) . '"
            AND COLUMN_NAME = "payload_hash"
     ');
 
     if (!$hasPayloadHash) {
-        $q = 'ALTER TABLE `'.$table.'` ADD COLUMN `payload_hash` CHAR(32) NOT NULL AFTER `id_cart`';
+        $q = 'ALTER TABLE `' . $table . '` ADD COLUMN `payload_hash` CHAR(32) NOT NULL AFTER `id_cart`';
         if (!$db->execute($q)) {
             DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::ERROR: Failed to add payload_hash column");
             $return = false;
@@ -35,16 +35,16 @@ function upgrade_module_3_1_8($module)
         DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: payload_hash already exists");
     }
 
-    $hasUniqueIdCart = (bool)$db->getValue('
+    $hasUniqueIdCart = (bool) $db->getValue('
         SELECT COUNT(*)
           FROM INFORMATION_SCHEMA.STATISTICS
          WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = "'.pSQL($table).'"
+           AND TABLE_NAME = "' . pSQL($table) . '"
            AND INDEX_NAME = "uniq_cart"
     ');
 
     if (!$hasUniqueIdCart) {
-        $q = 'ALTER TABLE `'.$table.'` ADD UNIQUE KEY `uniq_cart` (`id_cart`)';
+        $q = 'ALTER TABLE `' . $table . '` ADD UNIQUE KEY `uniq_cart` (`id_cart`)';
         if (!$db->execute($q)) {
             DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::ERROR: Failed to add UNIQUE index uniq_cart(id_cart)");
             $return = false;
@@ -76,18 +76,18 @@ function upgrade_module_3_1_8($module)
     }
 
     // Add sync_stock and sync_variations columns to egoi_active_catalogs
-    $catalogsTable = _DB_PREFIX_.'egoi_active_catalogs';
+    $catalogsTable = _DB_PREFIX_ . 'egoi_active_catalogs';
 
-    $hasSyncStock = (bool)$db->getValue('
+    $hasSyncStock = (bool) $db->getValue('
         SELECT COUNT(*)
           FROM INFORMATION_SCHEMA.COLUMNS
          WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = "'.pSQL($catalogsTable).'"
+           AND TABLE_NAME = "' . pSQL($catalogsTable) . '"
            AND COLUMN_NAME = "sync_stock"
     ');
 
     if (!$hasSyncStock) {
-        $q = 'ALTER TABLE `'.$catalogsTable.'` ADD `sync_stock` int(1) NOT NULL DEFAULT \'1\'';
+        $q = 'ALTER TABLE `' . $catalogsTable . '` ADD `sync_stock` int(1) NOT NULL DEFAULT \'1\'';
         if (!$db->execute($q)) {
             DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::ERROR: Failed to add sync_stock column");
             $return = false;
@@ -98,16 +98,16 @@ function upgrade_module_3_1_8($module)
         DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: sync_stock already exists");
     }
 
-    $hasSyncVariations = (bool)$db->getValue('
+    $hasSyncVariations = (bool) $db->getValue('
         SELECT COUNT(*)
           FROM INFORMATION_SCHEMA.COLUMNS
          WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = "'.pSQL($catalogsTable).'"
+           AND TABLE_NAME = "' . pSQL($catalogsTable) . '"
            AND COLUMN_NAME = "sync_variations"
     ');
 
     if (!$hasSyncVariations) {
-        $q = 'ALTER TABLE `'.$catalogsTable.'` ADD `sync_variations` int(1) NOT NULL DEFAULT \'1\'';
+        $q = 'ALTER TABLE `' . $catalogsTable . '` ADD `sync_variations` int(1) NOT NULL DEFAULT \'1\'';
         if (!$db->execute($q)) {
             DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::ERROR: Failed to add sync_variations column");
             $return = false;
@@ -129,12 +129,16 @@ function upgrade_module_3_1_8($module)
         ['egoi_id' => 2, 'name' => 'pending'],
         ['egoi_id' => 3, 'name' => 'canceled'],
         ['egoi_id' => 4, 'name' => 'completed'],
-        ['egoi_id' => 5, 'name' => 'unknown']
+        ['egoi_id' => 5, 'name' => 'unknown'],
+        ['egoi_id' => 6, 'name' => 'payment_pending'],
+        ['egoi_id' => 7, 'name' => 'payment_failed'],
+        ['egoi_id' => 8, 'name' => 'paid'],
+        ['egoi_id' => 9, 'name' => 'shipped']
     ];
 
     foreach ($states as $state) {
-        $sql = 'INSERT IGNORE INTO `'._DB_PREFIX_.'egoi_order_states` (`egoi_id`, `name`) 
-            VALUES ('.(int)$state['egoi_id'].', "'.pSQL($state['name']).'")';
+        $sql = 'INSERT IGNORE INTO `' . _DB_PREFIX_ . 'egoi_order_states` (`egoi_id`, `name`) 
+            VALUES (' . (int) $state['egoi_id'] . ', "' . pSQL($state['name']) . '")';
 
         if (!Db::getInstance()->execute($sql)) {
             DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::ERROR: Failed to insert egoi_order_state: " . $state['name']);
@@ -167,7 +171,7 @@ function upgrade_module_3_1_8($module)
         ['prestashop_state_id' => 4, 'egoi_id' => 4, 'type' => 'order'],
     ];
 
-    $orderStates = OrderState::getOrderStates((int)Context::getContext()->language->id);
+    $orderStates = OrderState::getOrderStates((int) Context::getContext()->language->id);
 
     foreach ($orderStates as $state) {
         $map = null;
@@ -186,12 +190,14 @@ function upgrade_module_3_1_8($module)
             continue;
         }
 
-        if (!Db::getInstance()->insert('egoi_prestashop_order_state_map', [
-            'prestashop_state_id' => (int)$map['prestashop_state_id'],
-            'egoi_state_id' => (int)$map['egoi_id'],
-            'type' => pSQL($map['type']),
-            'active' => 1,
-        ])) {
+        if (
+            !Db::getInstance()->insert('egoi_prestashop_order_state_map', [
+                'prestashop_state_id' => (int) $map['prestashop_state_id'],
+                'egoi_state_id' => (int) $map['egoi_id'],
+                'type' => pSQL($map['type']),
+                'active' => 1,
+            ])
+        ) {
             DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::ERROR: Failed to insert order state mapping for Prestashop ID " . $map['prestashop_state_id']);
             return false;
         }
@@ -202,7 +208,7 @@ function upgrade_module_3_1_8($module)
         return false;
     }
 
-    DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::UPGRADE TO 3.1.8 SUCCESSFUL");
+    DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::UPGRADE TO 3.1.9 SUCCESSFUL");
 
     // Clear all EGOI logs at the end of upgrade
     DebugLogger::clearLogsEgoi();
