@@ -8,8 +8,8 @@
  *  @package controllers/admin/EcommerceController
  */
 
-include_once dirname(__FILE__).'/../SmartMarketingBaseController.php';
-include_once dirname(__FILE__).'/../../smartmarketingps.php';
+include_once dirname(__FILE__) . '/../SmartMarketingBaseController.php';
+include_once dirname(__FILE__) . '/../../smartmarketingps.php';
 
 class EcommerceController extends SmartMarketingBaseController
 {
@@ -31,7 +31,7 @@ class EcommerceController extends SmartMarketingBaseController
 
         $this->bootstrap = true;
         $this->cfg = 0;
-        $this->meta_title = $this->l('E-commerce').' - '.$this->module->displayName;
+        $this->meta_title = $this->l('E-commerce') . ' - ' . $this->module->displayName;
 
         if (!$this->module->active) {
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
@@ -51,7 +51,7 @@ class EcommerceController extends SmartMarketingBaseController
     public function setMedia($isNewTheme = false)
     {
         parent::setMedia($isNewTheme);
-        $this->addJS($this->_path. '/views/js/ecommerce.js');
+        $this->addJS($this->_path . '/views/js/ecommerce.js');
     }
 
     /**
@@ -80,8 +80,9 @@ class EcommerceController extends SmartMarketingBaseController
         );
     }
 
-    public function countOrdersByShop(){
-        if(empty(Tools::getValue("size"))) {
+    public function countOrdersByShop()
+    {
+        if (empty(Tools::getValue("size"))) {
             return false;
         }
 
@@ -98,7 +99,7 @@ class EcommerceController extends SmartMarketingBaseController
     {
         parent::initContent();
         if ($this->isValid()) {
-            if(!empty($_POST)) {
+            if (!empty($_POST)) {
                 $this->saveOrdersSync();
                 $this->saveSystemAutomations();
             }
@@ -116,7 +117,7 @@ class EcommerceController extends SmartMarketingBaseController
     {
         // Get all Prestashop States
 
-        $orderStates = OrderState::getOrderStates((int)$this->context->language->id);
+        $orderStates = OrderState::getOrderStates((int) $this->context->language->id);
 
 
         // Get Egoi Order States
@@ -150,7 +151,7 @@ class EcommerceController extends SmartMarketingBaseController
      */
     private function getEgoiStateIdForState($prestashopStateId)
     {
-        $result = Db::getInstance()->executeS('SELECT egoi_state_id FROM `' . _DB_PREFIX_ . 'egoi_prestashop_order_state_map` WHERE prestashop_state_id = ' . (int)$prestashopStateId);
+        $result = Db::getInstance()->executeS('SELECT egoi_state_id FROM `' . _DB_PREFIX_ . 'egoi_prestashop_order_state_map` WHERE prestashop_state_id = ' . (int) $prestashopStateId);
 
         return isset($result[0]['egoi_state_id']) ? $result[0]['egoi_state_id'] : null;
     }
@@ -185,8 +186,8 @@ class EcommerceController extends SmartMarketingBaseController
         }
 
         foreach ($stateMappings as $prestashopStateId => $egoiStateId) {
-            $prestashopStateId = (int)$prestashopStateId;
-            $egoiStateId = (int)$egoiStateId;
+            $prestashopStateId = (int) $prestashopStateId;
+            $egoiStateId = (int) $egoiStateId;
 
             if ($prestashopStateId <= 0 || $egoiStateId <= 0) {
                 continue; // Ignorar entradas inválidas
@@ -211,7 +212,7 @@ class EcommerceController extends SmartMarketingBaseController
                 Db::getInstance()->update(
                     'egoi_prestashop_order_state_map',
                     $values,
-                    "prestashop_state_id = " . (int)$prestashopStateId
+                    "prestashop_state_id = " . (int) $prestashopStateId
                 );
             }
         }
@@ -225,15 +226,19 @@ class EcommerceController extends SmartMarketingBaseController
      */
     protected function saveSystemAutomations()
     {
-        if (!isset($_POST['egoi_paused_toggle_hidden'])) {
-            return false;
-        }
-
-        $isPaused = (int)Tools::getValue('egoi_paused_toggle_hidden') === 1;
         $baseUrl = Context::getContext()->shop->getBaseURL(true);
         $domain = parse_url($baseUrl, PHP_URL_HOST) ?: '';
 
-        $this->apiv3->setSystemAutomations($isPaused, $domain, 'abandoned_cart');
+        if (isset($_POST['egoi_paused_toggle_hidden'])) {
+            $isPausedCart = (int) Tools::getValue('egoi_paused_toggle_hidden') === 1;
+            $this->apiv3->setSystemAutomations($isPausedCart, $domain, 'abandoned_cart');
+        }
+
+        if (isset($_POST['egoi_welcome_toggle_hidden'])) {
+            $isPausedWelcome = (int) Tools::getValue('egoi_welcome_toggle_hidden') === 1;
+            $this->apiv3->setSystemAutomations($isPausedWelcome, $domain, 'welcome');
+        }
+
         return true;
     }
 
@@ -250,7 +255,7 @@ class EcommerceController extends SmartMarketingBaseController
 
         $res = SmartMarketingPs::getClientData();
         $list_id = $res['list_id'] ?? null;
-        $roleSync = (int)($res['role'] ?? 0);
+        $roleSync = (int) ($res['role'] ?? 0);
 
         if (!$list_id) {
             echo json_encode(['error' => 'List ID not found!']);
@@ -289,7 +294,7 @@ class EcommerceController extends SmartMarketingBaseController
         $ordersGrouped = [];
         foreach ($results as $row) {
             $orderId = $row['id_order'];
-            $customerId = (int)($row['id_customer'] ?? 0);
+            $customerId = (int) ($row['id_customer'] ?? 0);
 
             if (empty($orderId) || empty($row['customer_email']) || empty($row['total_paid_tax_incl'])) {
                 continue;
@@ -302,8 +307,8 @@ class EcommerceController extends SmartMarketingBaseController
                 $hasRoleInParams = in_array($roleSync, $customergroups);
                 $hasRoleInDB = Db::getInstance()->getValue(
                     "SELECT COUNT(*) FROM " . _DB_PREFIX_ . "customer_group 
-                 WHERE id_customer = " . (int)$customerId . " 
-                 AND id_group = " . (int)$roleSync
+                 WHERE id_customer = " . (int) $customerId . " 
+                 AND id_group = " . (int) $roleSync
                 );
 
                 if (!$hasRoleInParams && !$hasRoleInDB) {
@@ -378,7 +383,7 @@ class EcommerceController extends SmartMarketingBaseController
     public function ajaxProcessGetPausedStatus()
     {
         $response = $this->apiv3->getSystemAutomations();
-        
+
         $baseUrl = Context::getContext()->shop->getBaseURL(true);
         $domain = parse_url($baseUrl, PHP_URL_HOST) ?: '';
 

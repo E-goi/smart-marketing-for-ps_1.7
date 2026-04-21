@@ -6,7 +6,7 @@
  *  @license   LICENSE.txt
  */
 
-jQuery.fn.show = function() {
+jQuery.fn.show = function () {
     return this.prop('style', 'display:inline-block');
 };
 
@@ -20,6 +20,10 @@ $(document).ready(function () {
     var $pausedToggleOff = $('#egoi_paused_toggle_off');
     var $pausedLoading = $('#egoi_paused_loading');
 
+    var $welcomeToggleOn = $('#egoi_welcome_toggle_on');
+    var $welcomeToggleOff = $('#egoi_welcome_toggle_off');
+    var $welcomeLoading = $('#egoi_welcome_loading');
+
     // Fetch paused status on page load
     $.ajax({
         type: 'POST',
@@ -29,20 +33,27 @@ $(document).ready(function () {
         },
         success: function (response) {
             $pausedLoading.hide();
+            $welcomeLoading.hide();
             try {
                 var json = typeof response === 'string' ? JSON.parse(response) : response;
                 var isActive = false;
                 var showWarning = false;
                 
+                var isWelcomeActive = false;
+                var showWelcomeWarning = false;
+
                 if (json && Array.isArray(json.items) && json.items.length > 0) {
                     var abandonedCartItem = null;
+                    var welcomeItem = null;
                     for (var i = 0; i < json.items.length; i++) {
                         if (json.items[i].type === 'abandoned_cart') {
                             abandonedCartItem = json.items[i];
-                            break;
+                        }
+                        if (json.items[i].type === 'welcome') {
+                            welcomeItem = json.items[i];
                         }
                     }
-                    
+
                     // If we found the item and paused is explicitly false
                     if (abandonedCartItem && abandonedCartItem.paused === false) {
                         if (abandonedCartItem.url && json.current_domain && abandonedCartItem.url !== json.current_domain) {
@@ -51,8 +62,16 @@ $(document).ready(function () {
                             isActive = true;
                         }
                     }
+                    
+                    if (welcomeItem && welcomeItem.paused === false) {
+                        if (welcomeItem.url && json.current_domain && welcomeItem.url !== json.current_domain) {
+                            showWelcomeWarning = true;
+                        } else {
+                            isWelcomeActive = true;
+                        }
+                    }
                 }
-                
+
                 if (showWarning) {
                     $('#egoi_paused_toggle_wrapper').hide();
                     $('#egoi_paused_help').hide();
@@ -62,7 +81,7 @@ $(document).ready(function () {
                     $('#egoi_paused_toggle_wrapper').show();
                     $('#egoi_paused_help').show();
                     $('#egoi_paused_warning').hide();
-                    
+
                     if (isActive) {
                         $pausedToggleOn.prop('checked', true);
                         $pausedToggleOff.prop('checked', false);
@@ -73,6 +92,27 @@ $(document).ready(function () {
                         $('#egoi_paused_toggle_hidden').val("1");
                     }
                 }
+                
+                if (showWelcomeWarning) {
+                    $('#egoi_welcome_toggle_wrapper').hide();
+                    $('#egoi_welcome_help').hide();
+                    $('#egoi_welcome_warning').show();
+                    $('#egoi_welcome_toggle_hidden').val("1");
+                } else {
+                    $('#egoi_welcome_toggle_wrapper').show();
+                    $('#egoi_welcome_help').show();
+                    $('#egoi_welcome_warning').hide();
+
+                    if (isWelcomeActive) {
+                        $welcomeToggleOn.prop('checked', true);
+                        $welcomeToggleOff.prop('checked', false);
+                        $('#egoi_welcome_toggle_hidden').val("0");
+                    } else {
+                        $welcomeToggleOn.prop('checked', false);
+                        $welcomeToggleOff.prop('checked', true);
+                        $('#egoi_welcome_toggle_hidden').val("1");
+                    }
+                }
 
             } catch (e) {
                 console.error('Error parsing response', e);
@@ -81,18 +121,32 @@ $(document).ready(function () {
                 $('#egoi_paused_toggle_hidden').val("1");
                 $('#egoi_paused_toggle_wrapper').show();
                 $('#egoi_paused_help').show();
+                
+                $welcomeToggleOn.prop('checked', false);
+                $welcomeToggleOff.prop('checked', true);
+                $('#egoi_welcome_toggle_hidden').val("1");
+                $('#egoi_welcome_toggle_wrapper').show();
+                $('#egoi_welcome_help').show();
             }
         },
         error: function () {
             $pausedLoading.hide();
             $('#egoi_paused_toggle_wrapper').show();
             $('#egoi_paused_help').show();
+            
+            $welcomeLoading.hide();
+            $('#egoi_welcome_toggle_wrapper').show();
+            $('#egoi_welcome_help').show();
             console.error('Error fetching paused status');
         }
     });
 
-    $('input[name="egoi_paused_toggle"]').on('change', function() {
+    $('input[name="egoi_paused_toggle"]').on('change', function () {
         $('#egoi_paused_toggle_hidden').val($(this).val());
+    });
+    
+    $('input[name="egoi_welcome_toggle"]').on('change', function () {
+        $('#egoi_welcome_toggle_hidden').val($(this).val());
     });
 
 
@@ -176,7 +230,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            data:({
+            data: ({
                 size: 1,
             }),
             success: function (data, status) {

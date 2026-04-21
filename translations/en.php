@@ -312,3 +312,7 @@ $_MODULE['<{smartmarketingps}prestashop>ecommerce_a895668a0952bbf66d1922b781abcb
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_251933d38f41ffeb9096c2066123843d'] = 'Payment Failed';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_e0010a0a1a3259ab5c06a19bad532851'] = 'Paid';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_747cf5c8587184b9e489ff897d97c20d'] = 'Shipped';
+
+
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_83218ac34c1834c26781fe4bde918ee4'] = 'Automate welcome communications';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_b3fb62f3639fec5350657328cb73e44e'] = 'Send automated welcome communications whenever a new registration is made.';
