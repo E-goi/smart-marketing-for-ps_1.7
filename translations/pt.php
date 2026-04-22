@@ -318,3 +318,6 @@ $_MODULE['<{smartmarketingps}prestashop>ecommerce_a895668a0952bbf66d1922b781abcb
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_251933d38f41ffeb9096c2066123843d'] = 'Pagamento Falhado';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_e0010a0a1a3259ab5c06a19bad532851'] = 'Pago';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_747cf5c8587184b9e489ff897d97c20d'] = 'Enviado';
+
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_83218ac34c1834c26781fe4bde918ee4'] = 'Automatizar comunicações de boas vindas';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_b3fb62f3639fec5350657328cb73e44e'] = 'Envie automaticamente comunicações de boas vindas sempre que existe um novo registo.';

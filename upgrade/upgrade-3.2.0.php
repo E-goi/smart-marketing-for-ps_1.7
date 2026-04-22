@@ -1,8 +1,8 @@
 <?php
-function upgrade_module_3_1_9($module)
+function upgrade_module_3_2_0($module)
 {
 
-    DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.1.9");
+    DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::LOG: START UPGRADE TO 3.2.0");
 
     $db = Db::getInstance();
     $return = true;
@@ -208,7 +208,7 @@ function upgrade_module_3_1_9($module)
         return false;
     }
 
-    DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::UPGRADE TO 3.1.9 SUCCESSFUL");
+    DebugLogger::log("[EGOI-PS1.7]::" . __FUNCTION__ . "::UPGRADE TO 3.2.0 SUCCESSFUL");
 
     // Clear all EGOI logs at the end of upgrade
     DebugLogger::clearLogsEgoi();

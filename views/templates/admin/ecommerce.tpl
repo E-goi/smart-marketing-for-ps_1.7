@@ -34,6 +34,44 @@
                 </td>
             </tr>
             <tr valign="top">
+                <th class="egoi-td" scope="row" style="padding-bottom: 25px;">{l s='Welcome' mod='smartmarketingps'}</th>
+                <td>
+                    <div id="egoi_welcome_warning" style="display: none; color: #ca5c54; font-weight: bold; background: #ffe4e4; padding: 8px 12px; border-radius: 4px; margin-top: 0; width: fit-content;">
+                        {l s='This configuration is already active for another domain' mod='smartmarketingps'}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="switch prestashop-switch fixed-width-lg" id="egoi_welcome_toggle_wrapper" style="display: none;">
+                            <input type="radio" name="egoi_welcome_toggle" id="egoi_welcome_toggle_on" value="0">
+                            <label for="egoi_welcome_toggle_on">{l s='Active' mod='smartmarketingps'}</label>
+                            <input type="radio" name="egoi_welcome_toggle" id="egoi_welcome_toggle_off" value="1" checked="checked">
+                            <label for="egoi_welcome_toggle_off">{l s='Disabled' mod='smartmarketingps'}</label>
+                            <a class="slide-button btn"></a>
+                        </span>
+                        <i class="icon-spinner icon-spin" id="egoi_welcome_loading"></i>
+                    </div>
+                    <p class="help" id="egoi_welcome_help" style="display: none; margin-top: 10px;">{l s='Enable to track new registrations and trigger your automated journey in E-goi.' mod='smartmarketingps'}</p>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th class="egoi-td" scope="row" style="padding-bottom: 25px;">{l s='Order Confirmation' mod='smartmarketingps'}</th>
+                <td>
+                    <div id="egoi_order_status_updated_warning" style="display: none; color: #ca5c54; font-weight: bold; background: #ffe4e4; padding: 8px 12px; border-radius: 4px; margin-top: 0; width: fit-content;">
+                        {l s='This configuration is already active for another domain' mod='smartmarketingps'}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="switch prestashop-switch fixed-width-lg" id="egoi_order_status_updated_toggle_wrapper" style="display: none;">
+                            <input type="radio" name="egoi_order_status_updated_toggle" id="egoi_order_status_updated_toggle_on" value="0">
+                            <label for="egoi_order_status_updated_toggle_on">{l s='Active' mod='smartmarketingps'}</label>
+                            <input type="radio" name="egoi_order_status_updated_toggle" id="egoi_order_status_updated_toggle_off" value="1" checked="checked">
+                            <label for="egoi_order_status_updated_toggle_off">{l s='Disabled' mod='smartmarketingps'}</label>
+                            <a class="slide-button btn"></a>
+                        </span>
+                        <i class="icon-spinner icon-spin" id="egoi_order_status_updated_loading"></i>
+                    </div>
+                    <p class="help" id="egoi_order_status_updated_help" style="display: none; margin-top: 10px;">{l s='Enable to track order confirmation and trigger your automated journey in E-goi.' mod='smartmarketingps'}</p>
+                </td>
+            </tr>
+            <tr valign="top">
                 <th class="egoi-td" scope="row">{l s='Sync existing orders' mod='smartmarketingps'}</th>
                 <td>
                     <div style="display: flex; align-items: center; gap: 10px;">
@@ -124,6 +162,8 @@
             <tr style="display:none;">
                 <td colspan="2" style="text-align: right;">
                     <input type="hidden" name="egoi_paused_toggle_hidden" id="egoi_paused_toggle_hidden" value="1">
+                    <input type="hidden" name="egoi_welcome_toggle_hidden" id="egoi_welcome_toggle_hidden" value="1">
+                    <input type="hidden" name="egoi_order_status_updated_toggle_hidden" id="egoi_order_status_updated_toggle_hidden" value="1">
                     <input type='submit' name='action_add' id='action_add' value="1" style="display: none;">
                 </td>
             </tr>
