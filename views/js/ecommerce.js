@@ -24,6 +24,10 @@ $(document).ready(function () {
     var $welcomeToggleOff = $('#egoi_welcome_toggle_off');
     var $welcomeLoading = $('#egoi_welcome_loading');
 
+    var $orderStatusToggleOn = $('#egoi_order_status_updated_toggle_on');
+    var $orderStatusToggleOff = $('#egoi_order_status_updated_toggle_off');
+    var $orderStatusLoading = $('#egoi_order_status_updated_loading');
+
     // Fetch paused status on page load
     $.ajax({
         type: 'POST',
@@ -34,6 +38,7 @@ $(document).ready(function () {
         success: function (response) {
             $pausedLoading.hide();
             $welcomeLoading.hide();
+            $orderStatusLoading.hide();
             try {
                 var json = typeof response === 'string' ? JSON.parse(response) : response;
                 var isActive = false;
@@ -42,15 +47,22 @@ $(document).ready(function () {
                 var isWelcomeActive = false;
                 var showWelcomeWarning = false;
 
+                var isOrderStatusActive = false;
+                var showOrderStatusWarning = false;
+
                 if (json && Array.isArray(json.items) && json.items.length > 0) {
                     var abandonedCartItem = null;
                     var welcomeItem = null;
+                    var orderStatusItem = null;
                     for (var i = 0; i < json.items.length; i++) {
                         if (json.items[i].type === 'abandoned_cart') {
                             abandonedCartItem = json.items[i];
                         }
                         if (json.items[i].type === 'welcome') {
                             welcomeItem = json.items[i];
+                        }
+                        if (json.items[i].type === 'order_status_updated') {
+                            orderStatusItem = json.items[i];
                         }
                     }
 
@@ -68,6 +80,14 @@ $(document).ready(function () {
                             showWelcomeWarning = true;
                         } else {
                             isWelcomeActive = true;
+                        }
+                    }
+
+                    if (orderStatusItem && orderStatusItem.paused === false) {
+                        if (orderStatusItem.url && json.current_domain && orderStatusItem.url !== json.current_domain) {
+                            showOrderStatusWarning = true;
+                        } else {
+                            isOrderStatusActive = true;
                         }
                     }
                 }
@@ -114,6 +134,27 @@ $(document).ready(function () {
                     }
                 }
 
+                if (showOrderStatusWarning) {
+                    $('#egoi_order_status_updated_toggle_wrapper').hide();
+                    $('#egoi_order_status_updated_help').hide();
+                    $('#egoi_order_status_updated_warning').show();
+                    $('#egoi_order_status_updated_toggle_hidden').val("1");
+                } else {
+                    $('#egoi_order_status_updated_toggle_wrapper').show();
+                    $('#egoi_order_status_updated_help').show();
+                    $('#egoi_order_status_updated_warning').hide();
+
+                    if (isOrderStatusActive) {
+                        $orderStatusToggleOn.prop('checked', true);
+                        $orderStatusToggleOff.prop('checked', false);
+                        $('#egoi_order_status_updated_toggle_hidden').val("0");
+                    } else {
+                        $orderStatusToggleOn.prop('checked', false);
+                        $orderStatusToggleOff.prop('checked', true);
+                        $('#egoi_order_status_updated_toggle_hidden').val("1");
+                    }
+                }
+
             } catch (e) {
                 console.error('Error parsing response', e);
                 $pausedToggleOn.prop('checked', false);
@@ -127,6 +168,12 @@ $(document).ready(function () {
                 $('#egoi_welcome_toggle_hidden').val("1");
                 $('#egoi_welcome_toggle_wrapper').show();
                 $('#egoi_welcome_help').show();
+
+                $orderStatusToggleOn.prop('checked', false);
+                $orderStatusToggleOff.prop('checked', true);
+                $('#egoi_order_status_updated_toggle_hidden').val("1");
+                $('#egoi_order_status_updated_toggle_wrapper').show();
+                $('#egoi_order_status_updated_help').show();
             }
         },
         error: function () {
@@ -137,6 +184,10 @@ $(document).ready(function () {
             $welcomeLoading.hide();
             $('#egoi_welcome_toggle_wrapper').show();
             $('#egoi_welcome_help').show();
+
+            $orderStatusLoading.hide();
+            $('#egoi_order_status_updated_toggle_wrapper').show();
+            $('#egoi_order_status_updated_help').show();
             console.error('Error fetching paused status');
         }
     });
@@ -147,6 +198,10 @@ $(document).ready(function () {
     
     $('input[name="egoi_welcome_toggle"]').on('change', function () {
         $('#egoi_welcome_toggle_hidden').val($(this).val());
+    });
+
+    $('input[name="egoi_order_status_updated_toggle"]').on('change', function () {
+        $('#egoi_order_status_updated_toggle_hidden').val($(this).val());
     });
 
 

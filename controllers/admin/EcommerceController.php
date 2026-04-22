@@ -239,6 +239,11 @@ class EcommerceController extends SmartMarketingBaseController
             $this->apiv3->setSystemAutomations($isPausedWelcome, $domain, 'welcome');
         }
 
+        if (isset($_POST['egoi_order_status_updated_toggle_hidden'])) {
+            $isPausedOrderStatus = (int) Tools::getValue('egoi_order_status_updated_toggle_hidden') === 1;
+            $this->apiv3->setSystemAutomations($isPausedOrderStatus, $domain, 'order_status_updated');
+        }
+
         return true;
     }
 
