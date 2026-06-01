@@ -312,3 +312,6 @@ $_MODULE['<{smartmarketingps}prestashop>ecommerce_a895668a0952bbf66d1922b781abcb
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_251933d38f41ffeb9096c2066123843d'] = 'Payment Failed';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_e0010a0a1a3259ab5c06a19bad532851'] = 'Paid';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_747cf5c8587184b9e489ff897d97c20d'] = 'Shipped';
+
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_bb54c60d579b4f655ea4d0135743bcbb'] = 'Automate back in stock communications';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_3538be017c56bf13080b5a043082f262'] = 'Enable to track back in stock and trigger your automated journey in E-goi.';

@@ -20,6 +20,10 @@ $(document).ready(function () {
     var $pausedToggleOff = $('#egoi_paused_toggle_off');
     var $pausedLoading = $('#egoi_paused_loading');
 
+    var $backInStockToggleOn = $('#egoi_back_in_stock_toggle_on');
+    var $backInStockToggleOff = $('#egoi_back_in_stock_toggle_off');
+    var $backInStockLoading = $('#egoi_back_in_stock_loading');
+
     // Fetch paused status on page load
     $.ajax({
         type: 'POST',
@@ -29,17 +33,26 @@ $(document).ready(function () {
         },
         success: function (response) {
             $pausedLoading.hide();
+            $backInStockLoading.hide();
             try {
                 var json = typeof response === 'string' ? JSON.parse(response) : response;
                 var isActive = false;
                 var showWarning = false;
                 
+                // Back in stock
+                var isBackInStockActive = false;
+                var showBackInStockWarning = false;
+
                 if (json && Array.isArray(json.items) && json.items.length > 0) {
                     var abandonedCartItem = null;
+                    var backInStockItem = null;
+
                     for (var i = 0; i < json.items.length; i++) {
                         if (json.items[i].type === 'abandoned_cart') {
                             abandonedCartItem = json.items[i];
-                            break;
+                        }
+                        if (json.items[i].type === 'back_in_stock') {
+                            backInStockItem = json.items[i];
                         }
                     }
                     
@@ -49,6 +62,14 @@ $(document).ready(function () {
                             showWarning = true;
                         } else {
                             isActive = true;
+                        }
+                    }
+
+                    if (backInStockItem && backInStockItem.paused === false) {
+                        if (backInStockItem.url && json.current_domain && backInStockItem.url !== json.current_domain) {
+                            showBackInStockWarning = true;
+                        } else {
+                            isBackInStockActive = true;
                         }
                     }
                 }
@@ -74,6 +95,27 @@ $(document).ready(function () {
                     }
                 }
 
+                if (showBackInStockWarning) {
+                    $('#egoi_back_in_stock_toggle_wrapper').hide();
+                    $('#egoi_back_in_stock_help').hide();
+                    $('#egoi_back_in_stock_warning').show();
+                    $('#egoi_back_in_stock_toggle_hidden').val("1");
+                } else {
+                    $('#egoi_back_in_stock_toggle_wrapper').show();
+                    $('#egoi_back_in_stock_help').show();
+                    $('#egoi_back_in_stock_warning').hide();
+
+                    if (isBackInStockActive) {
+                        $backInStockToggleOn.prop('checked', true);
+                        $backInStockToggleOff.prop('checked', false);
+                        $('#egoi_back_in_stock_toggle_hidden').val("0");
+                    } else {
+                        $backInStockToggleOn.prop('checked', false);
+                        $backInStockToggleOff.prop('checked', true);
+                        $('#egoi_back_in_stock_toggle_hidden').val("1");
+                    }
+                }
+
             } catch (e) {
                 console.error('Error parsing response', e);
                 $pausedToggleOn.prop('checked', false);
@@ -81,18 +123,33 @@ $(document).ready(function () {
                 $('#egoi_paused_toggle_hidden').val("1");
                 $('#egoi_paused_toggle_wrapper').show();
                 $('#egoi_paused_help').show();
+
+                $backInStockToggleOn.prop('checked', false);
+                $backInStockToggleOff.prop('checked', true);
+                $('#egoi_back_in_stock_toggle_hidden').val("1");
+                $('#egoi_back_in_stock_toggle_wrapper').show();
+                $('#egoi_back_in_stock_help').show();
             }
         },
         error: function () {
             $pausedLoading.hide();
             $('#egoi_paused_toggle_wrapper').show();
             $('#egoi_paused_help').show();
+
+            $backInStockLoading.hide();
+            $('#egoi_back_in_stock_toggle_wrapper').show();
+            $('#egoi_back_in_stock_help').show();
+
             console.error('Error fetching paused status');
         }
     });
 
     $('input[name="egoi_paused_toggle"]').on('change', function() {
         $('#egoi_paused_toggle_hidden').val($(this).val());
+    });
+
+    $('input[name="egoi_back_in_stock_toggle"]').on('change', function () {
+        $('#egoi_back_in_stock_toggle_hidden').val($(this).val());
     });
 
 
