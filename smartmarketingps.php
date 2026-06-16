@@ -3395,12 +3395,6 @@ class SmartMarketingPs extends Module
         $order = new Order($params['id_order']);
         $products = $order->getProducts();
 
-        if (!empty($res['track_state'])) {
-            if ($res['track_state'] != $params['newOrderStatus']->id) {
-                return false;
-            }
-        }
-
         $this->apiv3 = new ApiV3();
 
         $order = self::formatOrder($order, $products);
