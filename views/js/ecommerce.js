@@ -205,6 +205,10 @@ $(document).ready(function () {
         $('#egoi_back_in_stock_toggle_hidden').val($(this).val());
     });
 
+    $('input[name="egoi_price_drop_toggle"]').on('change', function () {
+        $('#egoi_price_drop_toggle_hidden').val($(this).val());
+    });
+
 
     function interactionOrders(store, page) {
         var token_list = '1';
