@@ -6,7 +6,7 @@
  *  @license   LICENSE.txt
  */
 
-jQuery.fn.show = function() {
+jQuery.fn.show = function () {
     return this.prop('style', 'display:inline-block');
 };
 
@@ -24,6 +24,10 @@ $(document).ready(function () {
     var $backInStockToggleOff = $('#egoi_back_in_stock_toggle_off');
     var $backInStockLoading = $('#egoi_back_in_stock_loading');
 
+    var $priceDropToggleOn = $('#egoi_price_drop_toggle_on');
+    var $priceDropToggleOff = $('#egoi_price_drop_toggle_off');
+    var $priceDropLoading = $('#egoi_price_drop_loading');
+
     // Fetch paused status on page load
     $.ajax({
         type: 'POST',
@@ -34,18 +38,25 @@ $(document).ready(function () {
         success: function (response) {
             $pausedLoading.hide();
             $backInStockLoading.hide();
+            $priceDropLoading.hide();
+
             try {
                 var json = typeof response === 'string' ? JSON.parse(response) : response;
                 var isActive = false;
                 var showWarning = false;
-                
+
                 // Back in stock
                 var isBackInStockActive = false;
                 var showBackInStockWarning = false;
 
+                // Price drop
+                var isPriceDropActive = false;
+                var showPriceDropWarning = false;
+
                 if (json && Array.isArray(json.items) && json.items.length > 0) {
                     var abandonedCartItem = null;
                     var backInStockItem = null;
+                    var priceDropItem = null;
 
                     for (var i = 0; i < json.items.length; i++) {
                         if (json.items[i].type === 'abandoned_cart') {
@@ -54,8 +65,11 @@ $(document).ready(function () {
                         if (json.items[i].type === 'back_in_stock') {
                             backInStockItem = json.items[i];
                         }
+                        if (json.items[i].type === 'price_drop') {
+                            priceDropItem = json.items[i];
+                        }
                     }
-                    
+
                     // If we found the item and paused is explicitly false
                     if (abandonedCartItem && abandonedCartItem.paused === false) {
                         if (abandonedCartItem.url && json.current_domain && abandonedCartItem.url !== json.current_domain) {
@@ -72,8 +86,16 @@ $(document).ready(function () {
                             isBackInStockActive = true;
                         }
                     }
+
+                    if (priceDropItem && priceDropItem.paused === false) {
+                        if (priceDropItem.url && json.current_domain && priceDropItem.url !== json.current_domain) {
+                            showPriceDropWarning = true;
+                        } else {
+                            isPriceDropActive = true;
+                        }
+                    }
                 }
-                
+
                 if (showWarning) {
                     $('#egoi_paused_toggle_wrapper').hide();
                     $('#egoi_paused_help').hide();
@@ -83,7 +105,7 @@ $(document).ready(function () {
                     $('#egoi_paused_toggle_wrapper').show();
                     $('#egoi_paused_help').show();
                     $('#egoi_paused_warning').hide();
-                    
+
                     if (isActive) {
                         $pausedToggleOn.prop('checked', true);
                         $pausedToggleOff.prop('checked', false);
@@ -116,6 +138,27 @@ $(document).ready(function () {
                     }
                 }
 
+                if (showPriceDropWarning) {
+                    $('#egoi_price_drop_toggle_wrapper').hide();
+                    $('#egoi_price_drop_help').hide();
+                    $('#egoi_price_drop_warning').show();
+                    $('#egoi_price_drop_toggle_hidden').val("1");
+                } else {
+                    $('#egoi_price_drop_toggle_wrapper').show();
+                    $('#egoi_price_drop_help').show();
+                    $('#egoi_price_drop_warning').hide();
+
+                    if (isPriceDropActive) {
+                        $priceDropToggleOn.prop('checked', true);
+                        $priceDropToggleOff.prop('checked', false);
+                        $('#egoi_price_drop_toggle_hidden').val("0");
+                    } else {
+                        $priceDropToggleOn.prop('checked', false);
+                        $priceDropToggleOff.prop('checked', true);
+                        $('#egoi_price_drop_toggle_hidden').val("1");
+                    }
+                }
+
             } catch (e) {
                 console.error('Error parsing response', e);
                 $pausedToggleOn.prop('checked', false);
@@ -129,6 +172,12 @@ $(document).ready(function () {
                 $('#egoi_back_in_stock_toggle_hidden').val("1");
                 $('#egoi_back_in_stock_toggle_wrapper').show();
                 $('#egoi_back_in_stock_help').show();
+
+                $priceDropToggleOn.prop('checked', false);
+                $priceDropToggleOff.prop('checked', true);
+                $('#egoi_price_drop_toggle_hidden').val("1");
+                $('#egoi_price_drop_toggle_wrapper').show();
+                $('#egoi_price_drop_help').show();
             }
         },
         error: function () {
@@ -140,11 +189,15 @@ $(document).ready(function () {
             $('#egoi_back_in_stock_toggle_wrapper').show();
             $('#egoi_back_in_stock_help').show();
 
+            $priceDropLoading.hide();
+            $('#egoi_price_drop_toggle_wrapper').show();
+            $('#egoi_price_drop_help').show();
+
             console.error('Error fetching paused status');
         }
     });
 
-    $('input[name="egoi_paused_toggle"]').on('change', function() {
+    $('input[name="egoi_paused_toggle"]').on('change', function () {
         $('#egoi_paused_toggle_hidden').val($(this).val());
     });
 
@@ -233,7 +286,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: 'POST',
-            data:({
+            data: ({
                 size: 1,
             }),
             success: function (data, status) {

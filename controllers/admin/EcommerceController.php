@@ -238,6 +238,11 @@ class EcommerceController extends SmartMarketingBaseController
             $this->apiv3->setSystemAutomations($isPausedBackInStock, $domain, 'back_in_stock');
         }
 
+        if (isset($_POST['egoi_price_drop_toggle_hidden'])) {
+            $isPausedPriceDrop = (int) Tools::getValue('egoi_price_drop_toggle_hidden') === 1;
+            $this->apiv3->setSystemAutomations($isPausedPriceDrop, $domain, 'price_drop');
+        }
+
         return true;
     }
 
