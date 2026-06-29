@@ -315,3 +315,7 @@ $_MODULE['<{smartmarketingps}prestashop>ecommerce_747cf5c8587184b9e489ff897d97c2
 
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_bb54c60d579b4f655ea4d0135743bcbb'] = 'Automate back in stock communications';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_3538be017c56bf13080b5a043082f262'] = 'Enable to track back in stock and trigger your automated journey in E-goi.';
+
+
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_c8f312df214e2295809027c6ca79d232'] = 'Automate price drop communications';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_de0c631c0f8f116c30843a83e9d04047'] = 'Send automated communications for products that dropped in price.';

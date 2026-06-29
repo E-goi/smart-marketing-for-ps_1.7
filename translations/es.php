@@ -319,3 +319,7 @@ $_MODULE['<{smartmarketingps}prestashop>ecommerce_747cf5c8587184b9e489ff897d97c2
 
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_bb54c60d579b4f655ea4d0135743bcbb'] = 'Automatizar productos de nuevo en stock';
 $_MODULE['<{smartmarketingps}prestashop>ecommerce_3538be017c56bf13080b5a043082f262'] = 'Habilita el seguimiento de productos de nuevo en stock y el disparo de tu jornada automatizada en E-goi';
+
+
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_c8f312df214e2295809027c6ca79d232'] = 'Automatizar comunicación de productos con baja de precio';
+$_MODULE['<{smartmarketingps}prestashop>ecommerce_de0c631c0f8f116c30843a83e9d04047'] = 'Envía automáticamente comunicaciones de productos que bajaron de precio.';
